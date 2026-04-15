@@ -1,7 +1,7 @@
 {
-  "name": "班表查閱工具",
-  "short_name": "班表查閱",
-  "description": "查詢員工排班，規劃最佳拜訪時間",
+  "name": "得利蔦屋-營運支援工具",
+  "short_name": "得利蔦屋",
+  "description": "得利蔦屋營運支援工具",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -38,9 +38,9 @@
   ],
   "shortcuts": [
     {
-      "name": "查詢班表",
+      "name": "班表查詢",
       "short_name": "查詢",
-      "description": "快速查詢員工班表",
+      "description": "查詢員工班表",
       "url": "./index.html",
       "icons": [
         {
