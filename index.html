@@ -14,86 +14,124 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif; 
-            color: #1f2937; 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            color: #1f2937;
             background: #f9fafb;
             display: flex;
             flex-direction: column;
             padding-top: max(env(safe-area-inset-top), 0px);
         }
-        .app-container { flex: 1; display: flex; flex-direction: column; }
-        .status-bar { 
+        .app-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+        /* Status bar */
+        .status-bar {
             background: linear-gradient(to right, #2563eb, #1d4ed8);
             color: white;
             padding: max(12px, env(safe-area-inset-top)) 1rem;
-            text-align: center;
-            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
-        .content { flex: 1; overflow-y: auto; padding: 1rem; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
-        .header { margin-bottom: 1.5rem; text-align: center; }
-        .app-title { font-size: 26px; font-weight: 700; margin-bottom: 0.25rem; }
-        .app-subtitle { font-size: 13px; color: #6b7280; }
-        .upload-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .upload-input { display: none; }
-        .upload-btn { 
-            display: inline-block; 
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            border: none;
-            border-radius: 8px; 
-            padding: 0.8rem 2rem; 
-            cursor: pointer; 
-            font-size: 15px; 
+        .status-bar-title { font-size: 17px; font-weight: 700; }
+        .cloud-status { display: flex; align-items: center; gap: 0.4rem; font-size: 12px; opacity: 0.9; }
+        .cloud-dot { width: 7px; height: 7px; border-radius: 50%; background: #fbbf24; transition: background 0.4s; flex-shrink: 0; }
+        .cloud-dot.connected { background: #4ade80; }
+        .cloud-dot.error { background: #f87171; }
+
+        /* Content */
+        .content { flex: 1; overflow-y: auto; padding: 1rem; padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+
+        /* Month badges */
+        .months-bar {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+            margin-bottom: 1rem;
+            scrollbar-width: none;
+        }
+        .months-bar::-webkit-scrollbar { display: none; }
+        .month-badge {
+            flex-shrink: 0;
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            border: 1.5px solid #e5e7eb;
+            background: white;
+            font-size: 13px;
             font-weight: 600;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
         }
-        .upload-btn:active { transform: scale(0.96); }
-        .upload-status { font-size: 12px; color: #9ca3af; margin-top: 0.75rem; }
-        .query-panel { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .month-badge:active { transform: scale(0.95); }
+        .month-badge.active { background: #2563eb; color: white; border-color: #2563eb; }
+
+        /* Query panel */
+        .query-panel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
         .query-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-        @media (min-width: 640px) {
-            .query-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        @media (min-width: 640px) { .query-grid { grid-template-columns: repeat(2, 1fr); } }
         .control-group { display: flex; flex-direction: column; gap: 0.4rem; }
         .control-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .control-input { 
-            width: 100%; 
-            padding: 0.65rem 0.75rem; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 8px; 
-            font-size: 14px; 
+        .control-input {
+            width: 100%;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
             background: white;
             -webkit-appearance: none;
             appearance: none;
         }
-        .control-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
-        select.control-input { padding-right: 2rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding-right: 2.5rem; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
-        @media (min-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+        .control-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+        select.control-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+            padding-right: 2.5rem;
         }
-        .stat-card { 
-            background: white; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 12px; 
-            padding: 1rem; 
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+        @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
             text-align: center;
             border-top: 3px solid #2563eb;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .stat-label { font-size: 10px; color: #9ca3af; margin-bottom: 0.5rem; font-weight: 600; text-transform: uppercase; }
         .stat-value { font-size: 24px; font-weight: 700; color: #1f2937; }
-        .results-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* Results */
+        .results-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
         .dept-section { border-bottom: 1px solid #e5e7eb; }
         .dept-section:last-child { border-bottom: none; }
-        .dept-header { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0.875rem 1rem; 
+        .dept-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1rem;
             background: #f3f4f6;
             border-bottom: 1px solid #e5e7eb;
         }
@@ -101,68 +139,105 @@
         .dept-badge { display: flex; gap: 0.5rem; font-size: 12px; }
         .badge { background: white; padding: 0.3rem 0.65rem; border-radius: 6px; border: 1px solid #e5e7eb; }
         .employee-list { display: flex; flex-direction: column; }
-        .employee-row { 
-            display: flex; 
-            flex-direction: column; 
-            padding: 0.875rem 1rem; 
+        .employee-row {
+            display: flex;
+            flex-direction: column;
+            padding: 0.875rem 1rem;
             border-bottom: 1px solid #f3f4f6;
         }
         .employee-row:last-child { border-bottom: none; }
         .row-working { border-left: 3px solid #2563eb; background: #f0f9ff; }
         .row-rest { border-left: 3px solid #f59e0b; }
         .row-holiday { border-left: 3px solid #ef4444; }
-        .emp-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start; 
-            margin-bottom: 0.4rem;
-        }
+        .emp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; }
         .emp-info { flex: 1; }
         .emp-name { font-weight: 600; font-size: 14px; color: #1f2937; }
         .emp-id { font-size: 12px; color: #9ca3af; margin-top: 0.2rem; }
         .time-display { font-family: 'Menlo', 'Monaco', monospace; font-size: 13px; font-weight: 500; color: #374151; }
-        .status-badge { 
-            display: inline-block; 
-            padding: 0.25rem 0.6rem; 
-            border-radius: 6px; 
-            font-size: 11px; 
-            font-weight: 600;
-            white-space: nowrap;
-        }
+        .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 11px; font-weight: 600; white-space: nowrap; }
         .badge-working { background: #dcfce7; color: #166534; }
         .badge-rest { background: #fef3c7; color: #92400e; }
         .badge-holiday { background: #fee2e2; color: #991b1b; }
-        .empty-state { 
-            padding: 2rem 1rem; 
-            text-align: center; 
-            color: #9ca3af;
-        }
+
+        /* Empty / info states */
+        .empty-state { padding: 2.5rem 1rem; text-align: center; color: #9ca3af; }
         .empty-icon { font-size: 48px; margin-bottom: 0.75rem; }
-        .export-section { 
-            padding: 1rem; 
-            border-top: 1px solid #e5e7eb; 
+        .empty-title { font-size: 15px; font-weight: 600; color: #6b7280; margin-bottom: 0.35rem; }
+        .empty-desc { font-size: 13px; }
+
+        /* Day loading inline */
+        .day-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+            gap: 0.75rem;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        .day-spinner {
+            width: 20px; height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            flex-shrink: 0;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            right: 1rem;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            max-width: 260px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            animation: slideIn 0.25s ease;
+            pointer-events: all;
+        }
+        .toast-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .toast-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .toast-info    { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* App loading overlay */
+        .app-loading {
+            position: fixed;
+            inset: 0;
             background: #f9fafb;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            z-index: 300;
         }
-        .export-btn { 
-            display: inline-block; 
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 8px; 
-            padding: 0.65rem 1.5rem; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 600;
-            color: #374151;
-            transition: all 0.2s;
+        .app-loading-spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
-        .export-btn:active { transform: scale(0.96); }
-        .hidden { display: none; }
+        .app-loading-text { font-size: 14px; color: #9ca3af; }
+        .app-loading.hidden { display: none; }
+
+        /* Install prompt */
         .install-prompt {
             position: fixed;
             bottom: max(1rem, env(safe-area-inset-bottom));
-            left: 1rem;
-            right: 1rem;
+            left: 1rem; right: 1rem;
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
@@ -170,67 +245,90 @@
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
             z-index: 50;
         }
-        .install-prompt.hidden { display: none; }
         .install-text { font-size: 13px; color: #6b7280; margin-bottom: 0.75rem; }
         .install-buttons { display: flex; gap: 0.75rem; }
-        .install-btn { 
-            flex: 1;
-            padding: 0.6rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .install-btn { flex: 1; padding: 0.6rem; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .install-btn-primary { background: #2563eb; color: white; }
-        .install-btn-primary:active { transform: scale(0.96); }
         .install-btn-secondary { background: #e5e7eb; color: #374151; }
-        .install-btn-secondary:active { transform: scale(0.96); }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- App loading overlay -->
+    <div id="appLoading" class="app-loading">
+        <div class="app-loading-spinner"></div>
+        <div class="app-loading-text">連線中...</div>
+    </div>
+
     <div class="app-container">
-        <div class="status-bar">班表查閱</div>
-        
+        <div class="status-bar">
+            <span class="status-bar-title">班表查閱</span>
+            <div class="cloud-status">
+                <div class="cloud-dot" id="cloudDot"></div>
+                <span id="cloudStatusText">連線中</span>
+            </div>
+        </div>
+
         <div class="content">
-            <div class="header">
-                <div class="app-title">班表查閱</div>
-                <div class="app-subtitle">查詢員工排班，規劃拜訪時間</div>
+            <!-- Not configured -->
+            <div id="stateNotConfigured" class="empty-state hidden">
+                <div class="empty-icon">⚙️</div>
+                <div class="empty-title">尚未設定雲端連線</div>
+                <div class="empty-desc">請聯繫管理員設定 firebase-config.js</div>
             </div>
 
-            <div class="upload-card">
-                <input type="file" id="fileInput" class="upload-input" accept=".xlsx,.xls" />
-                <button class="upload-btn" onclick="document.getElementById('fileInput').click();">上傳班表</button>
-                <div class="upload-status">支援 Excel 格式</div>
+            <!-- No data yet -->
+            <div id="stateNoData" class="empty-state hidden">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">尚無班表資料</div>
+                <div class="empty-desc">請管理員至後台上傳當月班表</div>
             </div>
 
-            <div id="querySection" class="hidden">
+            <!-- Error state -->
+            <div id="stateError" class="empty-state hidden">
+                <div class="empty-icon">⚠️</div>
+                <div class="empty-title">連線失敗</div>
+                <div class="empty-desc" id="errorDesc">請檢查網路連線後重新整理</div>
+            </div>
+
+            <!-- Main UI -->
+            <div id="stateMain" class="hidden">
+                <!-- Available months bar -->
+                <div class="months-bar" id="monthsBar"></div>
+
+                <!-- Query panel -->
                 <div class="query-panel">
                     <div class="query-grid">
                         <div class="control-group">
                             <label class="control-label">日期</label>
-                            <input type="date" id="queryDate" class="control-input" onchange="performQuery()" />
+                            <input type="date" id="queryDate" class="control-input" onchange="onDateChange()" />
                         </div>
                         <div class="control-group">
                             <label class="control-label">部門</label>
-                            <select id="queryDept" class="control-input" onchange="performQuery()">
+                            <select id="queryDept" class="control-input" onchange="filterAndDisplay()">
                                 <option value="">全部</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
+                <!-- Stats -->
                 <div class="stats-grid" id="statsContainer"></div>
 
+                <!-- Results -->
                 <div class="results-card">
-                    <div id="resultsContainer"></div>
-                    <div id="emptyState" class="empty-state">
-                        <div class="empty-icon">📅</div>
-                        <div style="font-size: 14px;">選擇日期查詢</div>
+                    <div id="dayLoading" class="day-loading hidden">
+                        <div class="day-spinner"></div>
+                        <span>載入中</span>
                     </div>
-                    <div id="exportSection" class="export-section hidden">
-                        <button class="export-btn" onclick="exportResults();">下載 CSV</button>
+                    <div id="resultsContainer"></div>
+                    <div id="emptyState" class="empty-state hidden">
+                        <div class="empty-icon">📅</div>
+                        <div class="empty-title">此日期無班表資料</div>
+                        <div class="empty-desc">請選擇其他日期，或聯繫管理員確認</div>
                     </div>
                 </div>
             </div>
@@ -245,279 +343,350 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
-        let allScheduleData = [];
-        let deptList = [];
-        let dateList = [];
-        let filteredResults = [];
-        let deferredPrompt;
+    // ========== STATE ==========
+    let db = null;
+    let availableMonths = []; // [{ id: '2024-04', departments, dateRange, ... }]
+    let currentDayData = []; // records for selected date
+    let deferredPrompt;
 
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
-        }
+    // ========== UTILS ==========
+    function esc(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installPrompt').classList.remove('hidden');
+    function showToast(msg, type, ms) {
+        if (type === undefined) type = 'info';
+        if (ms === undefined) ms = 3000;
+        var c = document.getElementById('toastContainer');
+        var t = document.createElement('div');
+        t.className = 'toast toast-' + type;
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(function() {
+            t.style.cssText = 'opacity:0;transition:opacity 0.3s';
+            setTimeout(function() { t.remove(); }, 300);
+        }, ms);
+    }
+
+    function setCloud(state, text) {
+        var dot = document.getElementById('cloudDot');
+        dot.className = 'cloud-dot' + (state ? ' ' + state : '');
+        document.getElementById('cloudStatusText').textContent = text;
+    }
+
+    function showState(id) {
+        ['stateNotConfigured', 'stateNoData', 'stateError', 'stateMain'].forEach(function(s) {
+            document.getElementById(s).classList.toggle('hidden', s !== id);
         });
+    }
 
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => {
-                    deferredPrompt = null;
-                    document.getElementById('installPrompt').classList.add('hidden');
-                });
-            }
+    function hideAppLoading() {
+        document.getElementById('appLoading').classList.add('hidden');
+    }
+
+    // ========== FIREBASE INIT ==========
+    function isConfigured() {
+        try {
+            return typeof FIREBASE_CONFIG !== 'undefined' &&
+                   FIREBASE_CONFIG.apiKey &&
+                   FIREBASE_CONFIG.apiKey.indexOf('YOUR_') !== 0;
+        } catch(e) { return false; }
+    }
+
+    async function initApp() {
+        if (!isConfigured()) {
+            hideAppLoading();
+            setCloud('error', '未設定');
+            showState('stateNotConfigured');
+            return;
         }
 
-        function dismissInstall() {
-            document.getElementById('installPrompt').classList.add('hidden');
+        try {
+            setCloud('', '連線中');
+            firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.firestore();
+            await loadAvailableMonths();
+        } catch(e) {
+            hideAppLoading();
+            setCloud('error', '失敗');
+            document.getElementById('errorDesc').textContent = e.message || '請檢查網路連線後重新整理';
+            showState('stateError');
         }
+    }
 
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const workbook = XLSX.read(event.target.result, { type: 'binary' });
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rawData = XLSX.utils.sheet_to_json(worksheet);
-
-                    parseScheduleData(rawData);
-
-                    if (allScheduleData.length === 0) {
-                        alert('無法讀取班表');
-                        return;
-                    }
-
-                    document.getElementById('querySection').classList.remove('hidden');
-                    initializeSelectors();
-                    alert('載入成功');
-                } catch (error) {
-                    alert('讀取失敗：' + error.message);
-                }
-            };
-            reader.readAsBinaryString(file);
-        });
-
-        function parseShiftTime(shiftStr) {
-            const match = shiftStr.match(/^[BC]-(\d{2})(\d{2})~(\d{2})(\d{2})$/);
-            if (match) {
-                const startHour = parseInt(match[1]);
-                const startMin = parseInt(match[2]);
-                const endHour = parseInt(match[3]);
-                const endMin = parseInt(match[4]);
-                return {
-                    startTime: pad(startHour) + ':' + pad(startMin),
-                    endTime: pad(endHour) + ':' + pad(endMin),
-                    sortValue: startHour * 100 + startMin,
-                    isValid: true
-                };
-            }
-            return { startTime: shiftStr, endTime: '', sortValue: 9999, isValid: false };
-        }
-
-        function pad(num) { return String(num).padStart(2, '0'); }
-
-        function parseScheduleData(rawData) {
-            allScheduleData = [];
-            deptList = new Set();
-            dateList = new Set();
-
-            rawData.forEach(row => {
-                const empId = row['工號'] || '';
-                const empName = row['姓名'] || '';
-                const dept = row['部門'] || '未分類';
-
-                if (!empId || !empName) return;
-
-                Object.keys(row).forEach(key => {
-                    const dateMatch = key.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
-                    if (dateMatch) {
-                        const dateStr = dateMatch[1] + '-' + pad(dateMatch[2]) + '-' + pad(dateMatch[3]);
-                        const shiftNum = key.match(/班次[一二三]/)?.[0] || '';
-                        const shiftValue = row[key];
-
-                        if (shiftValue && String(shiftValue).trim()) {
-                            const shiftRaw = String(shiftValue).trim();
-                            const status = getShiftStatus(shiftRaw);
-                            const timeInfo = parseShiftTime(shiftRaw);
-
-                            allScheduleData.push({
-                                empId, empName, dept, date: dateStr, shift: shiftNum, shiftRaw,
-                                startTime: timeInfo.startTime, endTime: timeInfo.endTime,
-                                sortValue: timeInfo.sortValue, status, isValidTime: timeInfo.isValid
-                            });
-                            dateList.add(dateStr);
-                            deptList.add(dept);
-                        }
-                    }
-                });
+    // ========== DATA LOADING ==========
+    async function loadAvailableMonths() {
+        try {
+            var snap = await db.collection('schedules').orderBy('yearMonth', 'desc').get();
+            availableMonths = snap.docs.map(function(d) {
+                return Object.assign({ id: d.id }, d.data());
             });
 
-            dateList = Array.from(dateList).sort();
-            deptList = Array.from(deptList).sort();
-        }
+            hideAppLoading();
+            setCloud('connected', '已連線');
 
-        function getShiftStatus(shiftValue) {
-            if (shiftValue === '例假日') return 'holiday';
-            if (shiftValue === '休息日') return 'rest';
-            return 'working';
-        }
-
-        function initializeSelectors() {
-            const deptSelect = document.getElementById('queryDept');
-            deptSelect.innerHTML = '<option value="">全部</option>';
-            deptList.forEach(dept => {
-                const opt = document.createElement('option');
-                opt.value = dept;
-                opt.textContent = dept;
-                deptSelect.appendChild(opt);
-            });
-
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('queryDate').value = today;
-            performQuery();
-        }
-
-        function performQuery() {
-            const selectedDate = document.getElementById('queryDate').value;
-            const selectedDept = document.getElementById('queryDept').value;
-
-            if (!selectedDate) {
-                filteredResults = [];
-                displayResults();
-                updateStats();
+            if (availableMonths.length === 0) {
+                showState('stateNoData');
                 return;
             }
 
-            filteredResults = allScheduleData.filter(d => d.date === selectedDate);
-            if (selectedDept) {
-                filteredResults = filteredResults.filter(d => d.dept === selectedDept);
-            }
+            renderMonthsBar();
+            showState('stateMain');
+            setDefaultDate();
+        } catch(e) {
+            hideAppLoading();
+            setCloud('error', '失敗');
+            document.getElementById('errorDesc').textContent = e.message || '載入資料失敗';
+            showState('stateError');
+        }
+    }
 
-            displayResults();
-            updateStats();
+    function setDefaultDate() {
+        var today = new Date().toISOString().split('T')[0];
+        var todayYM = today.substring(0, 7);
+        var dateInput = document.getElementById('queryDate');
+
+        if (availableMonths.find(function(m) { return m.id === todayYM; })) {
+            dateInput.value = today;
+        } else {
+            var latest = availableMonths[0];
+            dateInput.value = (latest.dateRange && latest.dateRange.end) ? latest.dateRange.end : latest.id + '-01';
+        }
+        onDateChange();
+    }
+
+    async function loadDaySchedule(date) {
+        if (!date) return;
+
+        var ym = date.substring(0, 7);
+        var monthMeta = availableMonths.find(function(m) { return m.id === ym; });
+
+        // Highlight active month badge
+        document.querySelectorAll('.month-badge').forEach(function(b) {
+            b.classList.toggle('active', b.dataset.ym === ym);
+        });
+
+        if (!monthMeta) {
+            currentDayData = [];
+            updateDeptSelector();
+            document.getElementById('statsContainer').innerHTML = '';
+            document.getElementById('resultsContainer').innerHTML = '';
+            document.getElementById('emptyState').classList.remove('hidden');
+            return;
         }
 
-        function displayResults() {
-            const container = document.getElementById('resultsContainer');
-            const emptyState = document.getElementById('emptyState');
-            const exportSection = document.getElementById('exportSection');
+        // Show inline loading
+        document.getElementById('dayLoading').classList.remove('hidden');
+        document.getElementById('resultsContainer').innerHTML = '';
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('statsContainer').innerHTML = '';
 
+        try {
+            var doc = await db.collection('schedules').doc(ym).collection('days').doc(date).get();
+            currentDayData = (doc.exists && doc.data().records) ? doc.data().records : [];
+        } catch(e) {
+            showToast('載入失敗：' + e.message, 'error');
+            currentDayData = [];
+        }
+
+        document.getElementById('dayLoading').classList.add('hidden');
+        updateDeptSelector();
+        filterAndDisplay();
+    }
+
+    // ========== UI ==========
+    function renderMonthsBar() {
+        var bar = document.getElementById('monthsBar');
+        bar.innerHTML = '';
+        availableMonths.forEach(function(m) {
+            var btn = document.createElement('button');
+            btn.className = 'month-badge';
+            btn.dataset.ym = m.id;
+            btn.textContent = m.id;
+            btn.addEventListener('click', function() { jumpToMonth(m); });
+            bar.appendChild(btn);
+        });
+    }
+
+    function jumpToMonth(monthMeta) {
+        var dateInput = document.getElementById('queryDate');
+        var currentDay = dateInput.value ? dateInput.value.substring(8) : '01';
+        var start = (monthMeta.dateRange && monthMeta.dateRange.start) ? monthMeta.dateRange.start : monthMeta.id + '-01';
+        var end   = (monthMeta.dateRange && monthMeta.dateRange.end)   ? monthMeta.dateRange.end   : monthMeta.id + '-28';
+        var target = monthMeta.id + '-' + currentDay;
+
+        dateInput.value = (target >= start && target <= end) ? target : end;
+        onDateChange();
+    }
+
+    function updateDeptSelector() {
+        var depts = [];
+        var seen = {};
+        currentDayData.forEach(function(r) {
+            if (!seen[r.dept]) { seen[r.dept] = true; depts.push(r.dept); }
+        });
+        depts.sort();
+
+        var sel = document.getElementById('queryDept');
+        var prev = sel.value;
+        sel.innerHTML = '<option value="">全部</option>';
+        depts.forEach(function(d) {
+            var o = document.createElement('option');
+            o.value = d;
+            o.textContent = d;
+            if (d === prev) o.selected = true;
+            sel.appendChild(o);
+        });
+    }
+
+    function filterAndDisplay() {
+        var dept = document.getElementById('queryDept').value;
+        var data = dept ? currentDayData.filter(function(r) { return r.dept === dept; }) : currentDayData;
+        updateStats(data);
+        displayResults(data);
+    }
+
+    function updateStats(data) {
+        var container = document.getElementById('statsContainer');
+        if (!data.length) { container.innerHTML = ''; return; }
+
+        var working = 0, rest = 0;
+        var deptSet = {}, empSet = {};
+        data.forEach(function(r) {
+            if (r.status === 'working') working++; else rest++;
+            deptSet[r.dept] = 1;
+            empSet[r.empId] = 1;
+        });
+
+        container.innerHTML =
+            '<div class="stat-card"><div class="stat-label">上班</div><div class="stat-value">' + working + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">休假</div><div class="stat-value">' + rest + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">部門</div><div class="stat-value">' + Object.keys(deptSet).length + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">人員</div><div class="stat-value">' + Object.keys(empSet).length + '</div></div>';
+    }
+
+    function displayResults(data) {
+        var container = document.getElementById('resultsContainer');
+        var emptyState = document.getElementById('emptyState');
+
+        if (!data.length) {
             container.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        emptyState.classList.add('hidden');
 
-            if (filteredResults.length === 0) {
-                container.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                exportSection.classList.add('hidden');
-                return;
-            }
+        // Group by dept
+        var grouped = {};
+        data.forEach(function(r) {
+            if (!grouped[r.dept]) grouped[r.dept] = { working: [], rest: [] };
+            if (r.status === 'working') grouped[r.dept].working.push(r);
+            else grouped[r.dept].rest.push(r);
+        });
 
-            const grouped = {};
-            filteredResults.forEach(item => {
-                if (!grouped[item.dept]) grouped[item.dept] = { working: [], rest: [] };
-                if (item.status === 'working') grouped[item.dept].working.push(item);
-                else grouped[item.dept].rest.push(item);
+        var frag = document.createDocumentFragment();
+        Object.keys(grouped).sort().forEach(function(dept) {
+            var g = grouped[dept];
+            var section = document.createElement('div');
+            section.className = 'dept-section';
+
+            var header = document.createElement('div');
+            header.className = 'dept-header';
+            header.innerHTML =
+                '<div class="dept-title">' + esc(dept) + '</div>' +
+                '<div class="dept-badge">' +
+                '<span class="badge">上班 ' + g.working.length + '</span>' +
+                '<span class="badge">休假 ' + g.rest.length + '</span>' +
+                '</div>';
+            section.appendChild(header);
+
+            var list = document.createElement('div');
+            list.className = 'employee-list';
+
+            // Working – sort by start time
+            g.working.sort(function(a, b) {
+                return (a.sortValue || 0) - (b.sortValue || 0);
+            });
+            g.working.forEach(function(r) {
+                var div = document.createElement('div');
+                div.className = 'employee-row row-working';
+                var time = r.isValidTime ? esc(r.startTime) + ' - ' + esc(r.endTime) : esc(r.shiftRaw);
+                div.innerHTML =
+                    '<div class="emp-header">' +
+                    '<div class="emp-info"><div class="emp-name">' + esc(r.empName) + '</div>' +
+                    '<div class="emp-id">' + esc(r.empId) + '</div></div>' +
+                    '<span class="status-badge badge-working">上班</span>' +
+                    '</div>' +
+                    '<div class="time-display">' + time + '</div>';
+                list.appendChild(div);
             });
 
-            Object.keys(grouped).sort().forEach(dept => {
-                const deptData = grouped[dept];
-                const section = document.createElement('div');
-                section.className = 'dept-section';
-
-                const header = document.createElement('div');
-                header.className = 'dept-header';
-                header.innerHTML = '<div class="dept-title">' + dept + '</div>' +
-                    '<div class="dept-badge"><span class="badge">上班 ' + deptData.working.length + '</span>' +
-                    '<span class="badge">休假 ' + deptData.rest.length + '</span></div>';
-                section.appendChild(header);
-
-                const list = document.createElement('div');
-                list.className = 'employee-list';
-
-                deptData.working.sort((a, b) => {
-                    const diff = a.sortValue - b.sortValue;
-                    return diff !== 0 ? diff : a.empName.localeCompare(b.empName);
-                }).forEach(row => {
-                    const div = document.createElement('div');
-                    div.className = 'employee-row row-working';
-                    const time = row.isValidTime ? row.startTime + ' - ' + row.endTime : row.shiftRaw;
-                    div.innerHTML = '<div class="emp-header"><div class="emp-info">' +
-                        '<div class="emp-name">' + row.empName + '</div>' +
-                        '<div class="emp-id">' + row.empId + '</div></div>' +
-                        '<span class="status-badge badge-working">上班</span></div>' +
-                        '<div class="time-display">' + time + '</div>';
-                    list.appendChild(div);
-                });
-
-                deptData.rest.sort((a, b) => a.empName.localeCompare(b.empName)).forEach(row => {
-                    const div = document.createElement('div');
-                    const rowClass = row.status === 'holiday' ? 'row-holiday' : 'row-rest';
-                    div.className = 'employee-row ' + rowClass;
-                    const status = row.status === 'holiday' ? '例假日' : '休息日';
-                    const badge = row.status === 'holiday' ? 'badge-holiday' : 'badge-rest';
-                    div.innerHTML = '<div class="emp-header"><div class="emp-info">' +
-                        '<div class="emp-name">' + row.empName + '</div>' +
-                        '<div class="emp-id">' + row.empId + '</div></div>' +
-                        '<span class="status-badge ' + badge + '">' + status + '</span></div>' +
-                        '<div class="time-display"><em>' + row.shiftRaw + '</em></div>';
-                    list.appendChild(div);
-                });
-
-                section.appendChild(list);
-                container.appendChild(section);
+            // Rest – sort by name
+            g.rest.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
+            g.rest.forEach(function(r) {
+                var div = document.createElement('div');
+                var isHoliday = r.status === 'holiday';
+                div.className = 'employee-row ' + (isHoliday ? 'row-holiday' : 'row-rest');
+                var status = isHoliday ? '例假日' : '休息日';
+                var badgeClass = isHoliday ? 'badge-holiday' : 'badge-rest';
+                div.innerHTML =
+                    '<div class="emp-header">' +
+                    '<div class="emp-info"><div class="emp-name">' + esc(r.empName) + '</div>' +
+                    '<div class="emp-id">' + esc(r.empId) + '</div></div>' +
+                    '<span class="status-badge ' + badgeClass + '">' + status + '</span>' +
+                    '</div>' +
+                    '<div class="time-display"><em>' + esc(r.shiftRaw) + '</em></div>';
+                list.appendChild(div);
             });
 
-            container.classList.remove('hidden');
-            emptyState.classList.add('hidden');
-            exportSection.classList.remove('hidden');
-        }
+            section.appendChild(list);
+            frag.appendChild(section);
+        });
 
-        function updateStats() {
-            const container = document.getElementById('statsContainer');
-            if (filteredResults.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
+        container.innerHTML = '';
+        container.appendChild(frag);
+    }
 
-            const working = filteredResults.filter(d => d.status === 'working').length;
-            const rest = filteredResults.filter(d => d.status !== 'working').length;
-            const depts = new Set(filteredResults.map(d => d.dept)).size;
-            const people = new Set(filteredResults.map(d => d.empId)).size;
+    // ========== EVENT HANDLERS ==========
+    function onDateChange() {
+        var date = document.getElementById('queryDate').value;
+        if (date) loadDaySchedule(date);
+    }
 
-            container.innerHTML = 
-                '<div class="stat-card"><div class="stat-label">上班</div><div class="stat-value">' + working + '</div></div>' +
-                '<div class="stat-card"><div class="stat-label">休假</div><div class="stat-value">' + rest + '</div></div>' +
-                '<div class="stat-card"><div class="stat-label">部門</div><div class="stat-value">' + depts + '</div></div>' +
-                '<div class="stat-card"><div class="stat-label">人員</div><div class="stat-value">' + people + '</div></div>';
-        }
+    // ========== PWA ==========
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(function() {});
+    }
 
-        function exportResults() {
-            if (filteredResults.length === 0) {
-                alert('沒有資料可導出');
-                return;
-            }
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installPrompt').classList.remove('hidden');
+    });
 
-            const headers = ['工號', '姓名', '部門', '日期', '上班時間', '下班時間', '狀態'];
-            const rows = filteredResults.map(d => {
-                const status = d.status === 'holiday' ? '例假日' : d.status === 'rest' ? '休息日' : '上班';
-                return [d.empId, d.empName, d.dept, d.date, d.isValidTime ? d.startTime : '', 
-                        d.isValidTime ? d.endTime : d.shiftRaw, status];
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function() {
+                deferredPrompt = null;
+                document.getElementById('installPrompt').classList.add('hidden');
             });
-            
-            const csv = [headers].concat(rows).map(r => r.map(c => '"' + c + '"').join(',')).join('\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = '班表_' + document.getElementById('queryDate').value + '.csv';
-            link.click();
         }
+    }
+    function dismissInstall() {
+        document.getElementById('installPrompt').classList.add('hidden');
+    }
+
+    // ========== BOOT ==========
+    initApp();
     </script>
 </body>
 </html>
