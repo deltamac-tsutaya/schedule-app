@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e40af">
+    <title>班表後台管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            color: #1f2937;
+            background: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Admin bar */
+        .admin-bar {
+            background: linear-gradient(to right, #1e40af, #1e3a8a);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .admin-bar-title { font-size: 17px; font-weight: 700; }
+        .admin-bar-right { display: flex; align-items: center; gap: 1rem; font-size: 13px; opacity: 0.9; }
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 6px;
+            padding: 0.35rem 0.85rem;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: rgba(255,255,255,0.25); }
+
+        /* Content */
+        .content { flex: 1; overflow-y: auto; padding: 1.5rem; max-width: 860px; margin: 0 auto; width: 100%; }
+        @media (max-width: 640px) { .content { padding: 1rem; } }
+
+        /* Section card */
+        .section-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .refresh-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            font-size: 13px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .refresh-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+        /* Login */
+        #loginSection {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 56px);
+            padding: 1.5rem;
+        }
+        .login-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .login-title { font-size: 22px; font-weight: 700; margin-bottom: 0.35rem; color: #1e293b; }
+        .login-subtitle { font-size: 13px; color: #94a3b8; margin-bottom: 1.75rem; }
+        .field-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.4rem; display: block; }
+        .field-input {
+            width: 100%;
+            padding: 0.7rem 0.875rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+        .field-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(37,99,235,0.3);
+        }
+        .login-btn:active { transform: scale(0.98); }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-error {
+            margin-top: 0.75rem;
+            padding: 0.65rem 0.875rem;
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #991b1b;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .drop-icon { font-size: 40px; margin-bottom: 0.75rem; }
+        .drop-title { font-size: 15px; font-weight: 600; color: #475569; margin-bottom: 0.35rem; }
+        .drop-hint { font-size: 13px; color: #94a3b8; margin-bottom: 1rem; }
+        .browse-btn {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            background: white;
+            border: 1.5px solid #2563eb;
+            border-radius: 8px;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .browse-btn:hover { background: #eff6ff; }
+
+        /* Preview */
+        .preview-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .preview-filename { font-size: 14px; font-weight: 600; color: #334155; }
+        .preview-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #94a3b8;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.1rem 0.3rem;
+        }
+        .preview-body { padding: 1rem; }
+        .preview-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 0.875rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .preview-ym { font-size: 15px; font-weight: 700; color: #1e293b; }
+        .preview-meta { font-size: 12px; color: #64748b; margin-top: 0.2rem; }
+        .preview-exist-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            white-space: nowrap;
+        }
+        .preview-actions {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .confirm-btn {
+            flex: 1;
+            padding: 0.7rem;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .confirm-btn:active { transform: scale(0.98); }
+        .cancel-btn {
+            padding: 0.7rem 1.25rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Progress */
+        .progress-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            background: #f8fafc;
+        }
+        .progress-text { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 0.75rem; }
+        .progress-bar-wrap {
+            background: #e2e8f0;
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #2563eb, #3b82f6);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .progress-detail { font-size: 12px; color: #94a3b8; }
+
+        /* Month list */
+        .month-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            background: #f8fafc;
+            transition: all 0.15s;
+        }
+        .month-item:last-child { margin-bottom: 0; }
+        .month-item-left {}
+        .month-item-ym { font-size: 17px; font-weight: 700; color: #1e293b; }
+        .month-item-meta { font-size: 12px; color: #94a3b8; margin-top: 0.3rem; }
+        .month-item-tags { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
+        .month-tag {
+            font-size: 11px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            background: #dbeafe;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        .delete-btn {
+            padding: 0.45rem 0.875rem;
+            background: white;
+            border: 1.5px solid #fca5a5;
+            border-radius: 8px;
+            color: #ef4444;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .delete-btn:hover { background: #fee2e2; }
+
+        /* Not configured banner */
+        .not-configured {
+            background: #fef3c7;
+            border: 1.5px solid #fde68a;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 14px;
+            color: #92400e;
+        }
+        .not-configured strong { display: block; margin-bottom: 0.25rem; }
+
+        /* Loading text */
+        .loading-text { text-align: center; padding: 2rem; color: #94a3b8; font-size: 14px; }
+        .empty-months { text-align: center; padding: 2rem 1rem; color: #94a3b8; font-size: 14px; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 1rem; right: 1rem;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            animation: slideIn 0.25s ease;
+            pointer-events: all;
+        }
+        .toast-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .toast-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .toast-info    { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="admin-bar">
+        <span class="admin-bar-title">班表後台管理</span>
+        <div class="admin-bar-right" id="adminBarRight">
+            <span id="adminEmail" class="hidden"></span>
+            <button class="logout-btn hidden" id="logoutBtn" onclick="logout()">登出</button>
+        </div>
+    </div>
+
+    <!-- Login -->
+    <div id="loginSection">
+        <div class="login-card">
+            <div class="login-title">管理員登入</div>
+            <div class="login-subtitle">請使用管理員帳號登入後台</div>
+            <label class="field-label">電子郵件</label>
+            <input id="loginEmail" type="email" class="field-input" placeholder="admin@example.com"
+                   onkeydown="if(event.key==='Enter') login()" />
+            <label class="field-label">密碼</label>
+            <input id="loginPassword" type="password" class="field-input" placeholder="••••••••"
+                   onkeydown="if(event.key==='Enter') login()" />
+            <button class="login-btn" id="loginBtn" onclick="login()">登入</button>
+            <div id="loginError" class="login-error hidden"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardSection" class="hidden">
+        <div class="content">
+
+            <!-- Not configured banner -->
+            <div id="notConfiguredBanner" class="not-configured hidden">
+                <strong>⚠️ 尚未設定 Firebase</strong>
+                請編輯 firebase-config.js 填入您的 Firebase 專案設定後重新載入。
+            </div>
+
+            <!-- Upload section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title">📤 上傳班表</div>
+                </div>
+
+                <!-- Drop zone -->
+                <div id="dropZone" class="drop-zone"
+                     ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                     ondragleave="this.classList.remove('drag-over')"
+                     ondrop="handleDrop(event)">
+                    <div class="drop-icon">📂</div>
+                    <div class="drop-title">拖曳 Excel 班表到此處</div>
+                    <div class="drop-hint">支援 .xlsx / .xls 格式</div>
+                    <button class="browse-btn" onclick="document.getElementById('fileInput').click()">選擇檔案</button>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none"
+                           onchange="handleFileChange(this)" />
+                </div>
+
+                <!-- Preview -->
+                <div id="previewSection" class="hidden">
+                    <div class="preview-card">
+                        <div class="preview-header">
+                            <span class="preview-filename" id="previewFilename"></span>
+                            <button class="preview-close" onclick="hidePreview()">✕</button>
+                        </div>
+                        <div class="preview-body" id="previewBody"></div>
+                        <div class="preview-actions">
+                            <button class="confirm-btn" onclick="confirmUpload()">確認上傳</button>
+                            <button class="cancel-btn" onclick="hidePreview()">取消</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div id="progressSection" class="hidden">
+                    <div class="progress-card">
+                        <div class="progress-text" id="progressText">準備上傳...</div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-detail" id="progressDetail"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Months list -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title">📅 已上傳月份</div>
+                    <button class="refresh-btn" onclick="loadMonths()">重新整理</button>
+                </div>
+                <div id="monthsList"><div class="loading-text">載入中...</div></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+    // ========== STATE ==========
+    let db = null;
+    let auth = null;
+    let currentUser = null;
+    let pendingUpload = null;     // { byMonth: {ym: records[]}, filename }
+    let existingMonths = new Set();
+
+    // ========== UTILS ==========
+    function esc(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function showToast(msg, type, ms) {
+        if (type === undefined) type = 'info';
+        if (ms === undefined) ms = 3500;
+        var c = document.getElementById('toastContainer');
+        var t = document.createElement('div');
+        t.className = 'toast toast-' + type;
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(function() {
+            t.style.cssText = 'opacity:0;transition:opacity 0.3s';
+            setTimeout(function() { t.remove(); }, 300);
+        }, ms);
+    }
+
+    function isConfigured() {
+        try {
+            return typeof FIREBASE_CONFIG !== 'undefined' &&
+                   FIREBASE_CONFIG.apiKey &&
+                   FIREBASE_CONFIG.apiKey.indexOf('YOUR_') !== 0;
+        } catch(e) { return false; }
+    }
+
+    // ========== AUTH ==========
+    async function initAdmin() {
+        if (!isConfigured()) {
+            document.getElementById('notConfiguredBanner').classList.remove('hidden');
+            // Still show dashboard shell so user can see the banner
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            return;
+        }
+
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        auth = firebase.auth();
+
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = user;
+                showDashboard(user);
+                loadMonths();
+            } else {
+                currentUser = null;
+                showLogin();
+            }
+        });
+    }
+
+    function showLogin() {
+        document.getElementById('loginSection').classList.remove('hidden');
+        document.getElementById('dashboardSection').classList.add('hidden');
+        document.getElementById('logoutBtn').classList.add('hidden');
+        document.getElementById('adminEmail').classList.add('hidden');
+    }
+
+    function showDashboard(user) {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('dashboardSection').classList.remove('hidden');
+        document.getElementById('adminEmail').textContent = user.email;
+        document.getElementById('adminEmail').classList.remove('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+    }
+
+    async function login() {
+        var email = document.getElementById('loginEmail').value.trim();
+        var password = document.getElementById('loginPassword').value;
+        var btn = document.getElementById('loginBtn');
+        var errEl = document.getElementById('loginError');
+
+        if (!email || !password) {
+            errEl.textContent = '請填入電子郵件與密碼';
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '登入中...';
+        errEl.classList.add('hidden');
+
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+        } catch(e) {
+            var msgs = {
+                'auth/user-not-found': '帳號不存在',
+                'auth/wrong-password': '密碼錯誤',
+                'auth/invalid-email': '電子郵件格式錯誤',
+                'auth/too-many-requests': '嘗試次數過多，請稍後再試',
+                'auth/invalid-credential': '帳號或密碼錯誤'
+            };
+            errEl.textContent = msgs[e.code] || ('登入失敗：' + e.message);
+            errEl.classList.remove('hidden');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '登入';
+    }
+
+    function logout() {
+        if (auth) auth.signOut();
+    }
+
+    // ========== FILE HANDLING ==========
+    function handleDrop(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').classList.remove('drag-over');
+        var file = e.dataTransfer.files[0];
+        if (file) processFile(file);
+    }
+
+    function handleFileChange(input) {
+        var file = input.files[0];
+        if (file) processFile(file);
+        input.value = ''; // allow re-selecting same file
+    }
+
+    function processFile(file) {
+        var ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== 'xlsx' && ext !== 'xls') {
+            showToast('請上傳 Excel 檔案（.xlsx 或 .xls）', 'error');
+            return;
+        }
+        hidePreview();
+        document.getElementById('progressSection').classList.add('hidden');
+        readExcel(file);
+    }
+
+    function readExcel(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var wb = XLSX.read(e.target.result, { type: 'array' });
+                var ws = wb.Sheets[wb.SheetNames[0]];
+                var raw = XLSX.utils.sheet_to_json(ws);
+                var records = parseScheduleData(raw);
+
+                if (records.length === 0) {
+                    showToast('無法讀取班表，請確認欄位格式', 'error');
+                    return;
+                }
+
+                // Group by yearMonth
+                var byMonth = {};
+                records.forEach(function(r) {
+                    if (!byMonth[r.yearMonth]) byMonth[r.yearMonth] = [];
+                    byMonth[r.yearMonth].push(r);
+                });
+
+                pendingUpload = { byMonth: byMonth, filename: file.name };
+                showPreview(byMonth, file.name);
+            } catch(err) {
+                showToast('解析失敗：' + err.message, 'error');
+            }
+        };
+        reader.onerror = function() { showToast('檔案讀取失敗', 'error'); };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // ========== SCHEDULE PARSING ==========
+    function parseShiftTime(shiftStr) {
+        var match = shiftStr.match(/^[BC]-(\d{2})(\d{2})~(\d{2})(\d{2})$/);
+        if (match) {
+            return {
+                startTime: pad(parseInt(match[1])) + ':' + pad(parseInt(match[2])),
+                endTime:   pad(parseInt(match[3])) + ':' + pad(parseInt(match[4])),
+                sortValue: parseInt(match[1]) * 100 + parseInt(match[2]),
+                isValidTime: true
+            };
+        }
+        return { startTime: shiftStr, endTime: '', sortValue: 9999, isValidTime: false };
+    }
+
+    function getShiftStatus(v) {
+        if (v === '例假日') return 'holiday';
+        if (v === '休息日') return 'rest';
+        return 'working';
+    }
+
+    function parseScheduleData(rawData) {
+        var result = [];
+        rawData.forEach(function(row) {
+            var empId   = String(row['工號'] || '').trim();
+            var empName = String(row['姓名'] || '').trim();
+            var dept    = String(row['部門'] || '未分類').trim();
+            if (!empId || !empName) return;
+
+            Object.keys(row).forEach(function(key) {
+                var dm = key.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+                if (!dm) return;
+
+                var dateStr = dm[1] + '-' + pad(parseInt(dm[2])) + '-' + pad(parseInt(dm[3]));
+                var ym = dateStr.substring(0, 7);
+                var shiftValue = String(row[key] || '').trim();
+                if (!shiftValue) return;
+
+                var status   = getShiftStatus(shiftValue);
+                var timeInfo = parseShiftTime(shiftValue);
+
+                result.push({
+                    empId:       empId,
+                    empName:     empName,
+                    dept:        dept,
+                    date:        dateStr,
+                    yearMonth:   ym,
+                    shiftRaw:    shiftValue,
+                    startTime:   timeInfo.startTime,
+                    endTime:     timeInfo.endTime,
+                    sortValue:   timeInfo.sortValue,
+                    status:      status,
+                    isValidTime: timeInfo.isValidTime
+                });
+            });
+        });
+        return result;
+    }
+
+    // ========== PREVIEW ==========
+    function showPreview(byMonth, filename) {
+        var months = Object.keys(byMonth).sort();
+        var body = document.getElementById('previewBody');
+        body.innerHTML = '';
+
+        months.forEach(function(ym) {
+            var records  = byMonth[ym];
+            var empSet   = {}, deptSet = {}, dateSet = {};
+            records.forEach(function(r) { empSet[r.empId]=1; deptSet[r.dept]=1; dateSet[r.date]=1; });
+
+            var row = document.createElement('div');
+            row.className = 'preview-row';
+            var exists = existingMonths.has(ym);
+            row.innerHTML =
+                '<div>' +
+                '<div class="preview-ym">' + esc(ym) + '</div>' +
+                '<div class="preview-meta">' +
+                Object.keys(dateSet).length + ' 天 · ' +
+                Object.keys(empSet).length + ' 人 · ' +
+                Object.keys(deptSet).length + ' 部門' +
+                '</div>' +
+                '</div>' +
+                (exists ? '<span class="preview-exist-badge">將覆蓋舊資料</span>' : '');
+            body.appendChild(row);
+        });
+
+        document.getElementById('previewFilename').textContent = filename;
+        document.getElementById('previewSection').classList.remove('hidden');
+    }
+
+    function hidePreview() {
+        document.getElementById('previewSection').classList.add('hidden');
+        pendingUpload = null;
+    }
+
+    // ========== UPLOAD ==========
+    async function confirmUpload() {
+        if (!pendingUpload) return;
+        if (!db || !currentUser) { showToast('請先登入', 'error'); return; }
+
+        var months = Object.keys(pendingUpload.byMonth).sort();
+        var total  = months.length;
+
+        document.getElementById('previewSection').classList.add('hidden');
+        document.getElementById('progressSection').classList.remove('hidden');
+        setProgress(0, total, '準備上傳...', '');
+
+        try {
+            for (var i = 0; i < months.length; i++) {
+                var ym = months[i];
+                setProgress(i, total, '上傳 ' + ym + '...', (i + 1) + ' / ' + total + ' 個月份');
+                await uploadMonthData(ym, pendingUpload.byMonth[ym], pendingUpload.filename);
+                setProgress(i + 1, total, '完成 ' + ym, (i + 1) + ' / ' + total + ' 個月份');
+            }
+
+            showToast('成功上傳 ' + total + ' 個月份的班表', 'success');
+            pendingUpload = null;
+            setTimeout(function() {
+                document.getElementById('progressSection').classList.add('hidden');
+            }, 2000);
+            loadMonths();
+        } catch(e) {
+            showToast('上傳失敗：' + e.message, 'error');
+            document.getElementById('progressSection').classList.add('hidden');
+        }
+    }
+
+    function setProgress(done, total, text, detail) {
+        var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        document.getElementById('progressText').textContent = text;
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressDetail').textContent = detail;
+    }
+
+    async function uploadMonthData(yearMonth, records, filename) {
+        var year  = parseInt(yearMonth.split('-')[0]);
+        var month = parseInt(yearMonth.split('-')[1]);
+
+        var empSet  = {}, deptArr = [], dateArr = [];
+        var deptSeen = {}, dateSeen = {};
+        records.forEach(function(r) {
+            empSet[r.empId] = 1;
+            if (!deptSeen[r.dept])  { deptSeen[r.dept] = 1; deptArr.push(r.dept); }
+            if (!dateSeen[r.date])  { dateSeen[r.date] = 1; dateArr.push(r.date); }
+        });
+        deptArr.sort();
+        dateArr.sort();
+
+        // Write month metadata
+        await db.collection('schedules').doc(yearMonth).set({
+            yearMonth:      yearMonth,
+            year:           year,
+            month:          month,
+            filename:       filename,
+            uploadedAt:     firebase.firestore.FieldValue.serverTimestamp(),
+            uploadedBy:     currentUser.email,
+            totalEmployees: Object.keys(empSet).length,
+            departments:    deptArr,
+            dateRange:      { start: dateArr[0], end: dateArr[dateArr.length - 1] }
+        });
+
+        // Group records by date
+        var byDate = {};
+        records.forEach(function(r) {
+            if (!byDate[r.date]) byDate[r.date] = [];
+            byDate[r.date].push({
+                empId:       r.empId,
+                empName:     r.empName,
+                dept:        r.dept,
+                shiftRaw:    r.shiftRaw,
+                startTime:   r.startTime,
+                endTime:     r.endTime,
+                status:      r.status,
+                sortValue:   r.sortValue,
+                isValidTime: r.isValidTime
+            });
+        });
+
+        // Batch write daily records (≤500 ops each)
+        var dates = Object.keys(byDate);
+        var BATCH_LIMIT = 480;
+        var batch = db.batch();
+        var opCount = 0;
+
+        for (var i = 0; i < dates.length; i++) {
+            var date = dates[i];
+            var ref  = db.collection('schedules').doc(yearMonth).collection('days').doc(date);
+            batch.set(ref, { date: date, yearMonth: yearMonth, records: byDate[date] });
+            opCount++;
+            if (opCount >= BATCH_LIMIT) {
+                await batch.commit();
+                batch = db.batch();
+                opCount = 0;
+            }
+        }
+        if (opCount > 0) await batch.commit();
+
+        existingMonths.add(yearMonth);
+    }
+
+    // ========== MONTH LIST ==========
+    async function loadMonths() {
+        var container = document.getElementById('monthsList');
+        container.innerHTML = '<div class="loading-text">載入中...</div>';
+        existingMonths.clear();
+
+        try {
+            var snap = await db.collection('schedules').orderBy('yearMonth', 'desc').get();
+            if (snap.empty) {
+                container.innerHTML = '<div class="empty-months">尚未上傳任何班表</div>';
+                return;
+            }
+
+            var frag = document.createDocumentFragment();
+            snap.forEach(function(doc) {
+                var d = doc.data();
+                existingMonths.add(doc.id);
+
+                var item = document.createElement('div');
+                item.className = 'month-item';
+
+                var uploadDate = '';
+                if (d.uploadedAt) {
+                    try { uploadDate = d.uploadedAt.toDate().toLocaleDateString('zh-TW'); } catch(e) {}
+                }
+
+                var tagsHtml = (d.departments || []).slice(0, 5).map(function(dept) {
+                    return '<span class="month-tag">' + esc(dept) + '</span>';
+                }).join('');
+                if ((d.departments || []).length > 5) {
+                    tagsHtml += '<span class="month-tag">+' + (d.departments.length - 5) + '</span>';
+                }
+
+                item.innerHTML =
+                    '<div class="month-item-left">' +
+                    '<div class="month-item-ym">' + esc(doc.id) + '</div>' +
+                    '<div class="month-item-meta">' +
+                    (d.totalEmployees || 0) + ' 人 · ' +
+                    (d.dateRange ? esc(d.dateRange.start) + ' ~ ' + esc(d.dateRange.end) : '') +
+                    (uploadDate ? ' · 上傳於 ' + uploadDate : '') +
+                    (d.uploadedBy ? ' · ' + esc(d.uploadedBy) : '') +
+                    '</div>' +
+                    '<div class="month-item-tags">' + tagsHtml + '</div>' +
+                    '</div>' +
+                    '<button class="delete-btn" onclick="deleteMonth(\'' + esc(doc.id) + '\')">刪除</button>';
+                frag.appendChild(item);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(frag);
+        } catch(e) {
+            container.innerHTML = '<div class="loading-text" style="color:#ef4444">載入失敗：' + esc(e.message) + '</div>';
+        }
+    }
+
+    async function deleteMonth(yearMonth) {
+        if (!confirm('確定要刪除 ' + yearMonth + ' 的班表資料嗎？此操作無法復原。')) return;
+
+        showToast('刪除中...', 'info', 10000);
+
+        try {
+            // Delete all day sub-documents first
+            var daysSnap = await db.collection('schedules').doc(yearMonth).collection('days').get();
+
+            var BATCH_LIMIT = 480;
+            var batch = db.batch();
+            var opCount = 0;
+
+            daysSnap.forEach(function(doc) {
+                batch.delete(doc.ref);
+                opCount++;
+            });
+
+            // Delete month metadata in same or new batch
+            if (opCount >= BATCH_LIMIT) {
+                await batch.commit();
+                batch = db.batch();
+            }
+            batch.delete(db.collection('schedules').doc(yearMonth));
+            await batch.commit();
+
+            showToast(yearMonth + ' 已刪除', 'success');
+            loadMonths();
+        } catch(e) {
+            showToast('刪除失敗：' + e.message, 'error');
+        }
+    }
+
+    // ========== BOOT ==========
+    initAdmin();
+    </script>
+</body>
+</html>
