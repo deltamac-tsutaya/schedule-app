@@ -184,6 +184,31 @@
             flex-shrink: 0;
         }
 
+        /* Vacation toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            border-top: 1px solid #f3f4f6;
+        }
+        .toggle-label { font-size: 13px; color: #6b7280; font-weight: 500; user-select: none; }
+        .toggle-switch { position: relative; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .toggle-track {
+            position: absolute; inset: 0;
+            background: #e5e7eb; border-radius: 12px; transition: background 0.2s;
+        }
+        .toggle-switch input:checked + .toggle-track { background: #2563eb; }
+        .toggle-thumb {
+            position: absolute; top: 2px; left: 2px;
+            width: 20px; height: 20px; background: white; border-radius: 50%;
+            transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+        .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
         /* Toast */
         .toast-container {
             position: fixed;
@@ -312,6 +337,14 @@
                                 <option value="">全部</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">顯示休假人員（例假日／休息日）</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showVacationToggle" onchange="filterAndDisplay()" />
+                            <div class="toggle-track"></div>
+                            <div class="toggle-thumb"></div>
+                        </label>
                     </div>
                 </div>
 
@@ -576,6 +609,7 @@
     function displayResults(data) {
         var container = document.getElementById('resultsContainer');
         var emptyState = document.getElementById('emptyState');
+        var showVacation = document.getElementById('showVacationToggle').checked;
 
         if (!data.length) {
             container.innerHTML = '';
@@ -593,8 +627,15 @@
         });
 
         var frag = document.createDocumentFragment();
+        var hasVisible = false;
+
         Object.keys(grouped).sort().forEach(function(dept) {
             var g = grouped[dept];
+
+            // 若無上班人員且休假開關關閉，略過此部門
+            if (!showVacation && g.working.length === 0) return;
+            hasVisible = true;
+
             var section = document.createElement('div');
             section.className = 'dept-section';
 
@@ -604,7 +645,7 @@
                 '<div class="dept-title">' + esc(dept) + '</div>' +
                 '<div class="dept-badge">' +
                 '<span class="badge">上班 ' + g.working.length + '</span>' +
-                '<span class="badge">休假 ' + g.rest.length + '</span>' +
+                (showVacation ? '<span class="badge">休假 ' + g.rest.length + '</span>' : '') +
                 '</div>';
             section.appendChild(header);
 
@@ -629,30 +670,36 @@
                 list.appendChild(div);
             });
 
-            // Rest – sort by name
-            g.rest.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
-            g.rest.forEach(function(r) {
-                var div = document.createElement('div');
-                var isHoliday = r.status === 'holiday';
-                div.className = 'employee-row ' + (isHoliday ? 'row-holiday' : 'row-rest');
-                var status = isHoliday ? '例假日' : '休息日';
-                var badgeClass = isHoliday ? 'badge-holiday' : 'badge-rest';
-                div.innerHTML =
-                    '<div class="emp-header">' +
-                    '<div class="emp-info"><div class="emp-name">' + esc(r.empName) + '</div>' +
-                    '<div class="emp-id">' + esc(r.empId) + '</div></div>' +
-                    '<span class="status-badge ' + badgeClass + '">' + status + '</span>' +
-                    '</div>' +
-                    '<div class="time-display"><em>' + esc(r.shiftRaw) + '</em></div>';
-                list.appendChild(div);
-            });
+            // Rest – only shown when toggle is ON
+            if (showVacation) {
+                g.rest.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
+                g.rest.forEach(function(r) {
+                    var div = document.createElement('div');
+                    var isHoliday = r.status === 'holiday';
+                    div.className = 'employee-row ' + (isHoliday ? 'row-holiday' : 'row-rest');
+                    var status = isHoliday ? '例假日' : '休息日';
+                    var badgeClass = isHoliday ? 'badge-holiday' : 'badge-rest';
+                    div.innerHTML =
+                        '<div class="emp-header">' +
+                        '<div class="emp-info"><div class="emp-name">' + esc(r.empName) + '</div>' +
+                        '<div class="emp-id">' + esc(r.empId) + '</div></div>' +
+                        '<span class="status-badge ' + badgeClass + '">' + status + '</span>' +
+                        '</div>' +
+                        '<div class="time-display"><em>' + esc(r.shiftRaw) + '</em></div>';
+                    list.appendChild(div);
+                });
+            }
 
             section.appendChild(list);
             frag.appendChild(section);
         });
 
         container.innerHTML = '';
-        container.appendChild(frag);
+        if (hasVisible) {
+            container.appendChild(frag);
+        } else {
+            emptyState.classList.remove('hidden');
+        }
     }
 
     // ========== EVENT HANDLERS ==========
