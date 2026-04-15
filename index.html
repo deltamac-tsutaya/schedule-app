@@ -388,10 +388,12 @@
 
     // ========== 部門名稱對照 ==========
     var DEPT_NAMES = {
-        '1部BOOK': 'TSUTAYA BOOKSTORE 信義店',
-        '1部CAFE': 'WIRED TOKYO 信義店',
-        '2部BOOK': 'TSUTAYA BOOKSTORE 台中市政店',
-        '2部CAFE': 'WIRED TOKYO 台中市政店'
+        '1部 BOOK':      'TSUTAYA BOOKSTORE 信義店',
+        '1部 CAFE 外場':  'WIRED TOKYO 信義店 外場',
+        '1部 CAFÉ 內場':  'WIRED TOKYO 信義店 內場',
+        '2部 BOOK':      'TSUTAYA BOOKSTORE 台中市政店',
+        '2部 CAFE 外場':  'WIRED TOKYO 台中市政店 外場',
+        '2部 CAFÉ 內場':  'WIRED TOKYO 台中市政店 內場'
     };
     function deptLabel(dept) {
         return DEPT_NAMES[dept] || dept;
