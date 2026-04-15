@@ -650,12 +650,42 @@
         return 'working';
     }
 
+    // ===== 部門名稱對照（上傳時直接轉換，存入 Firestore 的就是正式名稱）=====
+    var DEPT_DISPLAY = {
+        '1部 BOOK':      'TSUTAYA BOOKSTORE 信義店',
+        '1部 CAFE 外場':  'WIRED TOKYO 信義店 外場',
+        '1部 CAFÉ 內場':  'WIRED TOKYO 信義店 內場',
+        '2部 BOOK':      'TSUTAYA BOOKSTORE 台中市政店',
+        '2部 CAFE 外場':  'WIRED TOKYO 台中市政店 外場',
+        '2部 CAFÉ 內場':  'WIRED TOKYO 台中市政店 內場'
+    };
+
+    function normDept(s) {
+        return String(s)
+            .replace(/\u3000/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toUpperCase()
+            .replace(/É/g, 'E')
+            .replace(/é/g, 'E');
+    }
+
+    // 建立正規化後的對照表
+    var DEPT_NORM = {};
+    Object.keys(DEPT_DISPLAY).forEach(function(k) {
+        DEPT_NORM[normDept(k)] = DEPT_DISPLAY[k];
+    });
+
+    function mapDept(raw) {
+        return DEPT_NORM[normDept(raw)] || raw;
+    }
+
     function parseScheduleData(rawData) {
         var result = [];
         rawData.forEach(function(row) {
             var empId   = String(row['工號'] || '').trim();
             var empName = String(row['姓名'] || '').trim();
-            var dept    = String(row['部門'] || '未分類').trim();
+            var dept    = mapDept(String(row['部門'] || '未分類').trim());
             if (!empId || !empName) return;
 
             Object.keys(row).forEach(function(key) {

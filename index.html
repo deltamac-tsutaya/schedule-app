@@ -394,39 +394,8 @@
     let currentDayData = []; // records for selected date
     let deferredPrompt;
 
-    // ========== 部門名稱對照 ==========
-    // key 統一正規化（全形空格→半形、去頭尾空白、É→E）後比對
-    var DEPT_NAMES_RAW = [
-        { key: '1部 BOOK',      label: 'TSUTAYA BOOKSTORE 信義店' },
-        { key: '1部 CAFE 外場',  label: 'WIRED TOKYO 信義店 外場' },
-        { key: '1部 CAFÉ 內場',  label: 'WIRED TOKYO 信義店 內場' },
-        { key: '2部 BOOK',      label: 'TSUTAYA BOOKSTORE 台中市政店' },
-        { key: '2部 CAFE 外場',  label: 'WIRED TOKYO 台中市政店 外場' },
-        { key: '2部 CAFÉ 內場',  label: 'WIRED TOKYO 台中市政店 內場' }
-    ];
-
-    function normDept(s) {
-        return String(s)
-            .replace(/\u3000/g, ' ')   // 全形空格→半形
-            .replace(/\s+/g, ' ')      // 連續空白→單一空白
-            .trim()
-            .toUpperCase()
-            .replace(/É/g, 'E')        // 去除重音
-            .replace(/é/g, 'E');
-    }
-
-    var DEPT_MAP = {};
-    DEPT_NAMES_RAW.forEach(function(e) {
-        DEPT_MAP[normDept(e.key)] = e.label;
-    });
-
-    function deptLabel(dept) {
-        var result = DEPT_MAP[normDept(dept)];
-        if (!result) {
-            console.warn('[部門未對照] 原始值:', JSON.stringify(dept), '正規化後:', JSON.stringify(normDept(dept)));
-        }
-        return result || dept;
-    }
+    // 部門名稱已在後台上傳時直接轉換，前台直接顯示即可
+    function deptLabel(dept) { return dept; }
 
     // ========== UTILS ==========
     function esc(s) {
