@@ -386,6 +386,17 @@
     let currentDayData = []; // records for selected date
     let deferredPrompt;
 
+    // ========== 部門名稱對照 ==========
+    var DEPT_NAMES = {
+        '1部':  '信義店',
+        '2部':  '台中市政店',
+        'BOOK': 'TSUTAYA BOOKSTORE',
+        'CAFE': 'WIRED TOKYO'
+    };
+    function deptLabel(dept) {
+        return DEPT_NAMES[dept] || dept;
+    }
+
     // ========== UTILS ==========
     function esc(s) {
         return String(s)
@@ -574,7 +585,7 @@
         depts.forEach(function(d) {
             var o = document.createElement('option');
             o.value = d;
-            o.textContent = d;
+            o.textContent = deptLabel(d);
             if (d === prev) o.selected = true;
             sel.appendChild(o);
         });
@@ -642,7 +653,7 @@
             var header = document.createElement('div');
             header.className = 'dept-header';
             header.innerHTML =
-                '<div class="dept-title">' + esc(dept) + '</div>' +
+                '<div class="dept-title">' + esc(deptLabel(dept)) + '</div>' +
                 '<div class="dept-badge">' +
                 '<span class="badge">上班 ' + g.working.length + '</span>' +
                 (showVacation ? '<span class="badge">休假 ' + g.rest.length + '</span>' : '') +
