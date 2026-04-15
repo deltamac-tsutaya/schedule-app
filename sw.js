@@ -1,9 +1,14 @@
 const CACHE_NAME = 'schedule-v2';
+
+// Derive base path automatically so this works on GitHub Pages
+// (e.g. /schedule-app/) as well as a custom domain root (/)
+const BASE = self.location.pathname.replace(/sw\.js$/, '');
+
 const SHELL_URLS = [
-  '/index.html',
-  '/admin.html',
-  '/manifest.json',
-  '/firebase-config.js'
+  BASE + 'index.html',
+  BASE + 'admin.html',
+  BASE + 'manifest.json',
+  BASE + 'firebase-config.js'
 ];
 
 // Skip caching requests to these external hosts

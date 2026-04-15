@@ -2,8 +2,8 @@
   "name": "班表查閱工具",
   "short_name": "班表查閱",
   "description": "查詢員工排班，規劃最佳拜訪時間",
-  "start_url": "/index.html",
-  "scope": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#2563eb",
@@ -41,7 +41,7 @@
       "name": "查詢班表",
       "short_name": "查詢",
       "description": "快速查詢員工班表",
-      "url": "/index.html",
+      "url": "./index.html",
       "icons": [
         {
           "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%232563eb' width='96' height='96'/><text x='48' y='55' font-size='60' font-weight='700' fill='white' text-anchor='middle'>班</text></svg>",
