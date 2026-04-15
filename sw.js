@@ -1,4 +1,4 @@
-const CACHE_NAME = 'schedule-v2';
+const CACHE_NAME = 'schedule-v3';
 
 // Derive base path automatically so this works on GitHub Pages
 // (e.g. /schedule-app/) as well as a custom domain root (/)
