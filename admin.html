@@ -352,6 +352,55 @@
         @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         .hidden { display: none !important; }
+
+        /* Employee title management */
+        .search-input {
+            width: 100%;
+            padding: 0.65rem 0.875rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+        .emp-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            transition: border-color 0.15s;
+        }
+        .emp-title-row:last-child { margin-bottom: 0; }
+        .emp-title-info { flex: 1; min-width: 0; }
+        .emp-title-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+        .emp-title-id { font-size: 12px; color: #94a3b8; margin-top: 0.2rem; }
+        .emp-title-input {
+            width: 150px;
+            padding: 0.45rem 0.65rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 13px;
+            flex-shrink: 0;
+            transition: border-color 0.2s;
+        }
+        .emp-title-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+        .save-titles-btn {
+            padding: 0.7rem 1.75rem;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(37,99,235,0.25);
+        }
+        .save-titles-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -446,6 +495,23 @@
                 <div id="monthsList"><div class="loading-text">載入中...</div></div>
             </div>
 
+            <!-- Employee title management -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title">👤 職稱管理</div>
+                    <button class="refresh-btn" onclick="loadEmployees()">重新整理</button>
+                </div>
+                <p style="font-size:13px;color:#64748b;margin-bottom:0.875rem;">上傳班表後系統會自動同步員工名單。在此設定每位員工的職稱，儲存後前台即會顯示。</p>
+                <div style="margin-bottom:0.75rem;">
+                    <input type="text" id="empSearch" class="search-input"
+                           placeholder="搜尋姓名或工號..." oninput="filterEmployeeList()" />
+                </div>
+                <div id="empList"><div class="loading-text">載入中...</div></div>
+                <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
+                    <button class="save-titles-btn" onclick="saveAllTitles()">儲存所有職稱</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -514,6 +580,7 @@
                 currentUser = user;
                 showDashboard(user);
                 loadMonths();
+                loadEmployees();
             } else {
                 currentUser = null;
                 showLogin();
@@ -761,6 +828,7 @@
 
         var months = Object.keys(pendingUpload.byMonth).sort();
         var total  = months.length;
+        var allRecs = [];
 
         document.getElementById('previewSection').classList.add('hidden');
         document.getElementById('progressSection').classList.remove('hidden');
@@ -771,15 +839,28 @@
                 var ym = months[i];
                 setProgress(i, total, '上傳 ' + ym + '...', (i + 1) + ' / ' + total + ' 個月份');
                 await uploadMonthData(ym, pendingUpload.byMonth[ym], pendingUpload.filename);
+                pendingUpload.byMonth[ym].forEach(function(r) { allRecs.push(r); });
                 setProgress(i + 1, total, '完成 ' + ym, (i + 1) + ' / ' + total + ' 個月份');
             }
 
-            showToast('成功上傳 ' + total + ' 個月份的班表', 'success');
+            // Sync employee roster for title management
+            try {
+                setProgress(total, total, '同步員工資料...', '請稍候');
+                await syncEmployees(allRecs);
+            } catch(e2) { console.warn('syncEmployees failed:', e2); }
+
+            showToast('成功上傳 ' + total + ' 個月份的班表，請至下方設定職稱', 'success', 5000);
             pendingUpload = null;
             setTimeout(function() {
                 document.getElementById('progressSection').classList.add('hidden');
-            }, 2000);
+            }, 1500);
             loadMonths();
+            loadEmployees();
+
+            // Scroll to title section
+            setTimeout(function() {
+                document.getElementById('empList').closest('.section-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 1800);
         } catch(e) {
             showToast('上傳失敗：' + e.message, 'error');
             document.getElementById('progressSection').classList.add('hidden');
@@ -945,6 +1026,132 @@
         } catch(e) {
             showToast('刪除失敗：' + e.message, 'error');
         }
+    }
+
+    // ========== EMPLOYEE TITLE MANAGEMENT ==========
+    var allEmployees = []; // [{empId, empName, dept, title}]
+
+    // After upload: extract unique employees, write to employees/{empId} preserving existing titles
+    async function syncEmployees(records) {
+        var empMap = {};
+        records.forEach(function(r) {
+            if (!empMap[r.empId]) {
+                empMap[r.empId] = { empId: r.empId, empName: r.empName, dept: r.dept };
+            }
+        });
+        var empIds = Object.keys(empMap);
+        if (empIds.length === 0) return;
+
+        // Fetch existing titles so we don't overwrite them
+        var existingTitles = {};
+        try {
+            var snap = await db.collection('employees').get();
+            snap.forEach(function(doc) {
+                existingTitles[doc.id] = doc.data().title || '';
+            });
+        } catch(e) {}
+
+        var BATCH_LIMIT = 480;
+        var batch = db.batch();
+        var opCount = 0;
+        for (var i = 0; i < empIds.length; i++) {
+            var empId = empIds[i];
+            var emp = empMap[empId];
+            var ref = db.collection('employees').doc(empId);
+            batch.set(ref, {
+                empId:   empId,
+                empName: emp.empName,
+                dept:    emp.dept,
+                title:   existingTitles[empId] !== undefined ? existingTitles[empId] : ''
+            });
+            opCount++;
+            if (opCount >= BATCH_LIMIT) {
+                await batch.commit();
+                batch = db.batch();
+                opCount = 0;
+            }
+        }
+        if (opCount > 0) await batch.commit();
+    }
+
+    async function loadEmployees() {
+        var container = document.getElementById('empList');
+        container.innerHTML = '<div class="loading-text">載入中...</div>';
+        try {
+            var snap = await db.collection('employees').orderBy('empName').get();
+            allEmployees = snap.docs.map(function(doc) {
+                return Object.assign({ id: doc.id }, doc.data());
+            });
+            filterEmployeeList();
+        } catch(e) {
+            container.innerHTML = '<div class="loading-text" style="color:#ef4444">載入失敗：' + esc(e.message) + '</div>';
+        }
+    }
+
+    function renderEmployeeList(employees) {
+        var container = document.getElementById('empList');
+        if (employees.length === 0) {
+            container.innerHTML = '<div class="empty-months">尚無員工資料，請先上傳班表</div>';
+            return;
+        }
+        var frag = document.createDocumentFragment();
+        employees.forEach(function(emp) {
+            var row = document.createElement('div');
+            row.className = 'emp-title-row';
+            row.innerHTML =
+                '<div class="emp-title-info">' +
+                '<div class="emp-title-name">' + esc(emp.empName) + '</div>' +
+                '<div class="emp-title-id">' + esc(emp.empId) +
+                (emp.dept ? ' · ' + esc(emp.dept) : '') + '</div>' +
+                '</div>' +
+                '<input type="text" class="emp-title-input" placeholder="職稱（空白表示不顯示）" ' +
+                'data-empid="' + esc(emp.empId) + '" value="' + esc(emp.title || '') + '" />';
+            frag.appendChild(row);
+        });
+        container.innerHTML = '';
+        container.appendChild(frag);
+    }
+
+    function filterEmployeeList() {
+        var q = (document.getElementById('empSearch').value || '').trim().toLowerCase();
+        var list = q ? allEmployees.filter(function(emp) {
+            return emp.empName.toLowerCase().indexOf(q) >= 0 ||
+                   emp.empId.toLowerCase().indexOf(q) >= 0;
+        }) : allEmployees;
+        renderEmployeeList(list);
+    }
+
+    async function saveAllTitles() {
+        var inputs = document.querySelectorAll('.emp-title-input');
+        if (inputs.length === 0) { showToast('沒有可儲存的資料', 'info'); return; }
+
+        var BATCH_LIMIT = 480;
+        var batch = db.batch();
+        var opCount = 0;
+        var count = 0;
+
+        for (var i = 0; i < inputs.length; i++) {
+            var input = inputs[i];
+            var empId = input.dataset.empid;
+            var title = input.value.trim();
+            batch.update(db.collection('employees').doc(empId), { title: title });
+            opCount++;
+            count++;
+            if (opCount >= BATCH_LIMIT) {
+                await batch.commit();
+                batch = db.batch();
+                opCount = 0;
+            }
+        }
+        if (opCount > 0) await batch.commit();
+
+        // Update in-memory list so filter stays consistent
+        inputs.forEach(function(input) {
+            var emp = allEmployees.find(function(e) { return e.empId === input.dataset.empid; });
+            if (emp) emp.title = input.value.trim();
+        });
+
+        showToast('已儲存 ' + count + ' 筆職稱', 'success');
     }
 
     // ========== BOOT ==========

@@ -152,6 +152,19 @@
         .emp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; }
         .emp-info { flex: 1; }
         .emp-name { font-weight: 600; font-size: 14px; color: #1f2937; }
+        .emp-title-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #4b5563;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 0 5px;
+            margin-right: 5px;
+            vertical-align: middle;
+            line-height: 1.6;
+        }
         .emp-id { font-size: 12px; color: #9ca3af; margin-top: 0.2rem; }
         .time-display { font-family: 'Menlo', 'Monaco', monospace; font-size: 13px; font-weight: 500; color: #374151; }
         .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 11px; font-weight: 600; white-space: nowrap; }
@@ -392,6 +405,7 @@
     let db = null;
     let availableMonths = []; // [{ id: '2024-04', departments, dateRange, ... }]
     let currentDayData = []; // records for selected date
+    let empTitles = {};       // { empId: title }
     let deferredPrompt;
 
     // 部門名稱已在後台上傳時直接轉換，前台直接顯示即可
@@ -445,6 +459,16 @@
         } catch(e) { return false; }
     }
 
+    async function loadEmployeeTitles() {
+        try {
+            var snap = await db.collection('employees').get();
+            snap.forEach(function(doc) {
+                var d = doc.data();
+                if (d.title) empTitles[doc.id] = d.title;
+            });
+        } catch(e) { /* non-critical, titles are optional */ }
+    }
+
     async function initApp() {
         if (!isConfigured()) {
             hideAppLoading();
@@ -457,6 +481,7 @@
             setCloud('', '連線中');
             firebase.initializeApp(FIREBASE_CONFIG);
             db = firebase.firestore();
+            loadEmployeeTitles(); // fire-and-forget, non-blocking
             await loadAvailableMonths();
         } catch(e) {
             hideAppLoading();
@@ -671,9 +696,10 @@
                 var div = document.createElement('div');
                 div.className = 'employee-row row-working';
                 var time = r.isValidTime ? esc(r.startTime) + ' - ' + esc(r.endTime) : esc(r.shiftRaw);
+                var titleBadge = empTitles[r.empId] ? '<span class="emp-title-badge">' + esc(empTitles[r.empId]) + '</span>' : '';
                 div.innerHTML =
                     '<div class="emp-header">' +
-                    '<div class="emp-info"><div class="emp-name">' + esc(r.empName) + '</div>' +
+                    '<div class="emp-info"><div class="emp-name">' + titleBadge + esc(r.empName) + '</div>' +
                     '<div class="emp-id">' + esc(r.empId) + '</div></div>' +
                     '<span class="status-badge badge-working">上班</span>' +
                     '</div>' +
@@ -690,9 +716,10 @@
                     div.className = 'employee-row ' + (isHoliday ? 'row-holiday' : 'row-rest');
                     var status = isHoliday ? '例假日' : '休息日';
                     var badgeClass = isHoliday ? 'badge-holiday' : 'badge-rest';
+                    var titleBadge2 = empTitles[r.empId] ? '<span class="emp-title-badge">' + esc(empTitles[r.empId]) + '</span>' : '';
                     div.innerHTML =
                         '<div class="emp-header">' +
-                        '<div class="emp-info"><div class="emp-name">' + esc(r.empName) + '</div>' +
+                        '<div class="emp-info"><div class="emp-name">' + titleBadge2 + esc(r.empName) + '</div>' +
                         '<div class="emp-id">' + esc(r.empId) + '</div></div>' +
                         '<span class="status-badge ' + badgeClass + '">' + status + '</span>' +
                         '</div>' +
