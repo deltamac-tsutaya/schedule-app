@@ -1017,14 +1017,20 @@
     // ========== DATE NAVIGATION ==========
     var WEEKDAYS = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
 
+    // 使用本地時間避免 toISOString() 的 UTC 偏移問題（台灣 UTC+8 會造成日期偏差）
+    function localDateStr(d) {
+        return d.getFullYear() + '-' +
+            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+            String(d.getDate()).padStart(2, '0');
+    }
+
     function updateDateDisplay(dateStr) {
         if (!dateStr) return;
         var d = new Date(dateStr + 'T00:00:00');
-        var todayStr = new Date().toISOString().split('T')[0];
+        var todayStr = localDateStr(new Date());
         document.getElementById('dateCenterMain').textContent =
             (d.getMonth() + 1) + '月' + d.getDate() + '日';
         document.getElementById('dateCenterWeekday').textContent = WEEKDAYS[d.getDay()];
-        // Highlight 今日 chip when viewing today
         document.getElementById('chipToday').classList.toggle('today-active', dateStr === todayStr);
     }
 
@@ -1033,7 +1039,7 @@
         if (!cur) return;
         var d = new Date(cur + 'T00:00:00');
         d.setDate(d.getDate() + delta);
-        var next = d.toISOString().split('T')[0];
+        var next = localDateStr(d);           // 本地日期字串，不受 UTC 偏移影響
         document.getElementById('queryDate').value = next;
         updateDateDisplay(next);
         onDateChange();
@@ -1042,14 +1048,14 @@
     function jumpRelDay(delta) {
         var d = new Date();
         d.setDate(d.getDate() + delta);
-        var target = d.toISOString().split('T')[0];
+        var target = localDateStr(d);
         document.getElementById('queryDate').value = target;
         updateDateDisplay(target);
         onDateChange();
     }
 
     function jumpToToday() {
-        var today = new Date().toISOString().split('T')[0];
+        var today = localDateStr(new Date());
         document.getElementById('queryDate').value = today;
         updateDateDisplay(today);
         onDateChange();
@@ -1075,7 +1081,7 @@
     })();
 
     function setDefaultDate() {
-        var today = new Date().toISOString().split('T')[0];
+        var today = localDateStr(new Date());
         var todayYM = today.substring(0, 7);
         var dateInput = document.getElementById('queryDate');
 
