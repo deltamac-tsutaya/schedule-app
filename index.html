@@ -243,18 +243,47 @@
             color: #1a1a1a;
             margin-bottom: 0.5rem;
         }
+        .staffing-header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .staffing-period {
+            font-size: 10px;
+            color: #78716c;
+            background: #f0ede8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+        }
         .spectrum-bar {
             display: flex;
             height: 8px;
             border-radius: 4px;
             overflow: hidden;
             gap: 2px;
+            background: #ede8e3;
         }
         .spectrum-seg {
             height: 100%;
             border-radius: 4px;
             flex-shrink: 0;
         }
+        .spectrum-ghost {
+            height: 100%;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(100,120,140,0.45) 0px,
+                rgba(100,120,140,0.45) 3px,
+                transparent 3px,
+                transparent 6px
+            );
+        }
+        .sfoot-arrow { font-size: 9px; font-weight: 700; line-height: 1; }
+        .sfoot-arrow.up   { color: #16a34a; }
+        .sfoot-arrow.down { color: #d97706; }
         .staffing-footer {
             display: flex;
             gap: 1rem;
@@ -1295,6 +1324,30 @@
         { key: 'dtype-admin',   color: '#C9C0B7', label: '行政' }
     ];
 
+    var TIME_PERIODS = [
+        [0,   360,  '深夜'],
+        [360, 510,  '開店準備'],
+        [510, 720,  '上午'],
+        [720, 840,  '午間高峰'],
+        [840, 960,  '換班時段'],
+        [960, 1080, '下午'],
+        [1080,1200, '傍晚'],
+        [1200,1320, '晚間'],
+        [1320,1440, '打烊']
+    ];
+
+    function getTimePeriod(min) {
+        for (var i = 0; i < TIME_PERIODS.length; i++) {
+            if (min >= TIME_PERIODS[i][0] && min < TIME_PERIODS[i][1]) return TIME_PERIODS[i][2];
+        }
+        return '';
+    }
+
+    function parseTimeToMin(t) {
+        if (!t || t.length < 5) return -1;
+        return parseInt(t) * 60 + parseInt(t.substring(3));
+    }
+
     function updateStats(data) {
         var container = document.getElementById('statsContainer');
         if (!data.length) { container.innerHTML = ''; return; }
@@ -1307,8 +1360,12 @@
             storeMap[store].push(r);
         });
 
-        var now = new Date();
-        var timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        var now        = new Date();
+        var nowMin     = now.getHours() * 60 + now.getMinutes();
+        var timeStr    = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        var periodLabel = getTimePeriod(nowMin);
+        var selectedDate = document.getElementById('queryDate').value;
+        var isToday    = (selectedDate === localDateStr(new Date()));
         var storeOrder = ['信義店', '臺中市政店'];
         var shortNames = { '信義店': '信義', '臺中市政店': '市政' };
 
@@ -1317,40 +1374,87 @@
             var rows = storeMap[store];
             if (!rows) return;
 
-            // Count by dept-type class
-            var counts = {};
+            /* ── Shift-time helpers (only meaningful on today) ── */
+            var activeNow = [], activeNext = [];
+            if (isToday) {
+                rows.forEach(function(r) {
+                    if (!r.isValidTime) return;
+                    var s = parseTimeToMin(r.startTime), e = parseTimeToMin(r.endTime);
+                    if (s < 0 || e < 0) return;
+                    if (s <= nowMin && e > nowMin)        activeNow.push(r);
+                    if (s <= nowMin + 60 && e > nowMin + 60) activeNext.push(r);
+                });
+            }
+
+            /* ── Dept counts (base = activeNow for today, all rows otherwise) ── */
+            var baseRows  = (isToday && activeNow.length) ? activeNow : rows;
+            var counts    = {};
             DEPT_SPECTRUM.forEach(function(d) { counts[d.key] = 0; });
-            rows.forEach(function(r) {
+            baseRows.forEach(function(r) {
                 var dt = getDeptType(r.dept, r.empId);
                 if (dt && counts[dt.cls] !== undefined) counts[dt.cls]++;
             });
-
             var totalTagged = DEPT_SPECTRUM.reduce(function(s, d) { return s + counts[d.key]; }, 0);
 
-            // Spectrum bar
+            /* ── Forecast delta ── */
+            var solidPct = 100, ghostPct = 0;
+            if (isToday && rows.length) {
+                solidPct = baseRows.length / rows.length * 100;
+                var delta = activeNext.length - activeNow.length;
+                if (delta > 0) ghostPct = Math.min(delta / rows.length * 100, 100 - solidPct);
+            }
+
+            /* ── 30-min dept-change arrows ── */
+            var deptChange = {};
+            DEPT_SPECTRUM.forEach(function(d) { deptChange[d.key] = null; });
+            if (isToday) {
+                rows.forEach(function(r) {
+                    if (!r.isValidTime) return;
+                    var dt = getDeptType(r.dept, r.empId);
+                    if (!dt) return;
+                    var s = parseTimeToMin(r.startTime), e = parseTimeToMin(r.endTime);
+                    if (s > nowMin && s <= nowMin + 30) deptChange[dt.cls] = 'up';
+                    if (e > nowMin && e <= nowMin + 30 && deptChange[dt.cls] !== 'up') deptChange[dt.cls] = 'down';
+                });
+            }
+
+            /* ── Spectrum bar HTML ── */
             var barSegs = '';
             DEPT_SPECTRUM.forEach(function(d) {
                 if (!counts[d.key] || !totalTagged) return;
-                var pct = (counts[d.key] / totalTagged * 100).toFixed(2);
+                var pct = (counts[d.key] / totalTagged * solidPct).toFixed(2);
                 barSegs += '<div class="spectrum-seg" style="width:' + pct + '%;background:' + d.color + '"></div>';
             });
+            if (ghostPct > 0.5) {
+                barSegs += '<div class="spectrum-ghost" style="width:' + ghostPct.toFixed(2) + '%"></div>';
+            }
 
-            // Footer items
+            /* ── Footer items ── */
             var footerItems = '';
             DEPT_SPECTRUM.forEach(function(d) {
+                var arrow = '';
+                if (deptChange[d.key] === 'up')   arrow = '<span class="sfoot-arrow up">↑</span>';
+                if (deptChange[d.key] === 'down')  arrow = '<span class="sfoot-arrow down">↓</span>';
                 footerItems +=
                     '<div class="sfoot-item">' +
                         '<span class="sfoot-dot" style="background:' + d.color + '"></span>' +
                         '<span class="sfoot-name">' + d.label + '</span>' +
                         '<span class="sfoot-count">' + counts[d.key] + '</span>' +
+                        arrow +
                     '</div>';
             });
 
+            /* ── Card HTML ── */
+            var periodHtml = periodLabel
+                ? '<span class="staffing-period">' + periodLabel + '</span>' : '';
             html +=
                 '<div class="staffing-card">' +
                     '<div class="staffing-header">' +
                         '<span class="staffing-store-name">' + shortNames[store] + '</span>' +
-                        '<span class="staffing-time">' + timeStr + '</span>' +
+                        '<div class="staffing-header-right">' +
+                            periodHtml +
+                            '<span class="staffing-time">' + timeStr + '</span>' +
+                        '</div>' +
                     '</div>' +
                     '<div class="staffing-main">' +
                         '<div class="staffing-total">' + rows.length + '</div>' +
