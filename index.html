@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23000' width='192' height='192'/><text x='5' y='185' font-size='155' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='188' y='44' font-size='40' font-family='sans-serif' font-weight='700' fill='white' text-anchor='end'>DM</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23000' width='180' height='180' rx='40'/><text x='5' y='174' font-size='145' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='176' y='42' font-size='38' font-family='sans-serif' font-weight='700' fill='white' text-anchor='end'>DM</text></svg>">
-    <title>得利蔦屋-營運支援工具</title>
+    <title>得利蔦屋-營運管理系統</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
@@ -267,32 +267,173 @@
         @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* App loading overlay */
-        .app-loading {
+        /* Content padding for bottom nav */
+        .content {
+            padding-bottom: calc(68px + max(1rem, env(safe-area-inset-bottom))) !important;
+        }
+
+        /* Splash screen */
+        .splash-screen {
             position: fixed;
             inset: 0;
-            background: #f9fafb;
+            background: #0a0f1a;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
-            z-index: 300;
+            z-index: 500;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        .app-loading-spinner {
-            width: 40px; height: 40px;
-            border: 3px solid #e5e7eb;
-            border-top-color: #2563eb;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .splash-screen.fade-out { opacity: 0; visibility: hidden; }
+        .splash-logo {
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 32px rgba(37,99,235,0.4));
         }
-        .app-loading-text { font-size: 14px; color: #9ca3af; }
-        .app-loading.hidden { display: none; }
+        .splash-brand { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: 3px; }
+        .splash-subtitle { font-size: 13px; color: rgba(255,255,255,0.45); letter-spacing: 2px; margin-top: 0.35rem; }
+        .splash-dots { display: flex; gap: 8px; margin-top: 3rem; }
+        .splash-dots span {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            animation: dotPulse 1.4s ease-in-out infinite;
+        }
+        .splash-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .splash-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dotPulse {
+            0%, 80%, 100% { background: rgba(255,255,255,0.2); transform: scale(0.8); }
+            40%            { background: rgba(255,255,255,0.85); transform: scale(1.25); }
+        }
+
+        /* Bottom navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+        }
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.55rem 0;
+            gap: 0.25rem;
+            cursor: pointer;
+            color: #9ca3af;
+            border: none;
+            background: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s;
+        }
+        .nav-tab.active { color: #2563eb; }
+        .nav-tab-icon { font-size: 22px; line-height: 1; }
+        .nav-tab-label { font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
+
+        /* Pages */
+        .page { display: flex; flex-direction: column; }
+        .page.hidden { display: none !important; }
+
+        /* Settings page */
+        .settings-group { margin-bottom: 1.25rem; }
+        .settings-section-title {
+            font-size: 11px; font-weight: 700; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 0.5rem; padding: 0 0.25rem;
+        }
+        .settings-card {
+            background: white; border: 1px solid #e5e7eb;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .settings-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-row-label { font-size: 14px; color: #374151; font-weight: 500; }
+        .settings-row-value { font-size: 13px; color: #9ca3af; }
+        .settings-action-btn {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2563eb;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .settings-action-btn:active { background: #eff6ff; }
+        .settings-action-btn.danger { color: #ef4444; }
+
+        /* Placeholder pages (儀表板 / 行銷) */
+        .placeholder-hero {
+            text-align: center;
+            padding: 2rem 1rem 1.5rem;
+        }
+        .placeholder-icon { font-size: 48px; margin-bottom: 0.75rem; }
+        .placeholder-title { font-size: 18px; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
+        .placeholder-desc { font-size: 13px; color: #9ca3af; line-height: 1.6; }
+        .placeholder-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .placeholder-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.1rem 1rem;
+            text-align: center;
+            border-top: 3px solid #e5e7eb;
+        }
+        .placeholder-card-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.5rem; }
+        .placeholder-card-value { font-size: 26px; font-weight: 700; color: #d1d5db; }
+        .placeholder-list {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .placeholder-list-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .placeholder-list-item:last-child { border-bottom: none; }
+        .placeholder-list-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #e5e7eb; flex-shrink: 0;
+        }
+        .placeholder-list-text { font-size: 14px; color: #d1d5db; font-weight: 500; }
+
+        /* Announcements page */
+        .announce-empty {
+            flex: 1;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 3rem 2rem; text-align: center;
+        }
+        .announce-icon { font-size: 52px; margin-bottom: 1rem; opacity: 0.7; }
+        .announce-title { font-size: 17px; font-weight: 700; color: #374151; margin-bottom: 0.5rem; }
+        .announce-desc { font-size: 13px; color: #9ca3af; line-height: 1.6; }
 
         /* Install prompt */
         .install-prompt {
             position: fixed;
-            bottom: max(1rem, env(safe-area-inset-bottom));
+            bottom: calc(64px + max(0.5rem, env(safe-area-inset-bottom)));
             left: 1rem; right: 1rem;
             background: white;
             border: 1px solid #e5e7eb;
@@ -313,15 +454,24 @@
 <body>
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- App loading overlay -->
-    <div id="appLoading" class="app-loading">
-        <div class="app-loading-spinner"></div>
-        <div class="app-loading-text">連線中...</div>
+    <!-- Splash screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-logo">
+            <svg viewBox="0 0 200 200" width="96" height="96" xmlns="http://www.w3.org/2000/svg">
+                <rect fill="#000" width="200" height="200" rx="46"/>
+                <text x="8" y="193" font-size="162" font-family="serif" fill="white">蔦</text>
+                <text x="196" y="50" font-size="43" font-family="sans-serif" font-weight="700" fill="white" text-anchor="end">DM</text>
+            </svg>
+        </div>
+        <div class="splash-brand">得利蔦屋</div>
+        <div class="splash-subtitle">營運管理系統</div>
+        <div class="splash-dots"><span></span><span></span><span></span></div>
     </div>
 
     <div class="app-container">
+        <!-- Status bar -->
         <div class="status-bar">
-            <span class="status-bar-title">得利蔦屋-營運支援工具</span>
+            <span class="status-bar-title">營運管理系統</span>
             <div style="display:flex;align-items:center;gap:0.75rem;">
                 <div class="cloud-status">
                     <div class="cloud-dot" id="cloudDot"></div>
@@ -337,75 +487,215 @@
         </div>
 
         <div class="content">
-            <!-- Not configured -->
-            <div id="stateNotConfigured" class="empty-state hidden">
-                <div class="empty-icon">⚙️</div>
-                <div class="empty-title">尚未設定雲端連線</div>
-                <div class="empty-desc">請聯繫管理員設定 firebase-config.js</div>
-            </div>
 
-            <!-- No data yet -->
-            <div id="stateNoData" class="empty-state hidden">
-                <div class="empty-icon">📋</div>
-                <div class="empty-title">尚無班表資料</div>
-                <div class="empty-desc">請管理員至後台上傳當月班表</div>
-            </div>
-
-            <!-- Error state -->
-            <div id="stateError" class="empty-state hidden">
-                <div class="empty-icon">⚠️</div>
-                <div class="empty-title">連線失敗</div>
-                <div class="empty-desc" id="errorDesc">請檢查網路連線後重新整理</div>
-            </div>
-
-            <!-- Main UI -->
-            <div id="stateMain" class="hidden">
-                <!-- Available months bar -->
-                <div class="months-bar" id="monthsBar"></div>
-
-                <!-- Query panel -->
-                <div class="query-panel">
-                    <div class="query-grid">
-                        <div class="control-group">
-                            <label class="control-label">日期</label>
-                            <input type="date" id="queryDate" class="control-input" onchange="onDateChange()" />
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">分店</label>
-                            <select id="queryStore" class="control-input" onchange="filterAndDisplay()">
-                                <option value="">全部</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="toggle-row">
-                        <span class="toggle-label">顯示休假人員（例假日／休息日）</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="showVacationToggle" onchange="filterAndDisplay()" />
-                            <div class="toggle-track"></div>
-                            <div class="toggle-thumb"></div>
-                        </label>
-                    </div>
+            <!-- ===== PAGE: 班表 ===== -->
+            <div id="pageSchedule" class="page">
+                <!-- Not configured -->
+                <div id="stateNotConfigured" class="empty-state hidden">
+                    <div class="empty-icon">⚙️</div>
+                    <div class="empty-title">尚未設定雲端連線</div>
+                    <div class="empty-desc">請聯繫管理員設定 firebase-config.js</div>
                 </div>
 
-                <!-- Stats -->
-                <div class="stats-grid" id="statsContainer"></div>
+                <!-- No data yet -->
+                <div id="stateNoData" class="empty-state hidden">
+                    <div class="empty-icon">📋</div>
+                    <div class="empty-title">尚無班表資料</div>
+                    <div class="empty-desc">請管理員至後台上傳當月班表</div>
+                </div>
 
-                <!-- Results -->
-                <div class="results-card">
-                    <div id="dayLoading" class="day-loading hidden">
-                        <div class="day-spinner"></div>
-                        <span>載入中</span>
+                <!-- Error state -->
+                <div id="stateError" class="empty-state hidden">
+                    <div class="empty-icon">⚠️</div>
+                    <div class="empty-title">連線失敗</div>
+                    <div class="empty-desc" id="errorDesc">請檢查網路連線後重新整理</div>
+                </div>
+
+                <!-- Main UI -->
+                <div id="stateMain" class="hidden">
+                    <div class="months-bar" id="monthsBar"></div>
+                    <div class="query-panel">
+                        <div class="query-grid">
+                            <div class="control-group">
+                                <label class="control-label">日期</label>
+                                <input type="date" id="queryDate" class="control-input" onchange="onDateChange()" />
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">分店</label>
+                                <select id="queryStore" class="control-input" onchange="filterAndDisplay()">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <span class="toggle-label">顯示休假人員（例假日／休息日）</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="showVacationToggle" onchange="filterAndDisplay()" />
+                                <div class="toggle-track"></div>
+                                <div class="toggle-thumb"></div>
+                            </label>
+                        </div>
                     </div>
-                    <div id="resultsContainer"></div>
-                    <div id="emptyState" class="empty-state hidden">
-                        <div class="empty-icon">📅</div>
-                        <div class="empty-title">此日期無班表資料</div>
-                        <div class="empty-desc">請選擇其他日期，或聯繫管理員確認</div>
+                    <div class="stats-grid" id="statsContainer"></div>
+                    <div class="results-card">
+                        <div id="dayLoading" class="day-loading hidden">
+                            <div class="day-spinner"></div>
+                            <span>載入中</span>
+                        </div>
+                        <div id="resultsContainer"></div>
+                        <div id="emptyState" class="empty-state hidden">
+                            <div class="empty-icon">📅</div>
+                            <div class="empty-title">此日期無班表資料</div>
+                            <div class="empty-desc">請選擇其他日期，或聯繫管理員確認</div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- ===== PAGE: 儀表板 ===== -->
+            <div id="pageDashboard" class="page hidden">
+                <div style="padding:1rem;">
+
+                    <div class="placeholder-hero">
+                        <div class="placeholder-icon">📊</div>
+                        <div class="placeholder-title">營運儀表板</div>
+                        <div class="placeholder-desc">即時掌握各店營運數據<br>功能開發中，敬請期待</div>
+                    </div>
+
+                    <div class="placeholder-preview-grid">
+                        <div class="placeholder-card">
+                            <div class="placeholder-card-label">今日上班人數</div>
+                            <div class="placeholder-card-value">—</div>
+                        </div>
+                        <div class="placeholder-card">
+                            <div class="placeholder-card-label">本月出勤率</div>
+                            <div class="placeholder-card-value">—</div>
+                        </div>
+                        <div class="placeholder-card">
+                            <div class="placeholder-card-label">信義店人力</div>
+                            <div class="placeholder-card-value">—</div>
+                        </div>
+                        <div class="placeholder-card">
+                            <div class="placeholder-card-label">台中市政人力</div>
+                            <div class="placeholder-card-value">—</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ===== PAGE: 行銷商品活動 ===== -->
+            <div id="pageMarketing" class="page hidden">
+                <div style="padding:1rem;">
+
+                    <div class="placeholder-hero">
+                        <div class="placeholder-icon">🎁</div>
+                        <div class="placeholder-title">行銷商品活動</div>
+                        <div class="placeholder-desc">查閱各期商品促銷與行銷活動資訊<br>功能開發中，敬請期待</div>
+                    </div>
+
+                    <div class="placeholder-list">
+                        <div class="placeholder-list-item">
+                            <div class="placeholder-list-dot"></div>
+                            <div class="placeholder-list-text">商品促銷活動</div>
+                        </div>
+                        <div class="placeholder-list-item">
+                            <div class="placeholder-list-dot"></div>
+                            <div class="placeholder-list-text">限時特賣資訊</div>
+                        </div>
+                        <div class="placeholder-list-item">
+                            <div class="placeholder-list-dot"></div>
+                            <div class="placeholder-list-text">主題展覽活動</div>
+                        </div>
+                        <div class="placeholder-list-item">
+                            <div class="placeholder-list-dot"></div>
+                            <div class="placeholder-list-text">會員優惠方案</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ===== PAGE: 公告 ===== -->
+            <div id="pageAnnouncements" class="page hidden">
+                <div class="announce-empty">
+                    <div class="announce-icon">📢</div>
+                    <div class="announce-title">公告通知</div>
+                    <div class="announce-desc">目前尚無公告<br>有最新消息時將會在此顯示</div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: 設定 ===== -->
+            <div id="pageSettings" class="page hidden">
+                <div style="padding:1rem;">
+
+                    <div class="settings-group">
+                        <div class="settings-section-title">連線狀態</div>
+                        <div class="settings-card">
+                            <div class="settings-row">
+                                <span class="settings-row-label">Firebase 雲端</span>
+                                <div style="display:flex;align-items:center;gap:0.4rem;">
+                                    <div class="cloud-dot" id="cloudDotSettings"></div>
+                                    <span id="cloudStatusSettings" class="settings-row-value">連線中</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-section-title">系統維護</div>
+                        <button class="settings-action-btn" onclick="clearCacheAndReload()">
+                            ↺ &nbsp;清除快取並重新載入
+                        </button>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-section-title">關於</div>
+                        <div class="settings-card">
+                            <div class="settings-row">
+                                <span class="settings-row-label">系統名稱</span>
+                                <span class="settings-row-value">營運管理系統</span>
+                            </div>
+                            <div class="settings-row">
+                                <span class="settings-row-label">品牌</span>
+                                <span class="settings-row-value">得利蔦屋</span>
+                            </div>
+                            <div class="settings-row">
+                                <span class="settings-row-label">版本</span>
+                                <span class="settings-row-value">v1.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </div>
+
+    <!-- Bottom navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-tab active" id="navSchedule" onclick="switchTab('schedule')">
+            <span class="nav-tab-icon">🗓️</span>
+            <span class="nav-tab-label">班表</span>
+        </button>
+        <button class="nav-tab" id="navDashboard" onclick="switchTab('dashboard')">
+            <span class="nav-tab-icon">📊</span>
+            <span class="nav-tab-label">儀表板</span>
+        </button>
+        <button class="nav-tab" id="navMarketing" onclick="switchTab('marketing')">
+            <span class="nav-tab-icon">🎁</span>
+            <span class="nav-tab-label">行銷活動</span>
+        </button>
+        <button class="nav-tab" id="navAnnouncements" onclick="switchTab('announcements')">
+            <span class="nav-tab-icon">📢</span>
+            <span class="nav-tab-label">公告</span>
+        </button>
+        <button class="nav-tab" id="navSettings" onclick="switchTab('settings')">
+            <span class="nav-tab-icon">⚙️</span>
+            <span class="nav-tab-label">設定</span>
+        </button>
+    </nav>
 
     <div id="installPrompt" class="install-prompt hidden">
         <div class="install-text">加入主螢幕使用更方便</div>
@@ -470,9 +760,12 @@
     }
 
     function setCloud(state, text) {
-        var dot = document.getElementById('cloudDot');
-        dot.className = 'cloud-dot' + (state ? ' ' + state : '');
+        var cls = 'cloud-dot' + (state ? ' ' + state : '');
+        document.getElementById('cloudDot').className = cls;
         document.getElementById('cloudStatusText').textContent = text;
+        // mirror to settings page
+        document.getElementById('cloudDotSettings').className = cls;
+        document.getElementById('cloudStatusSettings').textContent = text;
     }
 
     function showState(id) {
@@ -481,8 +774,27 @@
         });
     }
 
-    function hideAppLoading() {
-        document.getElementById('appLoading').classList.add('hidden');
+    function hideSplash() {
+        var s = document.getElementById('splashScreen');
+        s.classList.add('fade-out');
+        setTimeout(function() { s.style.display = 'none'; }, 520);
+    }
+
+    // ========== NAVIGATION ==========
+    var TABS = {
+        schedule:      { page: 'pageSchedule',      btn: 'navSchedule' },
+        dashboard:     { page: 'pageDashboard',     btn: 'navDashboard' },
+        marketing:     { page: 'pageMarketing',     btn: 'navMarketing' },
+        announcements: { page: 'pageAnnouncements', btn: 'navAnnouncements' },
+        settings:      { page: 'pageSettings',      btn: 'navSettings' }
+    };
+
+    function switchTab(tab) {
+        Object.keys(TABS).forEach(function(key) {
+            var t = TABS[key];
+            document.getElementById(t.page).classList.toggle('hidden', key !== tab);
+            document.getElementById(t.btn).classList.toggle('active', key === tab);
+        });
     }
 
     // ========== FIREBASE INIT ==========
@@ -506,7 +818,7 @@
 
     async function initApp() {
         if (!isConfigured()) {
-            hideAppLoading();
+            hideSplash();
             setCloud('error', '未設定');
             showState('stateNotConfigured');
             return;
@@ -519,7 +831,7 @@
             loadEmployeeTitles(); // fire-and-forget, non-blocking
             await loadAvailableMonths();
         } catch(e) {
-            hideAppLoading();
+            hideSplash();
             setCloud('error', '失敗');
             document.getElementById('errorDesc').textContent = e.message || '請檢查網路連線後重新整理';
             showState('stateError');
@@ -534,7 +846,7 @@
                 return Object.assign({ id: d.id }, d.data());
             });
 
-            hideAppLoading();
+            hideSplash();
             setCloud('connected', '已連線');
 
             if (availableMonths.length === 0) {
@@ -546,7 +858,7 @@
             showState('stateMain');
             setDefaultDate();
         } catch(e) {
-            hideAppLoading();
+            hideSplash();
             setCloud('error', '失敗');
             document.getElementById('errorDesc').textContent = e.message || '載入資料失敗';
             showState('stateError');
