@@ -11,13 +11,16 @@
     <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23000' width='192' height='192'/><text x='5' y='185' font-size='155' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='188' y='44' font-size='40' font-family='sans-serif' font-weight='700' fill='white' text-anchor='end'>DM</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23000' width='180' height='180' rx='40'/><text x='5' y='174' font-size='145' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='176' y='42' font-size='38' font-family='sans-serif' font-weight='700' fill='white' text-anchor='end'>DM</text></svg>">
     <title>得利蔦屋-營運管理系統</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Noto+Serif+TC:wght@400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
             color: #1f2937;
-            background: #f9fafb;
+            background: #F8F7F2;
             display: flex;
             flex-direction: column;
             /* 不在 body 加 padding-top，由 status-bar 自行處理 safe-area */
@@ -46,7 +49,7 @@
         .cloud-dot.error { background: #f87171; }
 
         /* Content */
-        .content { flex: 1; overflow-y: auto; padding: 1rem; padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+        .content { flex: 1; overflow-y: auto; padding: 1rem; padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); background: #F8F7F2; }
 
         /* Month badges */
         .months-bar {
@@ -199,20 +202,85 @@
         .vacation-toggle-wrap { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
         .vacation-toggle-label { font-size: 11px; color: #94a3b8; font-weight: 600; white-space: nowrap; }
 
-        /* Stats */
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
-        @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
-        .stat-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            border-top: 3px solid #2563eb;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        /* Stats — staffing overview cards */
+        .stats-grid { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+        @media (min-width: 640px) { .stats-grid { flex-direction: row; } .stats-grid .staffing-card { flex: 1; } }
+
+        .staffing-card {
+            background: rgba(255,255,255,0.58);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: none;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.06));
+            padding: 1rem 1.25rem 0.875rem;
         }
-        .stat-label { font-size: 10px; color: #9ca3af; margin-bottom: 0.5rem; font-weight: 600; text-transform: uppercase; }
-        .stat-value { font-size: 24px; font-weight: 700; color: #1f2937; }
+        .staffing-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        .staffing-store-name {
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 400;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            color: #4a4540;
+        }
+        .staffing-time {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: 12px;
+            color: #a8a29e;
+        }
+        .staffing-main { margin-bottom: 0.75rem; }
+        .staffing-total {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: 32px;
+            line-height: 1;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+        .spectrum-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            gap: 2px;
+        }
+        .spectrum-seg {
+            height: 100%;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .staffing-footer {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .sfoot-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .sfoot-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .sfoot-name {
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .sfoot-count {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: 11px;
+            color: #374151;
+        }
 
         /* Results */
         .results-card {
@@ -1220,23 +1288,79 @@
         displayResults(data);
     }
 
+    var DEPT_SPECTRUM = [
+        { key: 'dtype-book',    color: '#5D4037', label: '書店' },
+        { key: 'dtype-floor',   color: '#A3B1C6', label: '外場' },
+        { key: 'dtype-kitchen', color: '#E5E5E5', label: '內場' },
+        { key: 'dtype-admin',   color: '#C9C0B7', label: '行政' }
+    ];
+
     function updateStats(data) {
         var container = document.getElementById('statsContainer');
         if (!data.length) { container.innerHTML = ''; return; }
 
-        var working = 0, rest = 0;
-        var storeSet = {}, empSet = {};
+        // Group rows by store
+        var storeMap = {};
         data.forEach(function(r) {
-            if (r.status === 'working') working++; else rest++;
-            storeSet[getStore(r.dept)] = 1;
-            empSet[r.empId] = 1;
+            var store = getStore(r.dept);
+            if (!storeMap[store]) storeMap[store] = [];
+            storeMap[store].push(r);
         });
 
-        container.innerHTML =
-            '<div class="stat-card"><div class="stat-label">上班</div><div class="stat-value">' + working + '</div></div>' +
-            '<div class="stat-card"><div class="stat-label">休假</div><div class="stat-value">' + rest + '</div></div>' +
-            '<div class="stat-card"><div class="stat-label">店別</div><div class="stat-value">' + Object.keys(storeSet).length + '</div></div>' +
-            '<div class="stat-card"><div class="stat-label">人員</div><div class="stat-value">' + Object.keys(empSet).length + '</div></div>';
+        var now = new Date();
+        var timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        var storeOrder = ['信義店', '臺中市政店'];
+        var shortNames = { '信義店': '信義', '臺中市政店': '市政' };
+
+        var html = '';
+        storeOrder.forEach(function(store) {
+            var rows = storeMap[store];
+            if (!rows) return;
+
+            // Count by dept-type class
+            var counts = {};
+            DEPT_SPECTRUM.forEach(function(d) { counts[d.key] = 0; });
+            rows.forEach(function(r) {
+                var dt = getDeptType(r.dept, r.empId);
+                if (dt && counts[dt.cls] !== undefined) counts[dt.cls]++;
+            });
+
+            var totalTagged = DEPT_SPECTRUM.reduce(function(s, d) { return s + counts[d.key]; }, 0);
+
+            // Spectrum bar
+            var barSegs = '';
+            DEPT_SPECTRUM.forEach(function(d) {
+                if (!counts[d.key] || !totalTagged) return;
+                var pct = (counts[d.key] / totalTagged * 100).toFixed(2);
+                barSegs += '<div class="spectrum-seg" style="width:' + pct + '%;background:' + d.color + '"></div>';
+            });
+
+            // Footer items
+            var footerItems = '';
+            DEPT_SPECTRUM.forEach(function(d) {
+                footerItems +=
+                    '<div class="sfoot-item">' +
+                        '<span class="sfoot-dot" style="background:' + d.color + '"></span>' +
+                        '<span class="sfoot-name">' + d.label + '</span>' +
+                        '<span class="sfoot-count">' + counts[d.key] + '</span>' +
+                    '</div>';
+            });
+
+            html +=
+                '<div class="staffing-card">' +
+                    '<div class="staffing-header">' +
+                        '<span class="staffing-store-name">' + shortNames[store] + '</span>' +
+                        '<span class="staffing-time">' + timeStr + '</span>' +
+                    '</div>' +
+                    '<div class="staffing-main">' +
+                        '<div class="staffing-total">' + rows.length + '</div>' +
+                        '<div class="spectrum-bar">' + barSegs + '</div>' +
+                    '</div>' +
+                    '<div class="staffing-footer">' + footerItems + '</div>' +
+                '</div>';
+        });
+
+        container.innerHTML = html;
     }
 
     function makeEmpRow(r, statusText, badgeClass, rowClass) {
