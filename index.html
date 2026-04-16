@@ -26,23 +26,23 @@
 
         /* Status bar */
         .status-bar {
-            background: linear-gradient(to right, #2563eb, #1d4ed8);
-            color: white;
-            /* 頂部吃 safe-area-inset-top，底部固定 12px，避免雙重撐高 */
-            padding-top: max(12px, env(safe-area-inset-top));
-            padding-bottom: 12px;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            background: #fff;
+            color: #0f172a;
+            padding-top: max(14px, env(safe-area-inset-top));
+            padding-bottom: 14px;
+            padding-left: 1.1rem;
+            padding-right: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #f1f5f9;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             flex-shrink: 0;
         }
-        .status-bar-title { font-size: 17px; font-weight: 700; }
-        .cloud-status { display: flex; align-items: center; gap: 0.4rem; font-size: 12px; opacity: 0.9; }
+        .status-bar-title { font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; }
+        .cloud-status { display: flex; align-items: center; gap: 0.4rem; font-size: 12px; color: #64748b; }
         .cloud-dot { width: 7px; height: 7px; border-radius: 50%; background: #fbbf24; transition: background 0.4s; flex-shrink: 0; }
-        .cloud-dot.connected { background: #4ade80; }
+        .cloud-dot.connected { background: #22c55e; }
         .cloud-dot.error { background: #f87171; }
 
         /* Content */
@@ -51,60 +51,140 @@
         /* Month badges */
         .months-bar {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             overflow-x: auto;
-            padding-bottom: 0.25rem;
-            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
             scrollbar-width: none;
         }
         .months-bar::-webkit-scrollbar { display: none; }
         .month-badge {
             flex-shrink: 0;
-            padding: 0.35rem 0.8rem;
+            padding: 0.25rem 0.7rem;
             border-radius: 20px;
             border: 1.5px solid #e5e7eb;
             background: white;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            color: #6b7280;
+            color: #9ca3af;
             cursor: pointer;
             transition: all 0.15s;
             white-space: nowrap;
         }
         .month-badge:active { transform: scale(0.95); }
-        .month-badge.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .month-badge.active { background: #0f172a; color: white; border-color: #0f172a; }
 
-        /* Query panel */
-        .query-panel {
+        /* Date navigator */
+        .date-nav-card {
             background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 1rem 1rem 0.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
         }
-        .query-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-        @media (min-width: 640px) { .query-grid { grid-template-columns: repeat(2, 1fr); } }
-        .control-group { display: flex; flex-direction: column; gap: 0.4rem; }
-        .control-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .control-input {
-            width: 100%;
-            padding: 0.65rem 0.75rem;
+        .date-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.875rem;
+            user-select: none;
+        }
+        .date-arrow-btn {
+            width: 38px; height: 38px;
             border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #f8fafc;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: #374151;
+            flex-shrink: 0;
+            transition: all 0.15s;
+        }
+        .date-arrow-btn:active { background: #e9ecef; transform: scale(0.93); }
+        .date-arrow-btn svg { width: 18px; height: 18px; }
+        .date-display {
+            text-align: center;
+            flex: 1;
+        }
+        .date-main-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .date-weekday-text {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-top: 0.15rem;
+        }
+        /* Day quick-chips */
+        .day-chips {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .day-chip {
+            flex: 1;
+            padding: 0.5rem 0;
+            border-radius: 10px;
+            border: 1.5px solid #e5e7eb;
+            background: #f8fafc;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .day-chip:active { transform: scale(0.96); }
+        .day-chip.today-active {
+            background: #0f172a;
+            color: white;
+            border-color: #0f172a;
+        }
+
+        /* Filter bar (store pills + vacation toggle) */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: white;
+            border: 1px solid #f1f5f9;
+            border-radius: 14px;
+            padding: 0.6rem 0.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .store-pills {
+            display: flex;
+            gap: 0.35rem;
+            flex: 1;
+        }
+        .store-pill {
+            flex: 1;
+            padding: 0.4rem 0;
             border-radius: 8px;
-            font-size: 14px;
-            background: white;
-            -webkit-appearance: none;
-            appearance: none;
+            border: 1.5px solid #e5e7eb;
+            background: #f8fafc;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+            white-space: nowrap;
         }
-        .control-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
-        select.control-input {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 16px;
-            padding-right: 2.5rem;
+        .store-pill:active { transform: scale(0.95); }
+        .store-pill.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
         }
+        .filter-divider { width: 1px; height: 24px; background: #f1f5f9; flex-shrink: 0; }
+        .vacation-toggle-wrap { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+        .vacation-toggle-label { font-size: 11px; color: #94a3b8; font-weight: 600; white-space: nowrap; }
 
         /* Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
@@ -485,11 +565,11 @@
                     <span id="cloudStatusText">連線中</span>
                 </div>
                 <button onclick="clearCacheAndReload()" title="清除快取並重新載入"
-                    style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
-                           color:white;border-radius:6px;padding:0.25rem 0.55rem;font-size:15px;
-                           cursor:pointer;line-height:1;transition:background 0.2s;"
-                    onmouseenter="this.style.background='rgba(255,255,255,0.28)'"
-                    onmouseleave="this.style.background='rgba(255,255,255,0.15)'">↺</button>
+                    style="background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;border-radius:8px;
+                           padding:0.3rem 0.6rem;font-size:15px;cursor:pointer;line-height:1;
+                           transition:background 0.2s;"
+                    onmouseenter="this.style.background='#e2e8f0'"
+                    onmouseleave="this.style.background='#f1f5f9'">↺</button>
             </div>
         </div>
 
@@ -520,22 +600,50 @@
 
                 <!-- Main UI -->
                 <div id="stateMain" class="hidden">
+                    <!-- Hidden inputs for internal state -->
+                    <input type="date" id="queryDate" style="display:none" onchange="onDateChange()" />
+                    <select id="queryStore" style="display:none" onchange="filterAndDisplay()">
+                        <option value="">全部</option>
+                    </select>
+
+                    <!-- Month badges -->
                     <div class="months-bar" id="monthsBar"></div>
-                    <div class="query-panel">
-                        <div class="query-grid">
-                            <div class="control-group">
-                                <label class="control-label">日期</label>
-                                <input type="date" id="queryDate" class="control-input" onchange="onDateChange()" />
+
+                    <!-- Date navigator card -->
+                    <div class="date-nav-card" id="dateSwitcher">
+                        <div class="date-switcher">
+                            <button class="date-arrow-btn" onclick="shiftDay(-1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="15 18 9 12 15 6"/>
+                                </svg>
+                            </button>
+                            <div class="date-display">
+                                <div class="date-main-text" id="dateCenterMain">—</div>
+                                <div class="date-weekday-text" id="dateCenterWeekday"></div>
                             </div>
-                            <div class="control-group">
-                                <label class="control-label">分店</label>
-                                <select id="queryStore" class="control-input" onchange="filterAndDisplay()">
-                                    <option value="">全部</option>
-                                </select>
-                            </div>
+                            <button class="date-arrow-btn" onclick="shiftDay(1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"/>
+                                </svg>
+                            </button>
                         </div>
-                        <div class="toggle-row">
-                            <span class="toggle-label">顯示休假人員（例假日／休息日）</span>
+                        <div class="day-chips">
+                            <button class="day-chip" onclick="jumpRelDay(-1)" id="chipYesterday">昨天</button>
+                            <button class="day-chip" onclick="jumpToToday()" id="chipToday">今日</button>
+                            <button class="day-chip" onclick="jumpRelDay(1)" id="chipTomorrow">明天</button>
+                        </div>
+                    </div>
+
+                    <!-- Filter bar: store pills + vacation toggle -->
+                    <div class="filter-bar">
+                        <div class="store-pills">
+                            <button class="store-pill active" id="storePillAll"      onclick="selectStore('')">全部</button>
+                            <button class="store-pill"        id="storePillXinyi"    onclick="selectStore('信義店')">信義</button>
+                            <button class="store-pill"        id="storePillTaichung" onclick="selectStore('臺中市政店')">市政</button>
+                        </div>
+                        <div class="filter-divider"></div>
+                        <div class="vacation-toggle-wrap">
+                            <span class="vacation-toggle-label">休假</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="showVacationToggle" onchange="filterAndDisplay()" />
                                 <div class="toggle-track"></div>
@@ -906,6 +1014,66 @@
         }
     }
 
+    // ========== DATE NAVIGATION ==========
+    var WEEKDAYS = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+
+    function updateDateDisplay(dateStr) {
+        if (!dateStr) return;
+        var d = new Date(dateStr + 'T00:00:00');
+        var todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('dateCenterMain').textContent =
+            (d.getMonth() + 1) + '月' + d.getDate() + '日';
+        document.getElementById('dateCenterWeekday').textContent = WEEKDAYS[d.getDay()];
+        // Highlight 今日 chip when viewing today
+        document.getElementById('chipToday').classList.toggle('today-active', dateStr === todayStr);
+    }
+
+    function shiftDay(delta) {
+        var cur = document.getElementById('queryDate').value;
+        if (!cur) return;
+        var d = new Date(cur + 'T00:00:00');
+        d.setDate(d.getDate() + delta);
+        var next = d.toISOString().split('T')[0];
+        document.getElementById('queryDate').value = next;
+        updateDateDisplay(next);
+        onDateChange();
+    }
+
+    function jumpRelDay(delta) {
+        var d = new Date();
+        d.setDate(d.getDate() + delta);
+        var target = d.toISOString().split('T')[0];
+        document.getElementById('queryDate').value = target;
+        updateDateDisplay(target);
+        onDateChange();
+    }
+
+    function jumpToToday() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('queryDate').value = today;
+        updateDateDisplay(today);
+        onDateChange();
+    }
+
+    function selectStore(store) {
+        document.getElementById('queryStore').value = store;
+        document.getElementById('storePillAll').classList.toggle('active', store === '');
+        document.getElementById('storePillXinyi').classList.toggle('active', store === '信義店');
+        document.getElementById('storePillTaichung').classList.toggle('active', store === '臺中市政店');
+        filterAndDisplay();
+    }
+
+    // Touch-swipe on date card for prev/next day
+    (function() {
+        var sx = 0;
+        var el = document.getElementById('dateSwitcher');
+        el.addEventListener('touchstart', function(e) { sx = e.touches[0].clientX; }, { passive: true });
+        el.addEventListener('touchend', function(e) {
+            var dx = sx - e.changedTouches[0].clientX;
+            if (Math.abs(dx) > 48) shiftDay(dx > 0 ? 1 : -1);
+        }, { passive: true });
+    })();
+
     function setDefaultDate() {
         var today = new Date().toISOString().split('T')[0];
         var todayYM = today.substring(0, 7);
@@ -917,6 +1085,7 @@
             var latest = availableMonths[0];
             dateInput.value = (latest.dateRange && latest.dateRange.end) ? latest.dateRange.end : latest.id + '-01';
         }
+        updateDateDisplay(dateInput.value);
         onDateChange();
     }
 
@@ -981,6 +1150,7 @@
         var target = monthMeta.id + '-' + currentDay;
 
         dateInput.value = (target >= start && target <= end) ? target : end;
+        updateDateDisplay(dateInput.value);
         onDateChange();
     }
 
@@ -1142,7 +1312,10 @@
     // ========== EVENT HANDLERS ==========
     function onDateChange() {
         var date = document.getElementById('queryDate').value;
-        if (date) loadDaySchedule(date);
+        if (date) {
+            updateDateDisplay(date);
+            loadDaySchedule(date);
+        }
     }
 
     // ========== PWA ==========
