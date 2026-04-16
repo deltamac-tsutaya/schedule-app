@@ -1125,33 +1125,44 @@
         var inputs = document.querySelectorAll('.emp-title-input');
         if (inputs.length === 0) { showToast('沒有可儲存的資料', 'info'); return; }
 
-        var BATCH_LIMIT = 480;
-        var batch = db.batch();
-        var opCount = 0;
-        var count = 0;
+        var btn = document.querySelector('.save-titles-btn');
+        if (btn) { btn.disabled = true; btn.textContent = '儲存中...'; }
 
-        for (var i = 0; i < inputs.length; i++) {
-            var input = inputs[i];
-            var empId = input.dataset.empid;
-            var title = input.value.trim();
-            batch.update(db.collection('employees').doc(empId), { title: title });
-            opCount++;
-            count++;
-            if (opCount >= BATCH_LIMIT) {
-                await batch.commit();
-                batch = db.batch();
-                opCount = 0;
+        try {
+            var BATCH_LIMIT = 480;
+            var batch = db.batch();
+            var opCount = 0;
+            var count = 0;
+
+            for (var i = 0; i < inputs.length; i++) {
+                var input = inputs[i];
+                var empId = input.dataset.empid;
+                if (!empId) continue;
+                var title = input.value.trim();
+                // Use set+merge so it works even if the doc was somehow deleted
+                batch.set(db.collection('employees').doc(empId), { title: title }, { merge: true });
+                opCount++;
+                count++;
+                if (opCount >= BATCH_LIMIT) {
+                    await batch.commit();
+                    batch = db.batch();
+                    opCount = 0;
+                }
             }
+            if (opCount > 0) await batch.commit();
+
+            // Update in-memory list so filter stays consistent
+            inputs.forEach(function(input) {
+                var emp = allEmployees.find(function(e) { return e.empId === input.dataset.empid; });
+                if (emp) emp.title = input.value.trim();
+            });
+
+            showToast('已儲存 ' + count + ' 筆職稱', 'success');
+        } catch(e) {
+            showToast('儲存失敗：' + e.message, 'error');
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = '儲存所有職稱'; }
         }
-        if (opCount > 0) await batch.commit();
-
-        // Update in-memory list so filter stays consistent
-        inputs.forEach(function(input) {
-            var emp = allEmployees.find(function(e) { return e.empId === input.dataset.empid; });
-            if (emp) emp.title = input.value.trim();
-        });
-
-        showToast('已儲存 ' + count + ' 筆職稱', 'success');
     }
 
     // ========== BOOT ==========

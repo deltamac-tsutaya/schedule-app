@@ -1,12 +1,16 @@
 /**
  * Firebase 設定檔
  *
- * Firestore 安全規則（請在 Firebase Console → Firestore → 規則 設定）：
+ * Firestore 安全規則（請在 Firebase Console → Firestore → 規則 貼上並發佈）：
  *
  * rules_version = '2';
  * service cloud.firestore {
  *   match /databases/{database}/documents {
  *     match /schedules/{document=**} {
+ *       allow read: if true;
+ *       allow write: if request.auth != null;
+ *     }
+ *     match /employees/{empId} {
  *       allow read: if true;
  *       allow write: if request.auth != null;
  *     }
