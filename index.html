@@ -1027,11 +1027,17 @@
     function updateDateDisplay(dateStr) {
         if (!dateStr) return;
         var d = new Date(dateStr + 'T00:00:00');
-        var todayStr = localDateStr(new Date());
+        var today     = new Date();
+        var yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+        var tomorrow  = new Date(today); tomorrow.setDate(today.getDate() + 1);
+
         document.getElementById('dateCenterMain').textContent =
             (d.getMonth() + 1) + '月' + d.getDate() + '日';
         document.getElementById('dateCenterWeekday').textContent = WEEKDAYS[d.getDay()];
-        document.getElementById('chipToday').classList.toggle('today-active', dateStr === todayStr);
+
+        document.getElementById('chipYesterday').classList.toggle('today-active', dateStr === localDateStr(yesterday));
+        document.getElementById('chipToday').classList.toggle('today-active',     dateStr === localDateStr(today));
+        document.getElementById('chipTomorrow').classList.toggle('today-active',  dateStr === localDateStr(tomorrow));
     }
 
     function shiftDay(delta) {
