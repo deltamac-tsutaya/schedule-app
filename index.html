@@ -1347,6 +1347,19 @@
         { key: 'dtype-admin',   color: '#C9C0B7', label: '行政' }
     ];
 
+    var DEPT_TYPE_ORDER = { 'dtype-admin': 0, 'dtype-book': 1, 'dtype-floor': 2, 'dtype-kitchen': 3 };
+    function deptTypePriority(r) {
+        var dt = getDeptType(r.dept, r.empId);
+        if (!dt) return 99;
+        var v = DEPT_TYPE_ORDER[dt.cls];
+        return v !== undefined ? v : 99;
+    }
+    function sortByDeptThenTime(a, b) {
+        var dp = deptTypePriority(a) - deptTypePriority(b);
+        if (dp !== 0) return dp;
+        return (a.sortValue || 0) - (b.sortValue || 0);
+    }
+
     var TIME_PERIODS = [
         [0,   360,  '深夜'],
         [360, 510,  '開店準備'],
@@ -1575,7 +1588,7 @@
                 list.className = 'employee-list';
 
                 // 上班中
-                g.active.sort(function(a, b) { return (a.sortValue || 0) - (b.sortValue || 0); });
+                g.active.sort(sortByDeptThenTime);
                 g.active.forEach(function(r) {
                     list.appendChild(makeEmpRow(r, '上班中', 'badge-working', 'row-working'));
                 });
@@ -1586,7 +1599,7 @@
                     lbl1.className = 'time-sub-label';
                     lbl1.textContent = '未上班 ' + g.upcoming.length + ' 人';
                     list.appendChild(lbl1);
-                    g.upcoming.sort(function(a, b) { return (a.sortValue || 0) - (b.sortValue || 0); });
+                    g.upcoming.sort(sortByDeptThenTime);
                     g.upcoming.forEach(function(r) {
                         list.appendChild(makeEmpRow(r, '未上班', 'badge-upcoming', 'row-upcoming'));
                     });
@@ -1598,9 +1611,7 @@
                     lbl2.className = 'time-sub-label';
                     lbl2.textContent = '已下班 ' + g.finished.length + ' 人';
                     list.appendChild(lbl2);
-                    g.finished.sort(function(a, b) {
-                        return parseTimeToMin(a.endTime) - parseTimeToMin(b.endTime);
-                    });
+                    g.finished.sort(sortByDeptThenTime);
                     g.finished.forEach(function(r) {
                         list.appendChild(makeEmpRow(r, '已下班', 'badge-finished', 'row-finished'));
                     });
@@ -1612,7 +1623,7 @@
                     lbl3.className = 'time-sub-label';
                     lbl3.textContent = '休假 ' + g.vacation.length + ' 人';
                     list.appendChild(lbl3);
-                    g.vacation.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
+                    g.vacation.sort(sortByDeptThenTime);
                     g.vacation.forEach(function(r) {
                         var isHoliday = r.status === 'holiday';
                         list.appendChild(makeEmpRow(r,
@@ -1664,13 +1675,13 @@
                 var list = document.createElement('div');
                 list.className = 'employee-list';
 
-                g.working.sort(function(a, b) { return (a.sortValue || 0) - (b.sortValue || 0); });
+                g.working.sort(sortByDeptThenTime);
                 g.working.forEach(function(r) {
                     list.appendChild(makeEmpRow(r, '上班', 'badge-working', 'row-working'));
                 });
 
                 if (showAll) {
-                    g.rest.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
+                    g.rest.sort(sortByDeptThenTime);
                     g.rest.forEach(function(r) {
                         var isHoliday = r.status === 'holiday';
                         list.appendChild(makeEmpRow(r,
