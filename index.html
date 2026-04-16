@@ -383,6 +383,20 @@
         .badge-working { background: #dcfce7; color: #166534; }
         .badge-rest { background: #fef3c7; color: #92400e; }
         .badge-holiday { background: #fee2e2; color: #991b1b; }
+        .row-upcoming { border-left: 3px solid #f59e0b; background: #fffbeb; }
+        .row-finished { border-left: 3px solid #94a3b8; background: #f8fafc; opacity: 0.72; }
+        .badge-upcoming { background: #fef3c7; color: #b45309; }
+        .badge-finished { background: #f1f5f9; color: #64748b; }
+        .time-sub-label {
+            padding: 0.32rem 1rem;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+            letter-spacing: 0.04em;
+        }
 
         /* Empty / info states */
         .empty-state { padding: 2.5rem 1rem; text-align: center; color: #9ca3af; }
@@ -756,7 +770,7 @@
                         </div>
                         <div class="filter-divider"></div>
                         <div class="vacation-toggle-wrap">
-                            <span class="vacation-toggle-label">休假</span>
+                            <span class="vacation-toggle-label">全體</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="showVacationToggle" onchange="filterAndDisplay()" />
                                 <div class="toggle-track"></div>
@@ -1309,10 +1323,19 @@
     }
 
     function filterAndDisplay() {
-        var store = document.getElementById('queryStore').value;
+        var store    = document.getElementById('queryStore').value;
+        var showAll  = document.getElementById('showVacationToggle').checked;
+        var isToday  = (document.getElementById('queryDate').value === localDateStr(new Date()));
+
         var data = store
             ? currentDayData.filter(function(r) { return getStore(r.dept) === store; })
             : currentDayData;
+
+        // Today default: hide vacation/holiday; show only shift-scheduled staff
+        if (isToday && !showAll) {
+            data = data.filter(function(r) { return r.status === 'working'; });
+        }
+
         updateStats(data);
         displayResults(data);
     }
@@ -1473,8 +1496,9 @@
         var dt = getDeptType(r.dept, r.empId);
         var dtBadge = dt ? '<span class="dtype-badge ' + dt.cls + '">' + dt.label + '</span>' : '';
         var titleBadge = empTitles[r.empId] ? '<span class="emp-title-badge">' + esc(empTitles[r.empId]) + '</span>' : '';
-        var timeText = (rowClass === 'row-working')
-            ? (r.isValidTime ? esc(r.startTime) + ' - ' + esc(r.endTime) : esc(r.shiftRaw))
+        var isShiftRow = rowClass === 'row-working' || rowClass === 'row-upcoming' || rowClass === 'row-finished';
+        var timeText = isShiftRow
+            ? (r.isValidTime ? esc(r.startTime) + ' — ' + esc(r.endTime) : esc(r.shiftRaw))
             : '<em>' + esc(r.shiftRaw) + '</em>';
         div.innerHTML =
             '<div class="emp-header">' +
@@ -1489,9 +1513,11 @@
     }
 
     function displayResults(data) {
-        var container = document.getElementById('resultsContainer');
+        var container  = document.getElementById('resultsContainer');
         var emptyState = document.getElementById('emptyState');
-        var showVacation = document.getElementById('showVacationToggle').checked;
+        var showAll    = document.getElementById('showVacationToggle').checked;
+        var selectedDate = document.getElementById('queryDate').value;
+        var isToday    = (selectedDate === localDateStr(new Date()));
 
         if (!data.length) {
             container.innerHTML = '';
@@ -1500,70 +1526,165 @@
         }
         emptyState.classList.add('hidden');
 
-        // Group by store
-        var grouped = {};
-        data.forEach(function(r) {
-            var s = getStore(r.dept);
-            if (!grouped[s]) grouped[s] = { working: [], rest: [] };
-            if (r.status === 'working') grouped[s].working.push(r);
-            else grouped[s].rest.push(r);
-        });
-
+        var storeOrder = ['信義店', '臺中市政店'];
         var frag = document.createDocumentFragment();
         var hasVisible = false;
 
-        // Fixed store order
-        var storeOrder = ['信義店', '臺中市政店'];
-        var allStores = Object.keys(grouped).sort(function(a, b) {
-            var ia = storeOrder.indexOf(a), ib = storeOrder.indexOf(b);
-            if (ia < 0) ia = 99; if (ib < 0) ib = 99;
-            return ia - ib || a.localeCompare(b);
-        });
+        if (isToday) {
+            /* ── TODAY: realtime status groups (上班中 / 未上班 / 已下班) ── */
+            var now    = new Date();
+            var nowMin = now.getHours() * 60 + now.getMinutes();
+            var slotH  = now.getHours();
+            var slotM  = now.getMinutes() >= 30 ? 30 : 0;
+            var slotStr = String(slotH).padStart(2,'0') + ':' + String(slotM).padStart(2,'0');
 
-        allStores.forEach(function(store) {
-            var g = grouped[store];
-
-            if (!showVacation && g.working.length === 0) return;
-            hasVisible = true;
-
-            var section = document.createElement('div');
-            section.className = 'dept-section';
-
-            var header = document.createElement('div');
-            header.className = 'dept-header';
-            header.innerHTML =
-                '<div class="dept-title">' + esc(store) + '</div>' +
-                '<div class="dept-badge">' +
-                '<span class="badge">上班 ' + g.working.length + '</span>' +
-                (showVacation ? '<span class="badge">休假 ' + g.rest.length + '</span>' : '') +
-                '</div>';
-            section.appendChild(header);
-
-            var list = document.createElement('div');
-            list.className = 'employee-list';
-
-            // Working – sort by start time
-            g.working.sort(function(a, b) { return (a.sortValue || 0) - (b.sortValue || 0); });
-            g.working.forEach(function(r) {
-                list.appendChild(makeEmpRow(r, '上班', 'badge-working', 'row-working'));
+            // Group by store then by realtime status
+            var grouped = {};
+            data.forEach(function(r) {
+                var s = getStore(r.dept);
+                if (!grouped[s]) grouped[s] = { active: [], upcoming: [], finished: [], vacation: [] };
+                if (r.status !== 'working') { grouped[s].vacation.push(r); return; }
+                if (!r.isValidTime) { grouped[s].active.push(r); return; }
+                var sMin = parseTimeToMin(r.startTime), eMin = parseTimeToMin(r.endTime);
+                if (sMin < 0 || eMin < 0)    { grouped[s].active.push(r); return; }
+                if (sMin > nowMin)             grouped[s].upcoming.push(r);
+                else if (eMin <= nowMin)       grouped[s].finished.push(r);
+                else                           grouped[s].active.push(r);
             });
 
-            // Rest – only when toggle is ON
-            if (showVacation) {
-                g.rest.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
-                g.rest.forEach(function(r) {
-                    var isHoliday = r.status === 'holiday';
-                    list.appendChild(makeEmpRow(r,
-                        isHoliday ? '例假日' : '休息日',
-                        isHoliday ? 'badge-holiday' : 'badge-rest',
-                        isHoliday ? 'row-holiday' : 'row-rest'
-                    ));
-                });
-            }
+            storeOrder.forEach(function(store) {
+                var g = grouped[store];
+                if (!g) return;
+                if (!g.active.length && !g.upcoming.length && !g.finished.length && !g.vacation.length) return;
+                hasVisible = true;
 
-            section.appendChild(list);
-            frag.appendChild(section);
-        });
+                var section = document.createElement('div');
+                section.className = 'dept-section';
+
+                var header = document.createElement('div');
+                header.className = 'dept-header';
+                header.innerHTML =
+                    '<div class="dept-title">' + esc(store) + '</div>' +
+                    '<div class="dept-badge">' +
+                    '<span class="badge">' + slotStr + ' 時段</span>' +
+                    '<span class="badge">場上 ' + g.active.length + '</span>' +
+                    '</div>';
+                section.appendChild(header);
+
+                var list = document.createElement('div');
+                list.className = 'employee-list';
+
+                // 上班中
+                g.active.sort(function(a, b) { return (a.sortValue || 0) - (b.sortValue || 0); });
+                g.active.forEach(function(r) {
+                    list.appendChild(makeEmpRow(r, '上班中', 'badge-working', 'row-working'));
+                });
+
+                // 未上班
+                if (g.upcoming.length) {
+                    var lbl1 = document.createElement('div');
+                    lbl1.className = 'time-sub-label';
+                    lbl1.textContent = '未上班 ' + g.upcoming.length + ' 人';
+                    list.appendChild(lbl1);
+                    g.upcoming.sort(function(a, b) { return (a.sortValue || 0) - (b.sortValue || 0); });
+                    g.upcoming.forEach(function(r) {
+                        list.appendChild(makeEmpRow(r, '未上班', 'badge-upcoming', 'row-upcoming'));
+                    });
+                }
+
+                // 已下班
+                if (g.finished.length) {
+                    var lbl2 = document.createElement('div');
+                    lbl2.className = 'time-sub-label';
+                    lbl2.textContent = '已下班 ' + g.finished.length + ' 人';
+                    list.appendChild(lbl2);
+                    g.finished.sort(function(a, b) {
+                        return parseTimeToMin(a.endTime) - parseTimeToMin(b.endTime);
+                    });
+                    g.finished.forEach(function(r) {
+                        list.appendChild(makeEmpRow(r, '已下班', 'badge-finished', 'row-finished'));
+                    });
+                }
+
+                // 休假 (只在 全體 ON 時顯示)
+                if (showAll && g.vacation.length) {
+                    var lbl3 = document.createElement('div');
+                    lbl3.className = 'time-sub-label';
+                    lbl3.textContent = '休假 ' + g.vacation.length + ' 人';
+                    list.appendChild(lbl3);
+                    g.vacation.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
+                    g.vacation.forEach(function(r) {
+                        var isHoliday = r.status === 'holiday';
+                        list.appendChild(makeEmpRow(r,
+                            isHoliday ? '例假日' : '休息日',
+                            isHoliday ? 'badge-holiday' : 'badge-rest',
+                            isHoliday ? 'row-holiday' : 'row-rest'
+                        ));
+                    });
+                }
+
+                section.appendChild(list);
+                frag.appendChild(section);
+            });
+
+        } else {
+            /* ── OTHER DAYS: original working / rest view ── */
+            var grouped2 = {};
+            data.forEach(function(r) {
+                var s = getStore(r.dept);
+                if (!grouped2[s]) grouped2[s] = { working: [], rest: [] };
+                if (r.status === 'working') grouped2[s].working.push(r);
+                else grouped2[s].rest.push(r);
+            });
+
+            var allStores = Object.keys(grouped2).sort(function(a, b) {
+                var ia = storeOrder.indexOf(a), ib = storeOrder.indexOf(b);
+                if (ia < 0) ia = 99; if (ib < 0) ib = 99;
+                return ia - ib || a.localeCompare(b);
+            });
+
+            allStores.forEach(function(store) {
+                var g = grouped2[store];
+                if (!showAll && g.working.length === 0) return;
+                hasVisible = true;
+
+                var section = document.createElement('div');
+                section.className = 'dept-section';
+
+                var header = document.createElement('div');
+                header.className = 'dept-header';
+                header.innerHTML =
+                    '<div class="dept-title">' + esc(store) + '</div>' +
+                    '<div class="dept-badge">' +
+                    '<span class="badge">上班 ' + g.working.length + '</span>' +
+                    (showAll ? '<span class="badge">休假 ' + g.rest.length + '</span>' : '') +
+                    '</div>';
+                section.appendChild(header);
+
+                var list = document.createElement('div');
+                list.className = 'employee-list';
+
+                g.working.sort(function(a, b) { return (a.sortValue || 0) - (b.sortValue || 0); });
+                g.working.forEach(function(r) {
+                    list.appendChild(makeEmpRow(r, '上班', 'badge-working', 'row-working'));
+                });
+
+                if (showAll) {
+                    g.rest.sort(function(a, b) { return a.empName.localeCompare(b.empName); });
+                    g.rest.forEach(function(r) {
+                        var isHoliday = r.status === 'holiday';
+                        list.appendChild(makeEmpRow(r,
+                            isHoliday ? '例假日' : '休息日',
+                            isHoliday ? 'badge-holiday' : 'badge-rest',
+                            isHoliday ? 'row-holiday' : 'row-rest'
+                        ));
+                    });
+                }
+
+                section.appendChild(list);
+                frag.appendChild(section);
+            });
+        }
 
         container.innerHTML = '';
         if (hasVisible) {
