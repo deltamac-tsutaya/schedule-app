@@ -1,13 +1,13 @@
 {
-  "name": "得利蔦屋-營運支援工具",
-  "short_name": "得利蔦屋",
-  "description": "得利蔦屋營運支援工具",
+  "name": "得利蔦屋-營運管理系統",
+  "short_name": "營運管理",
+  "description": "得利蔦屋營運管理系統",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#2563eb",
-  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "background_color": "#F8F7F2",
   "icons": [
     {
       "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23000' width='192' height='192'/><text x='5' y='185' font-size='155' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='188' y='44' font-size='40' font-family='sans-serif' font-weight='700' fill='white' text-anchor='end'>DM</text></svg>",
