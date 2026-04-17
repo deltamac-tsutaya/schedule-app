@@ -1,4 +1,4 @@
-const CACHE_NAME = 'schedule-v7';
+const CACHE_NAME = 'schedule-v8';
 
 const SKIP_HOSTS = [
   'gstatic.com',
