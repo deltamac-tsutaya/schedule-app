@@ -340,7 +340,13 @@
             border-bottom: 1px solid #f3f4f6;
         }
         .employee-row:last-child { border-bottom: none; }
-        .row-working { border-left: 3px solid #2563eb; background: #f0f9ff; }
+        .row-working { border-left: 3px solid #2563eb; }
+
+        /* Dept-type row backgrounds (書店 vs 餐廳) */
+        .row-dept-book       { background: #fdf7ee; }
+        .row-dept-restaurant { background: #eef4ff; }
+        .row-dept-admin      { background: #f5f3ff; }
+        .row-dept-none       { background: #f9fafb; }
 
         /* Dept-type color badges */
         .dtype-badge {
@@ -383,8 +389,8 @@
         .badge-working { background: #dcfce7; color: #166534; }
         .badge-rest { background: #fef3c7; color: #92400e; }
         .badge-holiday { background: #fee2e2; color: #991b1b; }
-        .row-upcoming { border-left: 3px solid #f59e0b; background: #fffbeb; }
-        .row-finished { border-left: 3px solid #94a3b8; background: #f8fafc; opacity: 0.72; }
+        .row-upcoming { border-left: 3px solid #f59e0b; background: #fffbeb !important; }
+        .row-finished { border-left: 3px solid #94a3b8; background: #f8fafc !important; opacity: 0.72; }
         .badge-upcoming { background: #fef3c7; color: #b45309; }
         .badge-finished { background: #f1f5f9; color: #64748b; }
         .time-sub-label {
@@ -660,6 +666,69 @@
         .install-btn-secondary { background: #e5e7eb; color: #374151; }
 
         .hidden { display: none !important; }
+
+        /* Store info cards */
+        .store-info-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            margin-bottom: 0.5rem;
+        }
+        .store-info-header {
+            padding: 0.75rem 1rem;
+            background: #1e293b;
+            color: white;
+        }
+        .store-info-store-name {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.2rem;
+        }
+        .store-info-address {
+            font-size: 11px;
+            color: rgba(255,255,255,0.62);
+            line-height: 1.5;
+        }
+        .store-info-body { padding: 0.5rem 1rem 0.75rem; }
+        .store-info-brand-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 12.5px;
+        }
+        .store-info-brand-row:last-of-type { border-bottom: none; }
+        .store-brand-name { font-weight: 600; color: #1f2937; }
+        .store-brand-tel  { color: #2563eb; font-size: 12px; letter-spacing: 0.02em; }
+        .store-info-hours-block {
+            margin-top: 0.6rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid #f3f4f6;
+        }
+        .store-hours-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 0.35rem;
+        }
+        .store-hours-line {
+            font-size: 12.5px;
+            color: #374151;
+            padding: 0.15rem 0;
+            letter-spacing: 0.02em;
+        }
+        .store-hours-note {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -703,21 +772,18 @@
             <div id="pageSchedule" class="page">
                 <!-- Not configured -->
                 <div id="stateNotConfigured" class="empty-state hidden">
-                    <div class="empty-icon">⚙️</div>
                     <div class="empty-title">尚未設定雲端連線</div>
                     <div class="empty-desc">請聯繫管理員設定 firebase-config.js</div>
                 </div>
 
                 <!-- No data yet -->
                 <div id="stateNoData" class="empty-state hidden">
-                    <div class="empty-icon">📋</div>
                     <div class="empty-title">尚無班表資料</div>
                     <div class="empty-desc">請管理員至後台上傳當月班表</div>
                 </div>
 
                 <!-- Error state -->
                 <div id="stateError" class="empty-state hidden">
-                    <div class="empty-icon">⚠️</div>
                     <div class="empty-title">連線失敗</div>
                     <div class="empty-desc" id="errorDesc">請檢查網路連線後重新整理</div>
                 </div>
@@ -786,7 +852,6 @@
                         </div>
                         <div id="resultsContainer"></div>
                         <div id="emptyState" class="empty-state hidden">
-                            <div class="empty-icon">📅</div>
                             <div class="empty-title">此日期無班表資料</div>
                             <div class="empty-desc">請選擇其他日期，或聯繫管理員確認</div>
                         </div>
@@ -799,7 +864,6 @@
                 <div style="padding:1rem;">
 
                     <div class="placeholder-hero">
-                        <div class="placeholder-icon">📊</div>
                         <div class="placeholder-title">營運儀表板</div>
                         <div class="placeholder-desc">即時掌握各店營運數據<br>功能開發中，敬請期待</div>
                     </div>
@@ -831,7 +895,6 @@
                 <div style="padding:1rem;">
 
                     <div class="placeholder-hero">
-                        <div class="placeholder-icon">🎁</div>
                         <div class="placeholder-title">行銷商品活動</div>
                         <div class="placeholder-desc">查閱各期商品促銷與行銷活動資訊<br>功能開發中，敬請期待</div>
                     </div>
@@ -861,7 +924,6 @@
             <!-- ===== PAGE: 公告 ===== -->
             <div id="pageAnnouncements" class="page hidden">
                 <div class="announce-empty">
-                    <div class="announce-icon">📢</div>
                     <div class="announce-title">公告通知</div>
                     <div class="announce-desc">目前尚無公告<br>有最新消息時將會在此顯示</div>
                 </div>
@@ -896,6 +958,55 @@
                         <button class="settings-action-btn" onclick="clearCacheAndReload()">
                             ↺ &nbsp;清除快取並重新載入
                         </button>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-section-title">店舖資訊</div>
+
+                        <div class="store-info-card" style="border-left:4px solid #2563eb;">
+                            <div class="store-info-header">
+                                <div class="store-info-store-name">信義店</div>
+                                <div class="store-info-address">台北市信義區忠孝東路五段8號（統一時代百貨5樓）</div>
+                            </div>
+                            <div class="store-info-body">
+                                <div class="store-info-brand-row">
+                                    <span class="store-brand-name">TSUTAYA BOOKSTORE</span>
+                                    <span class="store-brand-tel">(02) 2725-1881</span>
+                                </div>
+                                <div class="store-info-brand-row">
+                                    <span class="store-brand-name">WIRED TOKYO</span>
+                                    <span class="store-brand-tel">(02) 2725-2338</span>
+                                </div>
+                                <div class="store-info-hours-block">
+                                    <div class="store-hours-label">營業時間</div>
+                                    <div class="store-hours-line">週日 ～ 週四　　11:00 ～ 21:30</div>
+                                    <div class="store-hours-line">週五、六　　　 11:00 ～ 22:00</div>
+                                    <div class="store-hours-note">國定假日依統一時代百貨公告調整</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="store-info-card" style="border-left:4px solid #059669;">
+                            <div class="store-info-header" style="background:#14312b;">
+                                <div class="store-info-store-name">台中市政店</div>
+                                <div class="store-info-address">台中市西屯區市政北二路18之1號 2F &amp; 3F</div>
+                            </div>
+                            <div class="store-info-body">
+                                <div class="store-info-brand-row">
+                                    <span class="store-brand-name">TSUTAYA BOOKSTORE</span>
+                                    <span class="store-brand-tel">(04) 2253-3636</span>
+                                </div>
+                                <div class="store-info-brand-row">
+                                    <span class="store-brand-name">WIRED TOKYO</span>
+                                    <span class="store-brand-tel">(04) 2253-2828</span>
+                                </div>
+                                <div class="store-info-hours-block">
+                                    <div class="store-hours-label">營業時間</div>
+                                    <div class="store-hours-line">週一 至 週日　　10:00 ～ 21:00</div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="settings-group">
@@ -1512,8 +1623,14 @@
 
     function makeEmpRow(r, statusText, badgeClass, rowClass) {
         var div = document.createElement('div');
-        div.className = 'employee-row ' + rowClass;
         var dt = getDeptType(r.dept, r.empId);
+        var deptBgClass = 'row-dept-none';
+        if (dt) {
+            if (dt.cls === 'dtype-book')                                      deptBgClass = 'row-dept-book';
+            else if (dt.cls === 'dtype-floor' || dt.cls === 'dtype-kitchen')  deptBgClass = 'row-dept-restaurant';
+            else if (dt.cls === 'dtype-admin')                                deptBgClass = 'row-dept-admin';
+        }
+        div.className = 'employee-row ' + rowClass + ' ' + deptBgClass;
         var dtBadge = dt ? '<span class="dtype-badge ' + dt.cls + '">' + dt.label + '</span>' : '';
         var titleBadge = empTitles[r.empId] ? '<span class="emp-title-badge">' + esc(empTitles[r.empId]) + '</span>' : '';
         var isShiftRow = rowClass === 'row-working' || rowClass === 'row-upcoming' || rowClass === 'row-finished';
@@ -1583,6 +1700,7 @@
 
                 var header = document.createElement('div');
                 header.className = 'dept-header';
+                header.style.borderLeft = '4px solid ' + (store === '信義店' ? '#3b82f6' : '#10b981');
                 header.innerHTML =
                     '<div class="dept-title">' + esc(store) + '</div>' +
                     '<div class="dept-badge">' +
@@ -1671,6 +1789,7 @@
 
                 var header = document.createElement('div');
                 header.className = 'dept-header';
+                header.style.borderLeft = '4px solid ' + (store === '信義店' ? '#3b82f6' : '#10b981');
                 header.innerHTML =
                     '<div class="dept-title">' + esc(store) + '</div>' +
                     '<div class="dept-badge">' +
