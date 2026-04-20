@@ -837,6 +837,7 @@
                 <div id="stateError" class="empty-state hidden">
                     <div class="empty-title">連線失敗</div>
                     <div class="empty-desc" id="errorDesc">請檢查網路連線後重新整理</div>
+                    <button class="settings-action-btn" style="margin-top:1rem" onclick="retryConnection()">↺ &nbsp;重新連線</button>
                 </div>
 
                 <!-- Main UI -->
@@ -1935,6 +1936,24 @@
             }
         } catch(e) {}
         window.location.reload(true);
+    }
+
+    // ========== RECONNECT ==========
+    async function retryConnection() {
+        if (!isConfigured()) return;
+        setCloud('', '連線中');
+        document.getElementById('stateError').classList.add('hidden');
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(FIREBASE_CONFIG);
+                db = firebase.firestore();
+            }
+            await loadAvailableMonths();
+        } catch(e) {
+            setCloud('error', '失敗');
+            document.getElementById('errorDesc').textContent = e.message || '請檢查網路連線後重新整理';
+            showState('stateError');
+        }
     }
 
     // ========== BOOT ==========
