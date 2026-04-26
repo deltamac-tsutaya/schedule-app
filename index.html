@@ -780,6 +780,83 @@
             margin-top: 0.25rem;
             line-height: 1.5;
         }
+
+        /* Calendar UI */
+        .calendar-wrapper {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 1.25rem 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 1rem;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .calendar-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+        .calendar-nav-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f8fafc;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: #374151;
+            transition: all 0.15s;
+        }
+        .calendar-nav-btn:active { background: #e9ecef; transform: scale(0.95); }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+            text-align: center;
+        }
+        .calendar-weekday {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            padding-bottom: 0.5rem;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            position: relative;
+        }
+        .calendar-day:active { background: #f1f5f9; transform: scale(0.95); }
+        .calendar-day.today {
+            color: #2563eb;
+        }
+        .calendar-day.today::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #2563eb;
+            border-radius: 50%;
+        }
+        .calendar-day.other-month {
+            color: #cbd5e1;
+        }
     </style>
 </head>
 <body>
@@ -915,27 +992,18 @@
             <div id="pageDashboard" class="page hidden">
                 <div style="padding:1rem;">
 
-                    <div class="placeholder-hero">
-                        <div class="placeholder-title">營運儀表板</div>
-                        <div class="placeholder-desc">即時掌握各店營運數據<br>功能開發中，敬請期待</div>
-                    </div>
-
-                    <div class="placeholder-preview-grid">
-                        <div class="placeholder-card">
-                            <div class="placeholder-card-label">今日上班人數</div>
-                            <div class="placeholder-card-value">—</div>
+                    <div class="calendar-wrapper">
+                        <div class="calendar-header">
+                            <button class="calendar-nav-btn" onclick="navCalendarMonth(-1)">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <div class="calendar-title" id="calendarTitle"></div>
+                            <button class="calendar-nav-btn" onclick="navCalendarMonth(1)">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
                         </div>
-                        <div class="placeholder-card">
-                            <div class="placeholder-card-label">本月出勤率</div>
-                            <div class="placeholder-card-value">—</div>
-                        </div>
-                        <div class="placeholder-card">
-                            <div class="placeholder-card-label">信義店人力</div>
-                            <div class="placeholder-card-value">—</div>
-                        </div>
-                        <div class="placeholder-card">
-                            <div class="placeholder-card-label">台中市政人力</div>
-                            <div class="placeholder-card-value">—</div>
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- JS Generated -->
                         </div>
                     </div>
 
@@ -1106,13 +1174,13 @@
         <button class="nav-tab" id="navDashboard" onclick="switchTab('dashboard')">
             <span class="nav-tab-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="3" width="9" height="9" rx="1.5"/>
-                    <rect x="13" y="3" width="9" height="5" rx="1.5"/>
-                    <rect x="13" y="12" width="9" height="9" rx="1.5"/>
-                    <rect x="2" y="16" width="9" height="5" rx="1.5"/>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
             </span>
-            <span class="nav-tab-label">儀表板</span>
+            <span class="nav-tab-label">行事曆</span>
         </button>
         <button class="nav-tab" id="navMarketing" onclick="switchTab('marketing')">
             <span class="nav-tab-icon">
@@ -1161,6 +1229,7 @@
     let currentDayData = []; // records for selected date
     let empTitles = {};       // { empId: title }
     let deferredPrompt;
+    let currentCalendarDate = new Date(); // State for Calendar Dashboard
 
     // 部門名稱已在後台上傳時直接轉換，前台直接顯示即可
     function deptLabel(dept) { return dept; }
@@ -1404,6 +1473,7 @@
         }
         updateDateDisplay(dateInput.value);
         onDateChange();
+        renderCalendarGrid();
     }
 
     async function loadDaySchedule(date) {
@@ -1443,6 +1513,80 @@
         document.getElementById('dayLoading').classList.add('hidden');
         updateStoreSelector();
         filterAndDisplay();
+    }
+
+    // ========== CALENDAR ==========
+    function renderCalendarGrid() {
+        var year = currentCalendarDate.getFullYear();
+        var month = currentCalendarDate.getMonth();
+        document.getElementById('calendarTitle').textContent = year + '年' + (month + 1) + '月';
+
+        var grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        // Weekdays header
+        WEEKDAYS.forEach(function(wd) {
+            var el = document.createElement('div');
+            el.className = 'calendar-weekday';
+            el.textContent = wd;
+            grid.appendChild(el);
+        });
+
+        var firstDay = new Date(year, month, 1);
+        var lastDay = new Date(year, month + 1, 0);
+        var startPadding = firstDay.getDay(); // 0 (Sun) to 6 (Sat)
+        var totalDays = lastDay.getDate();
+
+        var todayStr = localDateStr(new Date());
+
+        // Previous month padding
+        var prevLastDay = new Date(year, month, 0).getDate();
+        for (var i = startPadding - 1; i >= 0; i--) {
+            var el = document.createElement('div');
+            el.className = 'calendar-day other-month';
+            el.textContent = prevLastDay - i;
+            var pd = new Date(year, month - 1, prevLastDay - i);
+            el.onclick = (function(d){ return function() { goToCalendarDate(d); }; })(pd);
+            grid.appendChild(el);
+        }
+
+        // Current month days
+        for (var i = 1; i <= totalDays; i++) {
+            var d = new Date(year, month, i);
+            var dStr = localDateStr(d);
+            var el = document.createElement('div');
+            el.className = 'calendar-day';
+            if (dStr === todayStr) el.classList.add('today');
+            el.textContent = i;
+            el.onclick = (function(ds){ return function() { goToCalendarDate(ds); }; })(dStr);
+            grid.appendChild(el);
+        }
+
+        // Next month padding
+        var currentElements = startPadding + totalDays;
+        var endPadding = (7 - (currentElements % 7)) % 7;
+        // Also ensure at least 6 rows total if needed, but 5 or 6 rows is fine based on CSS grid.
+        for (var i = 1; i <= endPadding; i++) {
+            var el = document.createElement('div');
+            el.className = 'calendar-day other-month';
+            el.textContent = i;
+            var nd = new Date(year, month + 1, i);
+            el.onclick = (function(d){ return function() { goToCalendarDate(d); }; })(nd);
+            grid.appendChild(el);
+        }
+    }
+
+    function navCalendarMonth(delta) {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+        renderCalendarGrid();
+    }
+
+    function goToCalendarDate(dateStrOrObj) {
+        var dStr = (typeof dateStrOrObj === 'string') ? dateStrOrObj : localDateStr(dateStrOrObj);
+        document.getElementById('queryDate').value = dStr;
+        updateDateDisplay(dStr);
+        onDateChange();
+        switchTab('schedule');
     }
 
     // ========== UI ==========
