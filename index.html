@@ -857,6 +857,77 @@
         .calendar-day.other-month {
             color: #cbd5e1;
         }
+
+        /* Dashboard layout */
+        .dashboard-body { margin-top: 1rem; display: flex; flex-direction: column; gap: 1.25rem; }
+        .dash-section-title { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; }
+        .dash-section-title .badge { font-size: 11px; font-weight: 500; background: #f1f5f9; color: #64748b; padding: 2px 6px; border-radius: 4px; }
+        
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .metric-card { background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1rem; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .metric-label { font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 0.25rem; }
+        .metric-val { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.2; }
+        .metric-sub { font-size: 11px; color: #94a3b8; margin-top: 0.25rem; display: flex; align-items: center; gap: 4px; }
+        .metric-sub.up { color: #10b981; }
+        
+        .events-list, .venues-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .event-card { background: white; border-radius: 12px; padding: 0.875rem 1rem; border-left: 4px solid #3b82f6; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; }
+        .event-card.product { border-left-color: #f59e0b; }
+        .event-title { font-size: 14px; font-weight: 600; color: #1e293b; }
+        .event-type { font-size: 11px; color: #64748b; background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; }
+
+        .venue-card { background: white; border-radius: 12px; padding: 0.875rem 1rem; border-left: 4px solid #8b5cf6; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+        .venue-time { font-family: 'Inter', monospace; font-size: 12px; font-weight: 600; color: #8b5cf6; margin-bottom: 0.2rem; }
+        .venue-title { font-size: 14px; font-weight: 600; color: #1e293b; }
+        
+        .calendar-day.selected {
+            background: #0f172a;
+            color: white;
+            border-color: #0f172a;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.3);
+        }
+        .calendar-day.selected::after {
+            background: white !important;
+        }
+
+        /* Desktop Responsive */
+        @media (min-width: 1024px) {
+            #stateMain {
+                display: grid;
+                grid-template-columns: 380px 1fr;
+                gap: 2.5rem;
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 2rem;
+                align-items: start;
+            }
+            #stateMain > div:first-child { 
+                padding: 0 !important; 
+                position: sticky; 
+                top: 2rem; 
+            }
+            .dashboard-body { 
+                padding: 0 !important; 
+                margin-top: 0; 
+                display: grid; 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 1.5rem; 
+            }
+            .dashboard-section:nth-child(1) { grid-column: 1 / 2; }
+            .dashboard-section:nth-child(2) { grid-column: 2 / 3; }
+            .dashboard-section:nth-child(3) { grid-column: 1 / -1; }
+            .dashboard-section:nth-child(4) { grid-column: 1 / -1; }
+            
+            .bottom-nav {
+                max-width: 600px;
+                margin: 0 auto;
+                left: 0; right: 0;
+                border-radius: 24px 24px 0 0;
+                border: 1px solid #e5e7eb;
+                border-bottom: none;
+                bottom: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -896,117 +967,131 @@
 
         <div class="content">
 
-            <!-- ===== PAGE: 班表 ===== -->
-            <div id="pageSchedule" class="page">
-                <!-- Not configured -->
+            <!-- ===== PAGE: 首頁儀表板 (統一) ===== -->
+            <div id="pageDashboard" class="page">
+                <!-- Hidden inputs for internal state -->
+                <input type="date" id="queryDate" style="display:none" onchange="onDateChange()" />
+                <select id="queryStore" style="display:none" onchange="filterAndDisplay()">
+                    <option value="">全部</option>
+                </select>
+
+                <!-- Global States (Error/NoConfig) -->
                 <div id="stateNotConfigured" class="empty-state hidden">
                     <div class="empty-title">尚未設定雲端連線</div>
                     <div class="empty-desc">請聯繫管理員設定 firebase-config.js</div>
                 </div>
-
-                <!-- No data yet -->
-                <div id="stateNoData" class="empty-state hidden">
-                    <div class="empty-title">尚無班表資料</div>
-                    <div class="empty-desc">請管理員至後台上傳當月班表</div>
-                </div>
-
-                <!-- Error state -->
                 <div id="stateError" class="empty-state hidden">
                     <div class="empty-title">連線失敗</div>
                     <div class="empty-desc" id="errorDesc">請檢查網路連線後重新整理</div>
                     <button class="settings-action-btn" style="margin-top:1rem" onclick="retryConnection()">↺ &nbsp;重新連線</button>
                 </div>
-
-                <!-- Main UI -->
-                <div id="stateMain" class="hidden">
-                    <!-- Hidden inputs for internal state -->
-                    <input type="date" id="queryDate" style="display:none" onchange="onDateChange()" />
-                    <select id="queryStore" style="display:none" onchange="filterAndDisplay()">
-                        <option value="">全部</option>
-                    </select>
-
-                    <!-- Month badges -->
-                    <div class="months-bar" id="monthsBar"></div>
-
-                    <!-- Date navigator card -->
-                    <div class="date-nav-card" id="dateSwitcher">
-                        <div class="date-switcher">
-                            <button class="date-arrow-btn" onclick="shiftDay(-1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="15 18 9 12 15 6"/>
-                                </svg>
-                            </button>
-                            <div class="date-display">
-                                <div class="date-main-text" id="dateCenterMain">—</div>
-                                <div class="date-weekday-text" id="dateCenterWeekday"></div>
-                                <input type="date" id="datePicker"
-                                       style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;z-index:1;"
-                                       onchange="onPickerChange(this.value)" />
-                            </div>
-                            <button class="date-arrow-btn" onclick="shiftDay(1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="9 18 15 12 9 6"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="day-chips">
-                            <button class="day-chip" onclick="jumpRelDay(-1)" id="chipYesterday">昨天</button>
-                            <button class="day-chip" onclick="jumpToToday()" id="chipToday">今日</button>
-                            <button class="day-chip" onclick="jumpRelDay(1)" id="chipTomorrow">明天</button>
-                        </div>
-                    </div>
-
-                    <!-- Filter bar: store pills + vacation toggle -->
-                    <div class="filter-bar">
-                        <div class="store-pills">
-                            <button class="store-pill active" id="storePillAll"      onclick="selectStore('')">全部</button>
-                            <button class="store-pill"        id="storePillXinyi"    onclick="selectStore('信義店')">信義</button>
-                            <button class="store-pill"        id="storePillTaichung" onclick="selectStore('臺中市政店')">市政</button>
-                        </div>
-                        <div class="filter-divider"></div>
-                        <div class="vacation-toggle-wrap">
-                            <span class="vacation-toggle-label">全體</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="showVacationToggle" onchange="filterAndDisplay()" />
-                                <div class="toggle-track"></div>
-                                <div class="toggle-thumb"></div>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="stats-grid" id="statsContainer"></div>
-                    <div class="results-card">
-                        <div id="dayLoading" class="day-loading hidden">
-                            <div class="day-spinner"></div>
-                            <span>載入中</span>
-                        </div>
-                        <div id="resultsContainer"></div>
-                        <div id="emptyState" class="empty-state hidden">
-                            <div class="empty-title">此日期無班表資料</div>
-                            <div class="empty-desc">請選擇其他日期，或聯繫管理員確認</div>
-                        </div>
-                    </div>
+                <div id="stateNoData" class="empty-state hidden">
+                    <div class="empty-title">尚無資料</div>
+                    <div class="empty-desc">請管理員至後台上傳資料</div>
                 </div>
-            </div>
 
-            <!-- ===== PAGE: 儀表板 ===== -->
-            <div id="pageDashboard" class="page hidden">
-                <div style="padding:1rem;">
-
-                    <div class="calendar-wrapper">
-                        <div class="calendar-header">
-                            <button class="calendar-nav-btn" onclick="navCalendarMonth(-1)">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                            </button>
-                            <div class="calendar-title" id="calendarTitle"></div>
-                            <button class="calendar-nav-btn" onclick="navCalendarMonth(1)">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </button>
-                        </div>
-                        <div class="calendar-grid" id="calendarGrid">
-                            <!-- JS Generated -->
+                <div id="stateMain" class="hidden">
+                    <div style="padding: 1rem 1rem 0;">
+                        <!-- 行事曆區塊 -->
+                        <div class="calendar-wrapper" style="margin-bottom: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: none;">
+                            <div class="calendar-header">
+                                <button class="calendar-nav-btn" onclick="navCalendarMonth(-1)">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                <div class="calendar-title" id="calendarTitle"></div>
+                                <button class="calendar-nav-btn" onclick="navCalendarMonth(1)">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            </div>
+                            <div class="calendar-grid" id="calendarGrid">
+                                <!-- JS Generated -->
+                            </div>
                         </div>
                     </div>
 
+                    <!-- 下方戰情資料區 -->
+                    <div class="dashboard-body" style="padding: 0 1rem 1.5rem;">
+                        <!-- 營運指標 -->
+                        <div class="dashboard-section">
+                            <div class="dash-section-title">營運指標 <span class="badge">Mockup</span></div>
+                            <div class="metrics-grid">
+                                <div class="metric-card">
+                                    <div class="metric-label">業績達成率</div>
+                                    <div class="metric-val">85<span style="font-size:14px;color:#64748b;">%</span></div>
+                                    <div class="metric-sub up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> 較昨日 +2.4%</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">本日來客數</div>
+                                    <div class="metric-val">1,240</div>
+                                    <div class="metric-sub up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> 預估 1,200</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 活動任務 -->
+                        <div class="dashboard-section">
+                            <div class="dash-section-title">活動與任務 <span class="badge">Notion</span></div>
+                            <div class="events-list">
+                                <div class="event-card">
+                                    <div class="event-title">春季閱讀展覽佈置</div>
+                                    <div class="event-type">主題展覽</div>
+                                </div>
+                                <div class="event-card product">
+                                    <div class="event-title">全新咖啡豆系列上市</div>
+                                    <div class="event-type">商品上市</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 空間場地 -->
+                        <div class="dashboard-section">
+                            <div class="dash-section-title">場地與課程 <span class="badge">Notion</span></div>
+                            <div class="venues-list">
+                                <div class="venue-card">
+                                    <div class="venue-time">14:00 - 16:00</div>
+                                    <div class="venue-title">生活美學講座：咖啡沖煮入門</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 排班與人力 -->
+                        <div class="dashboard-section">
+                            <div class="dash-section-title" style="margin-bottom:0.5rem;">
+                                人力排班
+                            </div>
+                            <!-- Filter bar -->
+                            <div class="filter-bar">
+                                <div class="store-pills">
+                                    <button class="store-pill active" id="storePillAll"      onclick="selectStore('')">全部</button>
+                                    <button class="store-pill"        id="storePillXinyi"    onclick="selectStore('信義店')">信義</button>
+                                    <button class="store-pill"        id="storePillTaichung" onclick="selectStore('臺中市政店')">市政</button>
+                                </div>
+                                <div class="filter-divider"></div>
+                                <div class="vacation-toggle-wrap">
+                                    <span class="vacation-toggle-label">全體</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="showVacationToggle" onchange="filterAndDisplay()" />
+                                        <div class="toggle-track"></div>
+                                        <div class="toggle-thumb"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="stats-grid" id="statsContainer"></div>
+                            
+                            <div class="results-card">
+                                <div id="dayLoading" class="day-loading hidden">
+                                    <div class="day-spinner"></div>
+                                    <span>載入中</span>
+                                </div>
+                                <div id="resultsContainer"></div>
+                                <div id="emptyState" class="empty-state hidden">
+                                    <div class="empty-title">此日期無班表資料</div>
+                                    <div class="empty-desc">請選擇其他日期，或聯繫管理員確認</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1155,23 +1240,7 @@
 
     <!-- Bottom navigation -->
     <nav class="bottom-nav">
-        <button class="nav-tab active" id="navSchedule" onclick="switchTab('schedule')">
-            <span class="nav-tab-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                    <line x1="8" y1="14" x2="8" y2="14" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="12" y1="14" x2="12" y2="14" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="16" y1="14" x2="16" y2="14" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="8" y1="18" x2="8" y2="18" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="12" y1="18" x2="12" y2="18" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-            </span>
-            <span class="nav-tab-label">班表</span>
-        </button>
-        <button class="nav-tab" id="navDashboard" onclick="switchTab('dashboard')">
+        <button class="nav-tab active" id="navDashboard" onclick="switchTab('dashboard')">
             <span class="nav-tab-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -1180,7 +1249,7 @@
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
             </span>
-            <span class="nav-tab-label">行事曆</span>
+            <span class="nav-tab-label">首頁</span>
         </button>
         <button class="nav-tab" id="navMarketing" onclick="switchTab('marketing')">
             <span class="nav-tab-icon">
@@ -1297,7 +1366,6 @@
 
     // ========== NAVIGATION ==========
     var TABS = {
-        schedule:      { page: 'pageSchedule',      btn: 'navSchedule' },
         dashboard:     { page: 'pageDashboard',     btn: 'navDashboard' },
         marketing:     { page: 'pageMarketing',     btn: 'navMarketing' },
         announcements: { page: 'pageAnnouncements', btn: 'navAnnouncements' },
@@ -1369,7 +1437,6 @@
                 return;
             }
 
-            renderMonthsBar();
             showState('stateMain');
             setDefaultDate();
         } catch(e) {
@@ -1538,15 +1605,18 @@
         var totalDays = lastDay.getDate();
 
         var todayStr = localDateStr(new Date());
+        var selectedStr = document.getElementById('queryDate').value;
 
         // Previous month padding
         var prevLastDay = new Date(year, month, 0).getDate();
         for (var i = startPadding - 1; i >= 0; i--) {
             var el = document.createElement('div');
-            el.className = 'calendar-day other-month';
-            el.textContent = prevLastDay - i;
             var pd = new Date(year, month - 1, prevLastDay - i);
-            el.onclick = (function(d){ return function() { goToCalendarDate(d); }; })(pd);
+            var pdStr = localDateStr(pd);
+            el.className = 'calendar-day other-month';
+            if (pdStr === selectedStr) el.classList.add('selected');
+            el.textContent = prevLastDay - i;
+            el.onclick = (function(d){ return function() { goToCalendarDate(d); }; })(pdStr);
             grid.appendChild(el);
         }
 
@@ -1556,7 +1626,8 @@
             var dStr = localDateStr(d);
             var el = document.createElement('div');
             el.className = 'calendar-day';
-            if (dStr === todayStr) el.classList.add('today');
+            if (dStr === selectedStr) el.classList.add('selected');
+            if (dStr === todayStr && dStr !== selectedStr) el.classList.add('today');
             el.textContent = i;
             el.onclick = (function(ds){ return function() { goToCalendarDate(ds); }; })(dStr);
             grid.appendChild(el);
@@ -1568,10 +1639,12 @@
         // Also ensure at least 6 rows total if needed, but 5 or 6 rows is fine based on CSS grid.
         for (var i = 1; i <= endPadding; i++) {
             var el = document.createElement('div');
-            el.className = 'calendar-day other-month';
-            el.textContent = i;
             var nd = new Date(year, month + 1, i);
-            el.onclick = (function(d){ return function() { goToCalendarDate(d); }; })(nd);
+            var ndStr = localDateStr(nd);
+            el.className = 'calendar-day other-month';
+            if (ndStr === selectedStr) el.classList.add('selected');
+            el.textContent = i;
+            el.onclick = (function(d){ return function() { goToCalendarDate(d); }; })(ndStr);
             grid.appendChild(el);
         }
     }
@@ -1586,7 +1659,7 @@
         document.getElementById('queryDate').value = dStr;
         updateDateDisplay(dStr);
         onDateChange();
-        switchTab('schedule');
+        renderCalendarGrid();
     }
 
     // ========== UI ==========
