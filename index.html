@@ -1464,13 +1464,17 @@
         var yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
         var tomorrow  = new Date(today); tomorrow.setDate(today.getDate() + 1);
 
-        document.getElementById('dateCenterMain').textContent =
-            (d.getMonth() + 1) + '月' + d.getDate() + '日';
-        document.getElementById('dateCenterWeekday').textContent = WEEKDAYS[d.getDay()];
+        var elMain = document.getElementById('dateCenterMain');
+        if (elMain) elMain.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日';
+        var elWd = document.getElementById('dateCenterWeekday');
+        if (elWd) elWd.textContent = WEEKDAYS[d.getDay()];
 
-        document.getElementById('chipYesterday').classList.toggle('today-active', dateStr === localDateStr(yesterday));
-        document.getElementById('chipToday').classList.toggle('today-active',     dateStr === localDateStr(today));
-        document.getElementById('chipTomorrow').classList.toggle('today-active',  dateStr === localDateStr(tomorrow));
+        var elYest = document.getElementById('chipYesterday');
+        if (elYest) elYest.classList.toggle('today-active', dateStr === localDateStr(yesterday));
+        var elTod = document.getElementById('chipToday');
+        if (elTod) elTod.classList.toggle('today-active', dateStr === localDateStr(today));
+        var elTomor = document.getElementById('chipTomorrow');
+        if (elTomor) elTomor.classList.toggle('today-active', dateStr === localDateStr(tomorrow));
     }
 
     function shiftDay(delta) {
@@ -1505,7 +1509,8 @@
         document.getElementById('queryDate').value = val;
         updateDateDisplay(val);
         onDateChange();
-        document.getElementById('datePicker').value = '';
+        var picker = document.getElementById('datePicker');
+        if (picker) picker.value = '';
     }
 
     function selectStore(store) {
@@ -1520,6 +1525,7 @@
     (function() {
         var sx = 0;
         var el = document.getElementById('dateSwitcher');
+        if (!el) return;
         el.addEventListener('touchstart', function(e) { sx = e.touches[0].clientX; }, { passive: true });
         el.addEventListener('touchend', function(e) {
             var dx = sx - e.changedTouches[0].clientX;
