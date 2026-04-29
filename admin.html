@@ -401,6 +401,51 @@
             box-shadow: 0 2px 4px rgba(37,99,235,0.25);
         }
         .save-titles-btn:active { transform: scale(0.98); }
+
+        /* Title roster upload */
+        .title-upload-zone {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+        .title-upload-zone:hover, .title-upload-zone.drag-over { border-color: #2563eb; background: #eff6ff; }
+        .title-upload-text { font-size: 13px; color: #64748b; flex: 1; }
+        .title-upload-hint { font-size: 12px; color: #94a3b8; }
+        .browse-btn-sm {
+            padding: 0.3rem 0.75rem;
+            background: white;
+            border: 1.5px solid #2563eb;
+            border-radius: 6px;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .browse-btn-sm:hover { background: #eff6ff; }
+        .title-upload-preview {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 0.875rem;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            background: #f0fdf4;
+            margin-bottom: 0.75rem;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: #166534;
+        }
     </style>
 </head>
 <body>
@@ -501,7 +546,29 @@
                     <div class="section-title">👤 職稱管理</div>
                     <button class="refresh-btn" onclick="loadEmployees()">重新整理</button>
                 </div>
-                <p style="font-size:13px;color:#64748b;margin-bottom:0.875rem;">上傳班表後系統會自動同步員工名單。在此設定每位員工的職稱，儲存後前台即會顯示。</p>
+                <p style="font-size:13px;color:#64748b;margin-bottom:0.875rem;">上傳班表後系統會自動同步員工名單。可手動輸入職稱，或直接上傳職位清冊 Excel 批次套用。</p>
+
+                <!-- Title roster upload -->
+                <div class="title-upload-zone" id="titleDropZone"
+                     onclick="document.getElementById('titleFileInput').click()"
+                     ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                     ondragleave="this.classList.remove('drag-over')"
+                     ondrop="event.preventDefault(); this.classList.remove('drag-over'); handleTitleFileDrop(event)">
+                    <span>📋</span>
+                    <span class="title-upload-text">拖曳職位清冊至此，或點擊上傳</span>
+                    <span class="title-upload-hint">.xlsx / .xls</span>
+                    <button class="browse-btn-sm" type="button" onclick="event.stopPropagation(); document.getElementById('titleFileInput').click()">選擇檔案</button>
+                </div>
+                <input type="file" id="titleFileInput" accept=".xlsx,.xls" style="display:none"
+                       onchange="handleTitleFileSelect(this)" />
+                <div id="titleUploadPreview" class="title-upload-preview hidden">
+                    <span id="titlePreviewText"></span>
+                    <div style="display:flex;gap:0.5rem;flex-shrink:0">
+                        <button class="browse-btn-sm" type="button" onclick="cancelTitleUpload()">取消</button>
+                        <button class="save-titles-btn" id="applyTitleBtn" style="padding:0.45rem 1rem;font-size:13px" type="button" onclick="applyTitleUpload()">套用</button>
+                    </div>
+                </div>
+
                 <div style="margin-bottom:0.75rem;">
                     <input type="text" id="empSearch" class="search-input"
                            placeholder="搜尋姓名或工號..." oninput="filterEmployeeList()" />
@@ -1162,6 +1229,109 @@
             showToast('儲存失敗：' + e.message, 'error');
         } finally {
             if (btn) { btn.disabled = false; btn.textContent = '儲存所有職稱'; }
+        }
+    }
+
+    // ========== TITLE ROSTER UPLOAD ==========
+    var pendingTitleUpload = null; // [{empId, title}]
+
+    function handleTitleFileDrop(e) {
+        var file = e.dataTransfer.files[0];
+        if (file) processTitleFile(file);
+    }
+
+    function handleTitleFileSelect(input) {
+        var file = input.files[0];
+        if (file) processTitleFile(file);
+        input.value = '';
+    }
+
+    function processTitleFile(file) {
+        var ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== 'xlsx' && ext !== 'xls') {
+            showToast('請上傳 Excel 檔案（.xlsx 或 .xls）', 'error');
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var wb = XLSX.read(e.target.result, { type: 'array' });
+                var ws = wb.Sheets[wb.SheetNames[0]];
+                var rows = XLSX.utils.sheet_to_json(ws);
+
+                if (rows.length === 0) { showToast('檔案內沒有資料', 'error'); return; }
+
+                var keys = Object.keys(rows[0]);
+                var idCol    = keys.find(function(k) { return k.trim() === '工號'; });
+                var titleCol = keys.find(function(k) { return k.trim() === '職位名稱' || k.trim() === '職稱'; });
+
+                if (!idCol || !titleCol) {
+                    showToast('找不到「工號」或「職位名稱」欄位，請確認格式', 'error');
+                    return;
+                }
+
+                var parsed = [];
+                rows.forEach(function(row) {
+                    var empId = String(row[idCol] || '').trim();
+                    var title = String(row[titleCol] || '').trim();
+                    if (empId) parsed.push({ empId: empId, title: title });
+                });
+
+                if (parsed.length === 0) { showToast('沒有找到有效資料', 'error'); return; }
+
+                pendingTitleUpload = parsed;
+                document.getElementById('titlePreviewText').textContent =
+                    '解析到 ' + parsed.length + ' 筆職稱，套用後將覆寫現有設定';
+                document.getElementById('titleUploadPreview').classList.remove('hidden');
+            } catch(err) {
+                showToast('解析失敗：' + err.message, 'error');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function cancelTitleUpload() {
+        pendingTitleUpload = null;
+        document.getElementById('titleUploadPreview').classList.add('hidden');
+    }
+
+    async function applyTitleUpload() {
+        if (!pendingTitleUpload || pendingTitleUpload.length === 0) return;
+        var btn = document.getElementById('applyTitleBtn');
+        if (btn) { btn.disabled = true; btn.textContent = '套用中...'; }
+
+        try {
+            var BATCH_LIMIT = 480;
+            var batch = db.batch();
+            var opCount = 0;
+
+            for (var i = 0; i < pendingTitleUpload.length; i++) {
+                var item = pendingTitleUpload[i];
+                batch.set(db.collection('employees').doc(item.empId), { title: item.title }, { merge: true });
+                opCount++;
+                if (opCount >= BATCH_LIMIT) {
+                    await batch.commit();
+                    batch = db.batch();
+                    opCount = 0;
+                }
+            }
+            if (opCount > 0) await batch.commit();
+
+            // Sync in-memory state and visible inputs
+            var titleMap = {};
+            pendingTitleUpload.forEach(function(item) { titleMap[item.empId] = item.title; });
+            allEmployees.forEach(function(emp) {
+                if (titleMap[emp.empId] !== undefined) emp.title = titleMap[emp.empId];
+            });
+            document.querySelectorAll('.emp-title-input').forEach(function(input) {
+                if (titleMap[input.dataset.empid] !== undefined) input.value = titleMap[input.dataset.empid];
+            });
+
+            showToast('已套用 ' + pendingTitleUpload.length + ' 筆職稱', 'success');
+            cancelTitleUpload();
+        } catch(err) {
+            showToast('套用失敗：' + err.message, 'error');
+            if (btn) { btn.disabled = false; btn.textContent = '套用'; }
         }
     }
 
