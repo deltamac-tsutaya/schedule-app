@@ -526,6 +526,49 @@
             font-size: 13px;
             color: #166534;
         }
+        /* Popup review tabs */
+        .popup-tab {
+            padding: 5px 14px; border-radius: 16px; font-size: 12px; font-weight: 600;
+            border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .popup-tab:hover { background: #f1f5f9; }
+        .popup-tab.active { background: #1e40af; border-color: #1e40af; color: #fff; }
+        /* Popup app card */
+        .popup-app-card {
+            border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px;
+            margin-bottom: 10px; background: #fff;
+        }
+        .popup-app-card.status-pending  { border-left: 4px solid #f59e0b; }
+        .popup-app-card.status-approved { border-left: 4px solid #10b981; }
+        .popup-app-card.status-rejected { border-left: 4px solid #ef4444; }
+        .popup-app-row { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+        .popup-app-brand { font-size: 15px; font-weight: 700; color: #1e293b; }
+        .popup-status-badge {
+            display: inline-block; padding: 2px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 700;
+        }
+        .popup-status-badge.pending  { background: #fef3c7; color: #92400e; }
+        .popup-status-badge.approved { background: #d1fae5; color: #065f46; }
+        .popup-status-badge.rejected { background: #fee2e2; color: #991b1b; }
+        .popup-app-meta { font-size: 12px; color: #64748b; margin-top: 4px; }
+        .popup-app-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .popup-approve-btn {
+            padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+            border: none; cursor: pointer; background: #10b981; color: #fff; transition: background 0.15s;
+        }
+        .popup-approve-btn:hover { background: #059669; }
+        .popup-reject-btn {
+            padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+            border: 1px solid #e2e8f0; cursor: pointer; background: #fff; color: #ef4444; transition: all 0.15s;
+        }
+        .popup-reject-btn:hover { background: #fee2e2; border-color: #fca5a5; }
+        .popup-delete-btn {
+            padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+            border: 1px solid #e2e8f0; cursor: pointer; background: #fff; color: #94a3b8; transition: all 0.15s;
+            margin-left: auto;
+        }
+        .popup-delete-btn:hover { background: #f1f5f9; color: #64748b; }
     </style>
 </head>
 <body>
@@ -708,6 +751,34 @@
                 </div>
             </div>
 
+            <!-- ═══ 展區申請審核 ═══ -->
+            <div class="section-card" id="popupReviewCard">
+                <div class="section-header">
+                    <div class="section-title">🏪 展區申請審核</div>
+                    <button class="refresh-btn" onclick="loadPopupApps()">重新整理</button>
+                </div>
+                <p style="font-size:13px;color:#64748b;margin-bottom:1rem">審核來自前台的展區租用申請。核准前系統自動偵測時段衝突。</p>
+
+                <!-- Status filter tabs -->
+                <div style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap">
+                    <button class="popup-tab active" id="ptabAll"      onclick="setPopupTab('all')">全部</button>
+                    <button class="popup-tab"         id="ptabPending"  onclick="setPopupTab('pending')">待審核</button>
+                    <button class="popup-tab"         id="ptabApproved" onclick="setPopupTab('approved')">已核准</button>
+                    <button class="popup-tab"         id="ptabRejected" onclick="setPopupTab('rejected')">已駁回</button>
+                </div>
+
+                <div id="popupAppList"><div class="loading-text">載入中…</div></div>
+
+                <!-- Data management -->
+                <details style="margin-top:1.5rem">
+                    <summary style="font-size:13px;font-weight:600;color:#64748b;cursor:pointer;padding:6px 0">▸ 資料管理</summary>
+                    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="refresh-btn" onclick="importPopupMock()" style="background:#f0fdf4;border-color:#86efac;color:#15803d">匯入模擬資料</button>
+                        <button class="refresh-btn" onclick="clearPopupData()" style="background:#fef2f2;border-color:#fca5a5;color:#dc2626">清空所有展區資料</button>
+                    </div>
+                </details>
+            </div>
+
         </div>
     </div>
 
@@ -778,6 +849,7 @@
                 showDashboard(user);
                 loadMonths();
                 loadEmployees();
+                loadPopupApps();
             } else {
                 currentUser = null;
                 showLogin();
@@ -1890,6 +1962,184 @@
 
     // ========== BOOT ==========
     initAdmin();
+
+    // ========== POPUP REVIEW ==========
+    var _popupApps = [];
+    var _popupTab  = 'all';
+
+    var POPUP_SPACES = {
+        '台中市政店': [
+            { id: 1, name: '2F 入口導流展區'  },
+            { id: 2, name: '2F 窗前美學展區'  },
+            { id: 3, name: '2F 核心中島展區'  },
+            { id: 4, name: '3F 主題策展展區'  },
+            { id: 5, name: '3F 文藝沙龍展區'  }
+        ],
+        '信義店': [
+            { id: 1, name: '5F 提案主題花車1號' },
+            { id: 2, name: '5F 閱讀沙龍展桌1號' },
+            { id: 3, name: '5F 提案主題花車2號' },
+            { id: 4, name: '5F 主題策展展區'    },
+            { id: 5, name: '5F 閱讀沙龍展桌2號' }
+        ]
+    };
+
+    function getSpaceName(store, spaceId) {
+        var spaces = POPUP_SPACES[store] || [];
+        var sp = spaces.find(function(s) { return s.id == spaceId; });
+        return sp ? sp.name : ('展區 ' + spaceId);
+    }
+
+    function escHtml(s) {
+        if (s == null) return '';
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    async function loadPopupApps() {
+        var el = document.getElementById('popupAppList');
+        if (!el) return;
+        el.innerHTML = '<div class="loading-text">載入中…</div>';
+        try {
+            var snap = await db.collection('popup_applications').orderBy('startDate', 'desc').get();
+            _popupApps = snap.docs.map(function(d) { return Object.assign({ _id: d.id }, d.data()); });
+            renderPopupApps();
+        } catch(e) {
+            el.innerHTML = '<div class="loading-text" style="color:#ef4444">載入失敗：' + escHtml(e.message) + '</div>';
+        }
+    }
+
+    function setPopupTab(tab) {
+        _popupTab = tab;
+        ['All','Pending','Approved','Rejected'].forEach(function(t) {
+            var el = document.getElementById('ptab' + t);
+            if (el) el.className = 'popup-tab' + (t.toLowerCase() === tab ? ' active' : '');
+        });
+        renderPopupApps();
+    }
+
+    function renderPopupApps() {
+        var el = document.getElementById('popupAppList');
+        if (!el) return;
+
+        var filtered = _popupTab === 'all'
+            ? _popupApps
+            : _popupApps.filter(function(a) { return a.status === _popupTab; });
+
+        if (!filtered.length) {
+            el.innerHTML = '<div class="loading-text">沒有' + (_popupTab === 'all' ? '' : '符合') + '的申請紀錄</div>';
+            return;
+        }
+
+        el.innerHTML = filtered.map(function(app) {
+            var statusLabel = { pending: '待審核', approved: '已核准', rejected: '已駁回' }[app.status] || app.status;
+            var spaceName   = getSpaceName(app.store, app.spaceId);
+            var planLabel   = app.plan === 'fixed' ? '固定租金' : '業績抽成';
+            var pending = app.status === 'pending';
+            var approved = app.status === 'approved';
+            return [
+                '<div class="popup-app-card status-' + escHtml(app.status || 'pending') + '">',
+                    '<div class="popup-app-row">',
+                        '<span class="popup-app-brand">' + escHtml(app.brand) + '</span>',
+                        '<span class="popup-status-badge ' + escHtml(app.status || 'pending') + '">' + escHtml(statusLabel) + '</span>',
+                    '</div>',
+                    '<div class="popup-app-meta">',
+                        escHtml(app.store) + '・' + escHtml(spaceName) + '・' + escHtml(planLabel) + '<br>',
+                        escHtml(app.startDate) + ' ～ ' + escHtml(app.endDate),
+                    '</div>',
+                    '<div class="popup-app-actions">',
+                        pending ? '<button class="popup-approve-btn" onclick="reviewPopupApp(\'' + escHtml(app._id) + '\', true)">核准</button>' : '',
+                        (pending || approved) ? '<button class="popup-reject-btn" onclick="reviewPopupApp(\'' + escHtml(app._id) + '\', false)">駁回</button>' : '',
+                        '<button class="popup-delete-btn" onclick="deletePopupApp(\'' + escHtml(app._id) + '\')">刪除</button>',
+                    '</div>',
+                '</div>',
+            ].join('');
+        }).join('');
+    }
+
+    async function reviewPopupApp(appId, approve) {
+        var app = _popupApps.find(function(a) { return a._id === appId; });
+        if (!app) return;
+
+        // Conflict detection before approval
+        if (approve) {
+            var hasConflict = _popupApps.some(function(other) {
+                if (other._id === appId)               return false;
+                if (other.status !== 'approved')        return false;
+                if (other.store !== app.store)          return false;
+                if (other.spaceId != app.spaceId)       return false;
+                return other.startDate <= app.endDate && other.endDate >= app.startDate;
+            });
+            if (hasConflict) {
+                showToast('衝突！此時段已有已核准的申請，請先駁回後再核准', 'error', 5000);
+                return;
+            }
+        }
+
+        var newStatus = approve ? 'approved' : 'rejected';
+        try {
+            await db.collection('popup_applications').doc(appId).update({ status: newStatus });
+            app.status = newStatus;
+            renderPopupApps();
+            showToast(approve ? '已核准申請' : '已駁回申請', 'success');
+        } catch(e) {
+            showToast('操作失敗：' + e.message, 'error');
+        }
+    }
+
+    async function deletePopupApp(appId) {
+        if (!confirm('確認刪除此展區申請？')) return;
+        try {
+            await db.collection('popup_applications').doc(appId).delete();
+            _popupApps = _popupApps.filter(function(a) { return a._id !== appId; });
+            renderPopupApps();
+            showToast('已刪除申請', 'success');
+        } catch(e) {
+            showToast('刪除失敗：' + e.message, 'error');
+        }
+    }
+
+    async function importPopupMock() {
+        if (!confirm('這將新增 4 筆模擬展區申請資料（不會覆蓋現有資料），確認繼續？')) return;
+        var now  = new Date();
+        var y    = now.getFullYear();
+        var m    = String(now.getMonth() + 1).padStart(2, '0');
+        var mock = [
+            { brand: '質感生活選品', store: '台中市政店', spaceId: 1, startDate: y + '-' + m + '-01', endDate: y + '-' + m + '-07', plan: 'fixed',      status: 'pending',  createdAt: new Date().toISOString() },
+            { brand: '台灣手作工藝',  store: '台中市政店', spaceId: 3, startDate: y + '-' + m + '-10', endDate: y + '-' + m + '-24', plan: 'commission', status: 'approved', createdAt: new Date().toISOString() },
+            { brand: '北歐風格傢飾',  store: '信義店',     spaceId: 2, startDate: y + '-' + m + '-05', endDate: y + '-' + m + '-12', plan: 'fixed',      status: 'pending',  createdAt: new Date().toISOString() },
+            { brand: '誠品選書計劃',  store: '信義店',     spaceId: 4, startDate: y + '-' + m + '-15', endDate: y + '-' + m + '-28', plan: 'commission', status: 'rejected', createdAt: new Date().toISOString() },
+        ];
+        try {
+            var batch = db.batch();
+            mock.forEach(function(item) {
+                batch.set(db.collection('popup_applications').doc(), item);
+            });
+            await batch.commit();
+            showToast('已新增 4 筆模擬資料', 'success');
+            loadPopupApps();
+        } catch(e) {
+            showToast('匯入失敗：' + e.message, 'error');
+        }
+    }
+
+    async function clearPopupData() {
+        if (!confirm('⚠️ 確認清空所有展區申請資料？此操作不可復原。')) return;
+        try {
+            var snap = await db.collection('popup_applications').get();
+            var batch = db.batch();
+            snap.docs.forEach(function(d) { batch.delete(d.ref); });
+            await batch.commit();
+            _popupApps = [];
+            renderPopupApps();
+            showToast('已清空所有展區資料', 'success');
+        } catch(e) {
+            showToast('清空失敗：' + e.message, 'error');
+        }
+    }
+
+    // Load popup apps when admin section is ready (called after auth)
+    var _origInitAdmin = null;
+
     </script>
 
     <!-- Employee data edit dialog -->
