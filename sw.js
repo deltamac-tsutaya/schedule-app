@@ -1,4 +1,4 @@
-const CACHE_NAME = 'management-v10';
+const CACHE_NAME = 'management-v11';
 
 const SKIP_HOSTS = [
   'gstatic.com',
@@ -9,6 +9,11 @@ const SKIP_HOSTS = [
 
 const SHELL_URLS = [
   'index.html',
+  'admin.html',
+  'design-tokens.css',
+  'module-popup.js',
+  'module-employees.js',
+  'firebase-config.js',
   'manifest.json'
 ].map(p => {
   const base = self.location.pathname.replace(/sw\.js$/, '');

@@ -1,0 +1,102 @@
+/* design-tokens.css — Shared CSS custom properties from DESIGN.md */
+/* Imported by index.html (overrides --primary back to ivory) and admin.html */
+:root {
+  /* Background / Page */
+  --bg:                          #F8F7F2;
+  --on-bg:                       #1f2937;
+
+  /* Surface */
+  --surface:                     #ffffff;
+  --surface-dim:                 #f1f5f9;
+  --surface-container-lowest:    #ffffff;
+  --surface-container-low:       #f8fafc;
+  --surface-container:           #f1f5f9;
+  --surface-container-high:      #e5e7eb;
+  --surface-container-highest:   #cbd5e1;
+  --on-surface:                  #1f2937;
+  --on-surface-var:              #64748b;
+
+  /* Outline */
+  --outline:                     #e5e7eb;
+  --outline-variant:             #f1f5f9;
+
+  /* Inverse */
+  --inverse-surface:             #0f172a;
+  --inverse-on-surface:          #ffffff;
+  --surface-tint:                #2563eb;
+
+  /* Primary (blue — system interactive color) */
+  --primary:                     #2563eb;
+  --on-primary:                  #ffffff;
+  --primary-container:           #dbeafe;
+  --on-primary-container:        #1e40af;
+  --inverse-primary:             #93c5fd;
+
+  /* Secondary */
+  --secondary:                   #64748b;
+  --on-secondary:                #ffffff;
+  --secondary-container:         #f1f5f9;
+  --on-secondary-container:      #374151;
+
+  /* Tertiary (green / success) */
+  --tertiary:                    #10b981;
+  --on-tertiary:                 #ffffff;
+  --tertiary-container:          #dcfce7;
+  --on-tertiary-container:       #166534;
+
+  /* Error */
+  --error:                       #f87171;
+  --on-error:                    #ffffff;
+  --error-container:             #fee2e2;
+  --on-error-container:          #991b1b;
+
+  /* Warning */
+  --warning:                     #d97706;
+  --on-warning:                  #ffffff;
+  --warning-container:           #fef3c7;
+  --on-warning-container:        #92400e;
+
+  /* Status */
+  --status-pending:              #fbbf24;
+  --connected:                   #22c55e;
+
+  /* Department colors */
+  --dept-book-container:         #dcfce7;
+  --on-dept-book-container:      #15803d;
+  --dept-floor-container:        #dbeafe;
+  --on-dept-floor-container:     #1d4ed8;
+  --dept-kitchen-container:      #ffedd5;
+  --on-dept-kitchen-container:   #c2410c;
+  --dept-admin-container:        #ede9fe;
+  --on-dept-admin-container:     #6d28d9;
+
+  /* Store accents */
+  --store-xinyi-accent:          #2563eb;
+  --store-taichung-accent:       #10b981;
+
+  /* Spacing */
+  --space-xs:                    4px;
+  --space-sm:                    12px;
+  --space-md:                    16px;
+  --space-lg:                    20px;
+  --space-xl:                    24px;
+  --space-2xl:                   32px;
+  --page-padding:                16px;
+  --card-padding:                20px;
+  --section-gap:                 12px;
+  --nav-height:                  56px;
+
+  /* Border radius */
+  --radius-sm:                   6px;
+  --radius:                      8px;
+  --radius-md:                   12px;
+  --radius-lg:                   16px;
+  --radius-xl:                   20px;
+  --radius-full:                 9999px;
+
+  /* Shadows */
+  --shadow-card:                 0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-staffing:             0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-overlay:              0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-primary:              0 2px 4px rgba(37, 99, 235, 0.3);
+}
