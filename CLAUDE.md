@@ -12,10 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 全部檔案直接由 Firebase Hosting 提供，Service Worker 負責 PWA 快取。
 
 主要入口：
-- `index.html` — 前台門市排班瀏覽（員工使用）
-- `admin.html` — 後台 Excel 上傳與員工職稱管理（管理員使用）
-- `tool-popup-planning/index.html` — 獨立子工具：大型主題平台展區排程
-- `tool-schedule/index.html` — 獨立子工具：另一版本排班前台（重構原型）
+- `index.html` — 前台（4模組：排班/展區/員工/設定），Firebase Auth 登入後解鎖展區與員工模組
+- `admin.html` — 後台（Excel 班表上傳、員工管理、展區申請審核）
 
 Firebase 後端：Firestore（資料）+ Firebase Auth（員工登入）。
 
@@ -38,25 +36,38 @@ node create-admin.js   # 一次性：在 Firestore 建立管理員帳號
 ## 檔案結構
 
 ```
-index.html              前台主要頁面（含所有 CSS/JS）
-admin.html              後台管理頁面
+index.html              前台主要頁面（4模組，含 Firebase Auth）
+admin.html              後台管理頁面（含展區申請審核）
+design-tokens.css       共用 CSS 變數（index.html & admin.html 均引入）
+module-popup.js         展區排程模組 IIFE（window.PopupModule）
+module-employees.js     員工名冊模組 IIFE（window.EmployeesModule）
 firebase-config.js      Firebase 設定與 Firestore 安全規則說明
-sw.js                   Service Worker（目前版本 management-v10）
+sw.js                   Service Worker（目前版本 management-v11）
 manifest.json           PWA manifest
 create-admin.js         Node.js 一次性管理員建立腳本
 DESIGN.md               設計系統規格（色彩、字體、元件）
 gemini.md               本文件的 Gemini 副本（請同步更新）
 
-tool-popup-planning/    獨立 PWA 子工具：主題平台展區排程
-  index.html / firebase-config.js / sw.js / manifest.json
-
-tool-schedule/          獨立 PWA 子工具：排班前台重構原型
-  index.html / firebase-config.js / sw.js / manifest.json
+tool-popup-planning/    [deprecated] firebase.json 已加 redirect → /
+tool-schedule/          [deprecated] firebase.json 已加 redirect → /
 ```
 
 ## index.html — 目前的視圖架構
 
-前台現在採用**三層橫向 Carousel（peek 模式）**，而非頁籤切換：
+前台採**雙層結構**：外層 4-tab 底部導覽（模組層），內層排班 tab 維持三層 Carousel。
+
+### 外層：模組導覽（4 tabs）
+
+| navId | moduleId | 說明 |
+|---|---|---|
+| `navSchedule` | `moduleSchedule` | 排班（含月/週/日 Carousel，預設顯示） |
+| `navPopup` | `modulePopup` | 展區排程（PopupModule IIFE） |
+| `navEmployees` | `moduleEmployees` | 員工名冊（EmployeesModule IIFE） |
+| `navSettings` | `moduleSettings` | 設定面板（登入/登出、版本） |
+
+模組切換以 `display:none / display:flex` 控制，不用 transform。外層 `#appColumn`（flex-column，max-width 430px）包住所有 `.module-section`。
+
+### 內層：排班 Carousel（僅在排班 tab 內）
 
 | id | 背景 | 說明 |
 |---|---|---|
@@ -64,8 +75,40 @@ tool-schedule/          獨立 PWA 子工具：排班前台重構原型
 | `viewWeek` | `--primary`（象牙白） | 週條狀視圖，7 天橫列 |
 | `viewDay` | `--primary`（象牙白） | 單日排班詳情，Firestore 真實資料 |
 
-使用者透過滑動或點擊在三個 view 間切換，`view-track` 以 `transform: translateX` 動畫移動。
-**注意**：CLAUDE.md 舊版描述的頁籤結構（navDashboard / navMarketing 等）已不存在於目前 index.html。
+Carousel 以 `view-track` 的 `transform: translateX` 動畫切換，支援左右滑動。
+
+### Firebase Auth 登入流程
+
+- 未登入：只顯示排班 tab（月/週/日 Carousel 仍可瀏覽，但無 Firestore 資料）
+- 登入後：解鎖展區、員工 tab；模組 lazy init 在首次切換 tab 時觸發
+- 登入 UI：`#loginBackdrop` + `#loginSheet`（position fixed bottom sheet，z-index 600/601）
+- Auth 狀態：`_currentUser`（Firebase User）、`_userProfile`（Firestore employees 文件）
+- `isAdmin()`：`_userProfile?.role === 'admin'`
+
+## 模組系統（Module Registry）
+
+`index.html` 維護一個 `MODULES[]` 陣列作為插槽：
+
+```javascript
+const MODULES = [
+  { id: 'moduleSchedule', navId: 'navSchedule', module: null, initialized: true  },
+  { id: 'modulePopup',    navId: 'navPopup',    module: null, initialized: false },
+  { id: 'moduleEmployees',navId: 'navEmployees',module: null, initialized: false },
+];
+```
+
+**延遲初始化（lazy init）**：`initialized: false` 的模組只在首次切換到該 tab 時呼叫 `module.init(ctx)`。
+
+**模組 API 合約**（每個外部 `.js` IIFE 必須實作）：
+
+| 方法 | 呼叫時機 |
+|---|---|
+| `init(ctx)` | 首次進入 tab，`ctx = { db, getCurrentUser, isAdmin, getDate, setDate, toast, container }` |
+| `onShow()` | tab 變為可見 |
+| `onHide()` | tab 離開可見 |
+| `onDateChange(dateStr)` | 全域日期（`_viewDate`）變更時通知 |
+
+新增模組只需：在 `MODULES[]` 加登錄、建立 `module-xxx.js` IIFE、在 HTML 加 `<script src>`。
 
 ### index.html 的前台分類邏輯
 
@@ -114,6 +157,20 @@ employees/
   {empId}/
     title: "店長"            ← 員工職稱（選填）
     role:  "admin"           ← 管理員才有此欄位
+
+popup_applications/
+  {autoId}/
+    store:        "台中市政店" | "信義店"
+    spaceId:      "tc-1"～"tc-5" | "xyi-1"～"xyi-5"
+    clientName:   string
+    startDate:    "YYYY-MM-DD"
+    endDate:      "YYYY-MM-DD"
+    status:       "pending" | "approved" | "rejected"
+    pricingType:  "fixed" | "commission"
+    totalAmount:  number
+    deposit:      number
+    createdAt:    Timestamp
+    approvedBy:   string (empId)  ← 核准/駁回後寫入
 ```
 
 ## 部門名稱對照（admin.html 上傳時轉換）
@@ -137,16 +194,17 @@ Excel 中的班次值（shiftRaw）：
 
 ## Service Worker 版本控制
 
-每次修改 `index.html`、`admin.html` 或引用的資源後，必須遞增 `sw.js` 中的 `CACHE_NAME`。
-目前版本：`management-v10`。下次修改後改為 `management-v11`，依此類推。
+每次修改 `index.html`、`admin.html` 或任何引用的資源（`module-*.js`、`design-tokens.css` 等）後，必須遞增 `sw.js` 中的 `CACHE_NAME`。
+目前版本：`management-v11`。下次修改後改為 `management-v12`，依此類推。
 
-各子工具（`tool-popup-planning/`、`tool-schedule/`）各有獨立的 `sw.js`，需分別維護版本號。
+SHELL_URLS 目前包含：`index.html`、`admin.html`、`design-tokens.css`、`module-popup.js`、`module-employees.js`、`firebase-config.js`、`manifest.json`。
 
 ## Firestore 安全規則
 
 完整規則定義在 `firebase-config.js` 頂部的 JSDoc 註解中。核心原則：
 - `schedules` 集合：登入員工（`isAuthenticated()`）可讀，`role == 'admin'` 才能寫入。
 - `employees` 集合：登入員工可讀，管理員或本人（`isSelf(empId)`）可寫入。
+- `popup_applications` 集合：登入員工可讀/新增；`role == 'admin'` 才能核准/駁回（update status）。
 - Firebase Auth `displayName` 欄位用於儲存 empId（員工工號），Firestore 規則以此識別身份。
 
 ## Excel 班表解析與防錯
@@ -162,11 +220,6 @@ Excel 中的班次值（shiftRaw）：
 - 錯誤提示：Toast 顯示具體原因，不顯示含糊的「連線失敗」。
 
 ## 重要陷阱 / 過去踩過的坑
-
-### DOM 元素已移除，JS 需做 null guard
-PR #5（2026-04-26）把舊版日期導覽 UI 換成行事曆格狀視圖，以下 DOM id 已不存在：
-`dateSwitcher`、`dateCenterMain`、`dateCenterWeekday`、`chipYesterday`、`chipToday`、`chipTomorrow`、`datePicker`、`monthsBar`
-相關 JS 已加 null guard，不會 crash，但新功能不得假設這些元素存在。
 
 ### 「連線失敗」不代表 Firebase 問題
 `loadAvailableMonths()` 的 try-catch 也會捕捉到 DOM 操作的 TypeError。

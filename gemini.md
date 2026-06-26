@@ -67,18 +67,93 @@ Default to surfacing uncertainty, not hiding it.
 
 ## 專案概覽
 
-單頁 PWA（Progressive Web App），讓門市人員查看當日班表與人力狀況。
-後台（admin.html）負責從 Excel 上傳班表資料到 Firebase Firestore，前台（index.html）即時讀取顯示。
+純 HTML/CSS/JS 的 PWA（Progressive Web App）集合，無建置工具、無框架、無測試套件。
+全部檔案直接由 Firebase Hosting 提供，Service Worker 負責 PWA 快取。
+
+主要入口：
+- `index.html` — 前台（4模組：排班/展區/員工/設定），Firebase Auth 登入後解鎖展區與員工模組
+- `admin.html` — 後台（Excel 班表上傳、員工管理、展區申請審核）
+
+Firebase 後端：Firestore（資料）+ Firebase Auth（員工登入）。
 
 ## 檔案結構
 
 ```
-index.html        前台主要頁面（單一 HTML 檔，含所有 CSS/JS）
-admin.html        後台管理頁面（上傳班表、管理員工職稱）
-firebase-config.js  Firebase 設定（含 Firestore 安全規則說明）
-sw.js             Service Worker（PWA 離線快取，目前版本 schedule-v8）
-manifest.json     PWA manifest
+index.html              前台主要頁面（4模組，含 Firebase Auth）
+admin.html              後台管理頁面（含展區申請審核）
+design-tokens.css       共用 CSS 變數（index.html & admin.html 均引入）
+module-popup.js         展區排程模組 IIFE（window.PopupModule）
+module-employees.js     員工名冊模組 IIFE（window.EmployeesModule）
+firebase-config.js      Firebase 設定與 Firestore 安全規則說明
+sw.js                   Service Worker（目前版本 management-v11）
+manifest.json           PWA manifest
+create-admin.js         Node.js 一次性管理員建立腳本
+DESIGN.md               設計系統規格（色彩、字體、元件）
+gemini.md               本文件的 Gemini 副本（請同步更新）
+
+tool-popup-planning/    [deprecated] firebase.json 已加 redirect → /
+tool-schedule/          [deprecated] firebase.json 已加 redirect → /
 ```
+
+## index.html — 目前的視圖架構
+
+前台採**雙層結構**：外層 4-tab 底部導覽（模組層），內層排班 tab 維持三層 Carousel。
+
+### 外層：模組導覽（4 tabs）
+
+| navId | moduleId | 說明 |
+|---|---|---|
+| `navSchedule` | `moduleSchedule` | 排班（含月/週/日 Carousel，預設顯示） |
+| `navPopup` | `modulePopup` | 展區排程（PopupModule IIFE） |
+| `navEmployees` | `moduleEmployees` | 員工名冊（EmployeesModule IIFE） |
+| `navSettings` | `moduleSettings` | 設定面板（登入/登出、版本） |
+
+模組切換以 `display:none / display:flex` 控制，不用 transform。
+
+### 內層：排班 Carousel（僅在排班 tab 內）
+
+| id | 背景 | 說明 |
+|---|---|---|
+| `viewMonth` | `#000`（深黑） | 月曆格狀總覽，選擇日期 |
+| `viewWeek` | `--primary`（象牙白） | 週條狀視圖，7 天橫列 |
+| `viewDay` | `--primary`（象牙白） | 單日排班詳情，Firestore 真實資料 |
+
+### Firebase Auth 登入流程
+
+- 未登入：只顯示排班 tab（月/週/日 Carousel 仍可瀏覽，但無 Firestore 資料）
+- 登入後：解鎖展區、員工 tab；模組 lazy init 在首次切換 tab 時觸發
+- `isAdmin()`：`_userProfile?.role === 'admin'`
+
+## 模組系統（Module Registry）
+
+```javascript
+const MODULES = [
+  { id: 'moduleSchedule', navId: 'navSchedule', module: null, initialized: true  },
+  { id: 'modulePopup',    navId: 'navPopup',    module: null, initialized: false },
+  { id: 'moduleEmployees',navId: 'navEmployees',module: null, initialized: false },
+];
+```
+
+模組 API 合約（每個外部 `.js` IIFE 必須實作）：
+
+| 方法 | 呼叫時機 |
+|---|---|
+| `init(ctx)` | 首次進入 tab，`ctx = { db, getCurrentUser, isAdmin, getDate, setDate, toast, container }` |
+| `onShow()` | tab 變為可見 |
+| `onHide()` | tab 離開可見 |
+| `onDateChange(dateStr)` | 全域日期變更時通知 |
+
+## index.html 的前台分類邏輯
+
+**getStore(dept)** — 從部門名稱判斷門市：
+- 含「信義」→ `'信義店'`
+- 含「台中」或「臺中」→ `'臺中市政店'`（Firestore 存的是簡體「台」，顯示用繁體「臺」，兩者都識別）
+
+**getDeptType(dept, empId)** — 判斷部門類型：
+- empId === `'107066'` → 行政（ADMIN_EMP_ID，硬碼單一行政人員）
+- 含「BOOKSTORE」→ 書店
+- 含「外場」→ 外場
+- 含「內場」→ 內場
 
 ## Firebase Firestore 資料結構
 
@@ -95,17 +170,17 @@ schedules/
       {date}/                e.g. "2026-04-26"
         date: "2026-04-26"
         yearMonth: "2026-04"
-        records: [           每筆為一名員工當天的班表
+        records: [
           {
             empId:       "123456"
             empName:     "王小明"
-            dept:        "TSUTAYA BOOKSTORE 信義店"   ← 已轉換的正式名稱
+            dept:        "TSUTAYA BOOKSTORE 信義店"
             date:        "2026-04-26"
             yearMonth:   "2026-04"
-            shiftRaw:    "B-0900~1800"               ← Excel 原始值
+            shiftRaw:    "B-0900~1800"
             startTime:   "09:00"
             endTime:     "18:00"
-            sortValue:   900                          ← 用於排序（HHMM 數值）
+            sortValue:   900
             status:      "working" | "holiday" | "rest"
             isValidTime: true | false
           }
@@ -113,14 +188,27 @@ schedules/
 
 employees/
   {empId}/
-    title: "店長"            ← 員工職稱（選填，前台顯示用）
+    title: "店長"            ← 員工職稱（選填）
+    role:  "admin"           ← 管理員才有此欄位
+
+popup_applications/
+  {autoId}/
+    store:        "台中市政店" | "信義店"
+    spaceId:      "tc-1"～"tc-5" | "xyi-1"～"xyi-5"
+    clientName:   string
+    startDate:    "YYYY-MM-DD"
+    endDate:      "YYYY-MM-DD"
+    status:       "pending" | "approved" | "rejected"
+    pricingType:  "fixed" | "commission"
+    totalAmount:  number
+    deposit:      number
+    createdAt:    Timestamp
+    approvedBy:   string (empId)
 ```
 
 ## 部門名稱對照（admin.html 上傳時轉換）
 
-Excel 欄位 → Firestore 儲存的正式名稱：
-
-| Excel 部門欄 | 儲存值 |
+| Excel 部門欄 | Firestore 儲存值 |
 |---|---|
 | 1部BOOK | TSUTAYA BOOKSTORE 信義店 |
 | 1部CAFE外場 | WIRED TOKYO 信義店 外場 |
@@ -129,100 +217,44 @@ Excel 欄位 → Firestore 儲存的正式名稱：
 | 2部CAFE外場 | WIRED TOKYO 台中市政店 外場 |
 | 2部CAFE內場 | WIRED TOKYO 台中市政店 內場 |
 
-## 前台分類邏輯（index.html）
-
-**getStore(dept)** — 從部門名稱判斷門市：
-- 含「信義」→ `'信義店'`
-- 含「台中」或「臺中」→ `'臺中市政店'`（注意：Firestore 存的是簡體「台」，顯示用繁體「臺」，getStore 兩者都能識別）
-
-**getDeptType(dept, empId)** — 判斷部門類型：
-- empId === `'107066'` → 行政（ADMIN_EMP_ID，硬碼單一行政人員）
-- 含「BOOKSTORE」→ 書店
-- 含「外場」→ 外場
-- 含「內場」→ 內場
-
 ## 班表格式
 
 Excel 中的班次值（shiftRaw）：
-- `B-0900~1800` 或 `C-0900~1800`（B/C 為班別代碼，實際只解析時間）
+- `B-0900~1800` 或 `C-0900~1800`（B/C 為班別代碼，只解析時間）
 - `例假日` → status: `holiday`
 - `休息日` → status: `rest`
 - 其他任何值 → status: `working`，isValidTime: false
 
-## 頁籤結構
+## Service Worker 版本控制
 
-| 頁籤 id | 頁面 id | 說明 |
-|---|---|---|
-| navDashboard | pageDashboard | 行事曆 + 戰情儀表板（主頁） |
-| navMarketing | pageMarketing | 行銷商品活動（開發中） |
-| navAnnouncements | pageAnnouncements | 公告通知（開發中） |
-| navSettings | pageSettings | 設定 |
+每次修改 `index.html`、`admin.html` 或任何引用的資源後，必須遞增 `sw.js` 中的 `CACHE_NAME`。
+目前版本：`management-v11`。下次修改後改為 `management-v12`，依此類推。
 
-## 已知 Mockup / 尚未串接真實資料
+## Firestore 安全規則
 
-`pageDashboard` 裡有以下區塊是靜態假資料，標示 badge 說明來源：
-- **營運指標**（badge: Mockup）：業績達成率、來客數 — 數值寫死
-- **活動與任務**（badge: Notion）：預計串接 Notion API
-- **場地與課程**（badge: Notion）：預計串接 Notion API
+完整規則定義在 `firebase-config.js` 頂部的 JSDoc 註解中。核心原則：
+- `schedules` 集合：登入員工可讀，`role == 'admin'` 才能寫入。
+- `employees` 集合：登入員工可讀，管理員或本人（`isSelf(empId)`）可寫入。
+- `popup_applications` 集合：登入員工可讀/新增；`role == 'admin'` 才能核准/駁回。
+- Firebase Auth `displayName` 欄位用於儲存 empId（員工工號）。
 
-人力排班區塊（stateMain 內）是唯一真實接 Firestore 的資料。
+## Excel 班表解析與防錯
 
-## 代碼管理與 PWA 發佈規範
+- 必要欄位：部門、工號、姓名、班表日期、班次。缺欄位須立即中止並回報錯誤行。
+- 非標準班次 → `isValidTime: false`，不寫入 `startTime`/`endTime`。
+- 未登錄的部門名稱 → 中止上傳，UI 顯示明確錯誤。
 
-### Service Worker 版本控制與快取更新
-- 每次修改 [index.html](file:///Users/linus/made_by_vibe/Github/tbs-dm-pms/index.html)、[admin.html](file:///Users/linus/made_by_vibe/Github/tbs-dm-pms/admin.html) 或其引用的資源後，必須在 [sw.js](file:///Users/linus/made_by_vibe/Github/tbs-dm-pms/sw.js) 中將 `CACHE_NAME` 的版本號遞增（例如從 `schedule-v8` 升級至 `schedule-v9`）。
-- 部署新版本後，前台需實作快取更新提示，提醒門市人員「已有新版班表系統，請點擊更新」或自動重新載入頁面，避免門市人員使用過期快取。
+## UI/UX 規範摘要
 
-## Firestore 資料安全與權限設計規範
-
-### 安全規則維護與測試
-- 任何 Firestore 規則的異動，必須先於測試環境驗證，再貼上並發佈至 Firebase Console。
-- 嚴格遵守最小權限原則：
-  - `schedules` 集合：所有登入員工（`isAuthenticated()`）皆可讀取，僅限 `role == 'admin'` 的管理員可寫入。
-  - `employees` 集合：所有登入員工可讀取，管理員可寫入。員工本人（`isSelf(empId)`）僅能修改個人資料（如職稱）。
-- 請勿在客戶端程式碼中直接使用 `update` 或 `set` 修改他人權限，一切權限變更需透過後台驗證或 Firebase Auth 自訂聲明（Custom Claims）進行。
-
-## Excel 班表解析與防錯規範
-
-### 欄位格式校驗
-- 後台解析 Excel 時，必須驗證以下必要欄位：部門（Excel 部門欄）、工號、姓名、班表日期、班次。若缺少必要欄位應立即中止解析並回報錯誤行數。
-- 對於非標準格式的班次時間（如未帶 `B-` 或 `C-` 前綴，或格式不符 `HH:mm~HH:mm`），應記錄為 `isValidTime: false`，將 `status` 設為 `working`，但不寫入 `startTime` 與 `endTime`，以防前台轉換出錯。
-
-### 部門轉換失敗防護
-- 當 Excel 欄位出現未登錄於對照表中的部門名稱時，系統不得自動忽略或隨意指派，必須：
-  1. 暫停上傳流程。
-  2. 於後台 UI 顯示明確的錯誤訊息（例如：「偵測到未定義的部門名稱：『3部BOOK』，請先至對照表設定」）。
-  3. 待管理員修正或確認後再行上傳。
-
-## UI/UX 操作回饋與 Loading 設計規範
-
-### 非同步載入與骨架屏（Skeleton）
-- 前台從 Firestore 讀取月分列表或當日班表時，載入期間必須顯示骨架屏（Skeleton Screen）或微量動畫（如漸變閃爍效果），代替生硬的 Loading 文字。
-- 來回切換日期時，需保持舊資料顯示，並在背景讀取新資料，讀取完成後進行淡入漸變切換，提升視覺流暢度。
-
-### 防重複觸發與異常 Toast 提示
-- 所有寫入操作（如後台點擊上傳 Excel、前台修改設定）在發出 API 請求後，必須立即將觸發按鈕設為 `disabled` 狀態，避免門市人員因連線延遲重複點擊。
-- API 請求失敗時，需透過 Toast 或浮動提示視窗顯示具體異常原因（如：帳號權限不足、網路超時），避免僅顯示含糊的「連線失敗」或無響應。
+- 非同步載入：Firestore 讀取期間顯示骨架屏或動畫，切換日期時保持舊資料再淡入新資料。
+- 防重複點擊：寫入操作發出後立即將按鈕設為 `disabled`。
+- 錯誤提示：Toast 顯示具體原因，不顯示含糊的「連線失敗」。
 
 ## 重要陷阱 / 過去踩過的坑
 
-### DOM 元素已移除，JS 需做 null guard
-PR #5（2026-04-26）把舊版日期導覽 UI 換成行事曆格狀視圖，以下 DOM 元素已從 HTML 移除，
-但部分 JS function 仍有參考。若未來新增功能請確認這些 id 不再被無條件存取：
-- `dateSwitcher`、`dateCenterMain`、`dateCenterWeekday`
-- `chipYesterday`、`chipToday`、`chipTomorrow`
-- `datePicker`、`monthsBar`
-
-相關 JS（`updateDateDisplay`、`onPickerChange`、swipe IIFE）已加 null guard，不會 crash。
-
-### 錯誤訊息「連線失敗」不代表 Firebase 問題
-`loadAvailableMonths()` 用一個 try-catch 包住整個初始化流程，包含後續的 DOM 操作。
-若 JS 在 DOM 存取時拋出 TypeError，也會被捕獲並顯示「連線失敗」，容易誤導。
+### 「連線失敗」不代表 Firebase 問題
+`loadAvailableMonths()` 的 try-catch 也會捕捉到 DOM 操作的 TypeError。
 排查時先開 DevTools console 確認真正的 error 訊息。
-
-### Service Worker 快取版本
-`sw.js` 裡的 `CACHE_NAME = 'schedule-v8'`。
-每次改動 HTML/JS 後若使用者看到舊版本，需將版本號碼往上 bump（v9、v10…）。
 
 ### 日期字串格式
 所有日期統一使用本地時間 `YYYY-MM-DD`（透過 `localDateStr()` 產生）。
