@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="蔦屋主題平台排程">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23000' width='192' height='192'/><text x='5' y='185' font-size='155' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='188' y='44' font-size='38' font-family='sans-serif' font-weight='700' fill='%232563eb' text-anchor='end'>SCH</text></svg>">
-    <link class="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23000' width='180' height='180' rx='40'/><text x='5' y='174' font-size='145' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='176' y='42' font-size='38' font-family='sans-serif' font-weight='700' fill='%232563eb' text-anchor='end'>SCH</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23000' width='180' height='180' rx='40'/><text x='5' y='174' font-size='145' font-family='serif' fill='white' text-anchor='start'>蔦</text><text x='176' y='42' font-size='38' font-family='sans-serif' font-weight='700' fill='%232563eb' text-anchor='end'>SCH</text></svg>">
     <title>得利蔦屋大型主題平台展區排程系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
             --warning: #d97706;
             --warning-container: #fef3c7;
             --on-warning-container: #92400e;
-            
+
             /* Store colors */
             --store-taichung: #10b981;
             --store-xinyi: #2563eb;
@@ -44,7 +44,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
             color: var(--on-bg);
             background: var(--bg-color);
             display: flex;
@@ -54,7 +54,7 @@
 
         .app-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
-        /* Top status bar */
+        /* Top Status Bar */
         .status-bar {
             background: var(--surface);
             color: var(--inverse-surface);
@@ -66,7 +66,6 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--outline);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
             flex-shrink: 0;
             z-index: 100;
         }
@@ -86,62 +85,43 @@
 
         /* Role switcher */
         .role-badge {
-            font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-            cursor: pointer; user-select: none; border: 1px solid var(--outline); background: var(--surface);
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+            cursor: pointer; user-select: none; border: 1.5px solid var(--outline); background: var(--surface);
+            transition: all 0.15s;
         }
-        .role-badge:hover {
-            transform: translateY(-0.5px);
-        }
-        .role-badge.admin { 
-            border-color: #a78bfa; color: #6d28d9; background: #f5f3ff;
-            box-shadow: 0 2px 8px rgba(109, 40, 217, 0.08);
-        }
-        .role-badge.staff { 
-            border-color: #93c5fd; color: #1e40af; background: #eff6ff; 
-            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.08);
-        }
+        .role-badge.admin { border-color: #6d28d9; color: #6d28d9; background: #ede9fe; }
+        .role-badge.staff { border-color: var(--primary); color: var(--primary); background: var(--primary-container); }
 
         /* Store Selector */
         .store-selector-bar {
             background: var(--surface);
-            padding: 10px 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--outline);
             display: flex;
-            gap: 6px;
-            align-items: center;
-            justify-content: flex-start;
+            gap: 8px;
+            flex-shrink: 0;
         }
         .store-pill {
             padding: 6px 16px;
             border-radius: 20px;
-            border: 1px solid transparent;
-            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--outline);
+            background: var(--surface);
             font-size: 12px;
             font-weight: 700;
             color: var(--on-surface-variant);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s;
         }
-        .store-pill:hover {
-            background: rgba(0, 0, 0, 0.05);
-            color: var(--inverse-surface);
-        }
+        .store-pill:active { transform: scale(0.95); }
         .store-pill.active.taichung {
             background: var(--store-taichung);
             color: white;
             border-color: var(--store-taichung);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
         }
         .store-pill.active.xinyi {
             background: var(--store-xinyi);
             color: white;
             border-color: var(--store-xinyi);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
         /* Content Scroll Container */
@@ -157,6 +137,10 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+        }
+
+        /* Responsive Container */
+        .responsive-container {
             max-width: 1200px;
             margin: 0 auto;
             width: 100%;
@@ -172,63 +156,22 @@
                 position: sticky;
                 top: 16px;
             }
-            .status-bar { order: 1; }
-            .store-selector-bar { order: 2; }
-            .bottom-nav { 
-                order: 3;
-                position: static;
-                border-top: none;
-                border-bottom: 1px solid var(--outline);
-                box-shadow: none;
-                padding-bottom: 0;
-                background: var(--surface);
-                display: flex;
-                justify-content: flex-start;
-                padding-left: 24px;
-                gap: 8px;
-            }
-            .content { 
-                order: 4; 
-                padding-bottom: 24px; 
-            }
-            .nav-tab {
-                flex: none;
-                width: auto;
-                padding: 0 20px;
-                height: 48px;
-                flex-direction: row;
-                gap: 8px;
-                border-bottom: 3px solid transparent;
-                border-radius: 0;
-            }
-            .nav-tab.active {
-                border-bottom-color: var(--primary);
-                background: transparent;
-                color: var(--primary);
-            }
-            .nav-tab-label {
-                font-size: 13px;
-                font-weight: 700;
-            }
         }
 
-        /* Standard Cards */
+        /* Cards */
         .card {
             background: var(--surface);
             border: 1px solid var(--outline);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
             margin-bottom: 12px;
-            transition: all 0.2s ease;
         }
         .card-title {
             font-family: 'Noto Serif TC', serif;
             font-size: 16px;
             font-weight: 700;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: var(--inverse-surface);
             display: flex;
             align-items: center;
@@ -263,66 +206,77 @@
             justify-content: space-between;
             margin-bottom: 12px;
         }
-        .calendar-month-text { font-size: 16px; font-weight: 700; color: var(--inverse-surface); }
+        .calendar-month-text { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700; color: var(--inverse-surface); }
         .calendar-arrow-btn {
             width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--outline);
             background: var(--surface); display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--on-bg); transition: all 0.2s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            cursor: pointer; color: var(--on-bg); transition: background 0.15s;
         }
-        .calendar-arrow-btn:hover {
-            border-color: var(--on-surface-variant);
-            color: var(--inverse-surface);
+        .calendar-arrow-btn:active { background: var(--bg-color); }
+        .calendar-arrow-btn svg { width: 14px; height: 14px; }
+
+        /* Space Filter Tabs (顏色分離系統關鍵) */
+        .space-filter-bar {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            scrollbar-width: none;
         }
-        .calendar-arrow-btn:active { transform: scale(0.92); background: #f1f5f9; }
+        .space-filter-bar::-webkit-scrollbar { display: none; }
+        .space-filter-tab {
+            flex-shrink: 0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--outline);
+            background: var(--surface);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        /* Taichung store Space active colors */
+        .space-filter-tab.active.store-taichung-1 { background-color: #ef4444 !important; border-color: #ef4444 !important; color: #fff !important; }
+        .space-filter-tab.active.store-taichung-2 { background-color: #3b82f6 !important; border-color: #3b82f6 !important; color: #fff !important; }
+        .space-filter-tab.active.store-taichung-3 { background-color: #10b981 !important; border-color: #10b981 !important; color: #fff !important; }
+        .space-filter-tab.active.store-taichung-4 { background-color: #f59e0b !important; border-color: #f59e0b !important; color: #fff !important; }
+        .space-filter-tab.active.store-taichung-5 { background-color: #8b5cf6 !important; border-color: #8b5cf6 !important; color: #fff !important; }
+
+        /* Xinyi store Space active colors */
+        .space-filter-tab.active.store-xinyi-1 { background-color: #ec4899 !important; border-color: #ec4899 !important; color: #fff !important; }
+        .space-filter-tab.active.store-xinyi-2 { background-color: #14b8a6 !important; border-color: #14b8a6 !important; color: #fff !important; }
+        .space-filter-tab.active.store-xinyi-3 { background-color: #6366f1 !important; border-color: #6366f1 !important; color: #fff !important; }
+        .space-filter-tab.active.store-xinyi-4 { background-color: #f97316 !important; border-color: #f97316 !important; color: #fff !important; }
+        .space-filter-tab.active.store-xinyi-5 { background-color: #d946ef !important; border-color: #d946ef !important; color: #fff !important; }
+
+        .space-filter-tab.active.tab-all { background-color: var(--inverse-surface) !important; border-color: var(--inverse-surface) !important; color: var(--inverse-on-surface) !important; }
+
+        /* Calendar Grid */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            margin-bottom: 16px;
+            gap: 4px;
         }
         .calendar-hdr {
-            text-align: center; font-size: 10px; font-weight: 700; color: var(--on-surface-variant);
-            padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px;
+            text-align: center; font-size: 11px; font-weight: 700; color: var(--on-surface-variant);
+            padding: 4px 0; user-select: none;
         }
         .calendar-day {
-            aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; font-size: 12px; font-weight: 600;
-            color: var(--on-bg); background: var(--surface); border: 1px solid var(--outline);
-            position: relative; cursor: pointer; transition: all 0.2s ease;
+            aspect-ratio: 1; border: 1px solid var(--outline); border-radius: 8px;
+            background: var(--surface); padding: 4px; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative; cursor: pointer;
+            transition: border 0.15s, background 0.15s; min-height: 48px;
         }
-        .calendar-day:active { transform: scale(0.9); }
-        .calendar-day.empty { background: transparent; border: none; cursor: default; pointer-events: none; }
-        .calendar-day.today { border: 1.5px solid var(--primary); }
-        .calendar-day.today::after {
-            content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px;
-            border-radius: 50%; background: var(--primary);
-        }
-        .calendar-day.selected {
-            border: 2.5px solid var(--inverse-surface) !important;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
-            z-index: 10;
-        }
-        .calendar-day span {
-            position: relative;
-            z-index: 2;
-            font-size: 11px;
-            font-weight: 700;
-            pointer-events: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            transition: all 0.15s;
-        }
+        .calendar-day.empty { background: transparent; border: none; cursor: default; }
+        .calendar-day span { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; z-index: 2; pointer-events: none; }
+        .calendar-day.today span { color: var(--primary); }
+        .calendar-day.today { border: 2px solid var(--primary); }
+        .calendar-day.selected { border: 2px solid var(--inverse-surface) !important; }
 
-        /* Booking Indicator Bars (巨大顯眼的色塊) */
+        /* Booking Indicator Bars (顏色分離系統) */
         .day-occupancy {
             position: absolute;
             inset: 0;
@@ -331,32 +285,51 @@
             border-radius: 6px;
             overflow: hidden;
             z-index: 1;
+            padding-top: 16px;
         }
         .occupancy-bar {
             flex: 1;
             width: 100%;
             opacity: 0.85;
             transition: all 0.2s;
+            margin-bottom: 1px;
         }
-        /* Day Occupancy Heatmap - Taichung (台中市政店) */
-        .occupancy-bar.space-taichung-1 { background: #fee2e2; border-left: 3px solid #ef4444; }
-        .occupancy-bar.space-taichung-2 { background: #dbeafe; border-left: 3px solid #3b82f6; }
-        .occupancy-bar.space-taichung-3 { background: #dcfce7; border-left: 3px solid #10b981; }
-        .occupancy-bar.space-taichung-4 { background: #fef3c7; border-left: 3px solid #f59e0b; }
-        .occupancy-bar.space-taichung-5 { background: #f3e8ff; border-left: 3px solid #8b5cf6; }
-        
-        /* Day Occupancy Heatmap - Xinyi (信義店) */
-        .occupancy-bar.space-xinyi-1 { background: #fce7f3; border-left: 3px solid #ec4899; }
-        .occupancy-bar.space-xinyi-2 { background: #ccfbf1; border-left: 3px solid #14b8a6; }
-        .occupancy-bar.space-xinyi-3 { background: #e0e7ff; border-left: 3px solid #6366f1; }
-        .occupancy-bar.space-xinyi-4 { background: #ffedd5; border-left: 3px solid #f97316; }
-        .occupancy-bar.space-xinyi-5 { background: #fae8ff; border-left: 3px solid #d946ef; }
 
-        /* Single Space Occupancy Filter Colors */
-        .occupancy-bar.space-occupied-single-taichung { background: #fee2e2; border-left: 3px solid #ef4444; }
-        .occupancy-bar.space-free-single-taichung { background: #dcfce7; border-left: 3px solid #10b981; }
-        .occupancy-bar.space-occupied-single-xinyi { background: #fce7f3; border-left: 3px solid #ec4899; }
-        .occupancy-bar.space-free-single-xinyi { background: #ccfbf1; border-left: 3px solid #14b8a6; }
+        /* Taichung occupancy colors */
+        .occupancy-bar.store-taichung-1 { background: #ef4444; }
+        .occupancy-bar.store-taichung-2 { background: #3b82f6; }
+        .occupancy-bar.store-taichung-3 { background: #10b981; }
+        .occupancy-bar.store-taichung-4 { background: #f59e0b; }
+        .occupancy-bar.store-taichung-5 { background: #8b5cf6; }
+
+        /* Xinyi occupancy colors */
+        .occupancy-bar.store-xinyi-1 { background: #ec4899; }
+        .occupancy-bar.store-xinyi-2 { background: #14b8a6; }
+        .occupancy-bar.store-xinyi-3 { background: #6366f1; }
+        .occupancy-bar.store-xinyi-4 { background: #f97316; }
+        .occupancy-bar.store-xinyi-5 { background: #d946ef; }
+
+        /* Single Space occupied state styles (輕透透底背景色) */
+        .calendar-day.occupied-taichung-1 { background: #fee2e2; border-color: #fca5a5; }
+        .calendar-day.occupied-taichung-2 { background: #dbeafe; border-color: #bfdbfe; }
+        .calendar-day.occupied-taichung-3 { background: #dcfce7; border-color: #bbf7d0; }
+        .calendar-day.occupied-taichung-4 { background: #fef3c7; border-color: #fde68a; }
+        .calendar-day.occupied-taichung-5 { background: #f3e8ff; border-color: #e9d5ff; }
+
+        .calendar-day.occupied-xinyi-1 { background: #fce7f3; border-color: #fbcfe8; }
+        .calendar-day.occupied-xinyi-2 { background: #e0f2fe; border-color: #bae6fd; }
+        .calendar-day.occupied-xinyi-3 { background: #e0e7ff; border-color: #c7d2fe; }
+        .calendar-day.occupied-xinyi-4 { background: #ffedd5; border-color: #fed7aa; }
+        .calendar-day.occupied-xinyi-5 { background: #fae8ff; border-color: #f5d0fe; }
+
+        .calendar-day.free-single { background: #e8f5e9; border-color: #a5d6a7; }
+
+        /* Calendar Legend */
+        .calendar-legend {
+            display: flex; flex-wrap: wrap; gap: 10px; font-size: 10px;
+            color: var(--on-surface-variant); font-weight: 600; margin-top: 12px;
+            padding-top: 8px; border-top: 1px solid var(--outline);
+        }
 
         /* Daily Space Status Grid */
         .space-status-list { display: flex; flex-direction: column; gap: 8px; }
@@ -365,275 +338,180 @@
             padding: 10px 14px; border-radius: 10px; border: 1px solid var(--outline);
             background: var(--surface); transition: background 0.2s;
         }
-        .space-status-row.occupied { border-left: 4px solid var(--primary); }
-        
-        /* Space Status - Taichung */
-        .space-status-row.space-taichung-1.occupied { border-left-color: #ef4444; }
-        .space-status-row.space-taichung-2.occupied { border-left-color: #3b82f6; }
-        .space-status-row.space-taichung-3.occupied { border-left-color: #10b981; }
-        .space-status-row.space-taichung-4.occupied { border-left-color: #f59e0b; }
-        .space-status-row.space-taichung-5.occupied { border-left-color: #8b5cf6; }
 
-        /* Space Status - Xinyi */
-        .space-status-row.space-xinyi-1.occupied { border-left-color: #ec4899; }
-        .space-status-row.space-xinyi-2.occupied { border-left-color: #14b8a6; }
-        .space-status-row.space-xinyi-3.occupied { border-left-color: #6366f1; }
-        .space-status-row.space-xinyi-4.occupied { border-left-color: #f97316; }
-        .space-status-row.space-xinyi-5.occupied { border-left-color: #d946ef; }
+        /* Left Borders on Occupied Status Rows */
+        .space-status-row.space-taichung-1.occupied { border-left: 4px solid #ef4444; }
+        .space-status-row.space-taichung-2.occupied { border-left: 4px solid #3b82f6; }
+        .space-status-row.space-taichung-3.occupied { border-left: 4px solid #10b981; }
+        .space-status-row.space-taichung-4.occupied { border-left: 4px solid #f59e0b; }
+        .space-status-row.space-taichung-5.occupied { border-left: 4px solid #8b5cf6; }
+
+        .space-status-row.space-xinyi-1.occupied { border-left: 4px solid #ec4899; }
+        .space-status-row.space-xinyi-2.occupied { border-left: 4px solid #14b8a6; }
+        .space-status-row.space-xinyi-3.occupied { border-left: 4px solid #6366f1; }
+        .space-status-row.space-xinyi-4.occupied { border-left: 4px solid #f97316; }
+        .space-status-row.space-xinyi-5.occupied { border-left: 4px solid #d946ef; }
 
         .space-info { display: flex; flex-direction: column; gap: 2px; }
-        .space-name { font-size: 13px; font-weight: 700; color: var(--on-bg); }
+        .space-name { font-size: 13px; font-weight: 700; color: var(--inverse-surface); }
         .space-meta { font-size: 11px; color: var(--on-surface-variant); }
-        .space-badge {
-            font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
-        }
+        
+        .space-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
         .space-badge.available { background: var(--tertiary-container); color: var(--on-tertiary-container); }
         .space-badge.occupied { background: var(--error-container); color: var(--on-error-container); }
 
-        /* Applications & Forms */
-        .app-list { display: flex; flex-direction: column; gap: 12px; }
-        .app-item-card {
+        /* Applications UI List */
+        .app-list { display: flex; flex-direction: column; gap: 10px; }
+        .app-item {
             background: var(--surface); border: 1px solid var(--outline); border-radius: 12px;
-            padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02); display: flex; flex-direction: column; gap: 10px;
+            padding: 14px; position: relative; transition: box-shadow 0.15s;
         }
+        .app-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .app-item-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .app-brand { font-family: 'Noto Serif TC', serif; font-size: 15px; font-weight: 700; color: var(--inverse-surface); }
-        .app-space-tag { font-size: 11px; font-weight: 700; color: var(--on-surface-variant); }
-        .app-dates { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--on-surface-variant); }
-        .app-calc-details {
-            background: #fafaf9; border-radius: 12px; padding: 14px 16px; display: flex;
-            flex-direction: column; gap: 8px; font-size: 12px; border: 1px dashed var(--outline);
-        }
-        .app-calc-row { display: flex; justify-content: space-between; }
-        .app-calc-total { font-weight: 700; border-top: 1px dashed var(--outline); padding-top: 6px; margin-top: 2px; }
-        .app-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+        .app-status-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+        .app-status-tag.approved { background: var(--tertiary-container); color: var(--on-tertiary-container); }
+        .app-status-tag.pending { background: var(--warning-container); color: var(--on-warning-container); }
+        .app-status-tag.rejected { background: var(--error-container); color: var(--on-error-container); }
+        
+        .app-item-details { margin-top: 8px; font-size: 12px; color: var(--on-surface-variant); display: flex; flex-direction: column; gap: 4px; }
+        .app-item-actions { margin-top: 10px; display: flex; gap: 8px; justify-content: flex-end; }
 
-        /* Status Badge for applications */
-        .status-pill {
-            font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; display: inline-block;
-        }
-        .status-pill.pending { background: var(--warning-container); color: var(--on-warning-container); }
-        .status-pill.approved { background: var(--tertiary-container); color: var(--on-tertiary-container); }
-        .status-pill.rejected { background: var(--error-container); color: var(--on-error-container); }
-
-        /* Form Controls */
-        .form-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
-        .form-label { font-size: 11px; font-weight: 700; color: var(--on-surface-variant); }
-        .form-input {
-            width: 100%; padding: 8px 12px; border: 1.5px solid var(--outline); border-radius: 8px;
-            font-size: 13px; outline: none; background: rgba(0,0,0,0.02); transition: all 0.2s ease;
-        }
-        .form-input:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        .form-select {
-            width: 100%; padding: 8px 12px; border: 1.5px solid var(--outline); border-radius: 8px;
-            font-size: 13px; outline: none; background: rgba(0,0,0,0.02); transition: all 0.2s ease;
-        }
-        .form-select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        /* Buttons */
+        /* Buttons & Forms */
         .btn {
-            padding: 10px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
-            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-            transition: all 0.15s;
+            display: inline-flex; align-items: center; gap: 4px; justify-content: center;
+            border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+            padding: 6px 12px; height: 32px; border: 1px solid var(--outline);
+            transition: all 0.15s; background: var(--surface); color: var(--on-bg);
+            user-select: none;
         }
-        .btn:active { transform: scale(0.96); }
-        .btn:disabled {
-            background: #e2e8f0 !important;
-            color: #94a3b8 !important;
-            cursor: not-allowed !important;
-            transform: none !important;
-            box-shadow: none !important;
-            border-color: transparent !important;
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: var(--surface); color: var(--on-bg); border-color: var(--outline); }
+        .btn-secondary:hover { background: var(--bg-color); }
+        .btn-danger { background: var(--error); color: white; border-color: var(--error); }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-success { background: var(--tertiary); color: white; border-color: var(--tertiary); }
+        .btn-success:hover { background: #059669; }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 4px; }
+        .form-control, .form-select {
+            width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--outline);
+            font-size: 13px; font-family: inherit; color: var(--on-bg); background: var(--surface);
+            height: 38px; transition: border 0.15s;
         }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2); }
-        .btn-secondary { background: var(--bg-color); color: var(--on-bg); border: 1px solid var(--outline); }
-        .btn-danger { background: var(--error-container); color: var(--on-error-container); }
-        .btn-success { background: var(--tertiary); color: white; }
-        .btn-block { width: 100%; }
+        .form-control:focus, .form-select:focus { outline: none; border-color: var(--primary); }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--inverse-surface); color: var(--inverse-on-surface);
+            padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px;
+            opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1100;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 400;
-            display: flex; align-items: center; justify-content: center; padding: 16px;
-            opacity: 0; visibility: hidden; transition: all 0.25s ease;
-        }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal {
-            background: var(--surface); border-radius: 16px; width: 100%; max-width: 500px;
-            max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            display: flex; flex-direction: column;
-            transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
-        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--outline); display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700; }
-        .modal-close { font-size: 20px; color: var(--on-surface-variant); cursor: pointer; border: none; background: transparent; }
-        .modal-body { padding: 20px; overflow-y: auto; }
-        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--outline); display: flex; gap: 12px; justify-content: flex-end; }
-
-        /* Responsive Modal & Mobile UI */
-        @media (max-width: 600px) {
-            .modal-overlay {
-                align-items: flex-end;
-                padding: 0;
-            }
-            .modal {
-                max-width: 100%;
-                border-radius: 20px 20px 0 0;
-                max-height: 85vh;
-                transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-            .modal-overlay.active .modal {
-                transform: translateY(0);
-            }
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            .metrics-grid {
-                gap: 8px;
-            }
-            .metric-value {
-                font-size: 20px;
-            }
-        }
-
-        /* Banner list item warning alerts */
-        .rule-alert {
-            background: var(--warning-container); color: var(--on-warning-container);
-            border: 1px solid #fde047; padding: 10px 14px; border-radius: 8px; font-size: 11px;
-            line-height: 1.5; display: flex; flex-direction: column; gap: 4px;
-        }
-        .rule-alert-title { font-weight: 700; display: flex; align-items: center; gap: 4px; }
-
-        /* Bottom Tab Navigator */
+        /* RWD Mobile Menu Navigation bar */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
-            border-top: 1px solid var(--outline); display: flex; z-index: 100;
-            padding-bottom: max(env(safe-area-inset-bottom), 0px);
-            box-shadow: 0 -1px 0 var(--outline), 0 -4px 16px rgba(0, 0, 0, 0.05);
+            position: fixed; bottom: 0; left: 0; right: 0; height: 56px;
+            background: var(--surface); border-top: 1px solid var(--outline);
+            display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 100; box-shadow: 0 -1px 8px rgba(0,0,0,0.03);
         }
-        .nav-tab {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 56px; gap: 2px; cursor: pointer; color: var(--on-surface-variant);
-            border: none; background: none; transition: color 0.15s;
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            color: var(--on-surface-variant); cursor: pointer; flex: 1; height: 100%;
+            justify-content: center; text-decoration: none; user-select: none;
         }
-        .nav-tab.active { color: var(--primary); }
-        .nav-tab-icon { width: 22px; height: 22px; display: block; flex-shrink: 0; }
-        .nav-tab-icon svg { width: 100%; height: 100%; display: block; }
-        .nav-tab-label { font-size: 10px; font-weight: 700; letter-spacing: 0.3px; line-height: 1; }
+        .nav-item svg { width: 18px; height: 18px; transition: color 0.15s; }
+        .nav-item span { font-size: 9px; font-weight: 700; transition: color 0.15s; }
+        .nav-item.active { color: var(--primary); }
 
-        /* Pages visibility */
-        .page {
-            display: flex; flex-direction: column;
-            animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        /* Section visibility */
+        .page { display: block; }
         .page.hidden { display: none !important; }
-        @keyframes pageFadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        /* Modal Overlay & Bottom Sheet Transition */
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 999;
+        }
+        .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+
+        .modal {
+            position: fixed; z-index: 1000; background: var(--surface);
+            display: flex; flex-direction: column;
         }
 
-        /* Space Detail Cards */
-        .space-detail-card {
-            background: var(--surface); border: 1px solid var(--outline); border-radius: 12px;
-            overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03); margin-bottom: 16px;
-        }
-        .space-detail-hdr { background: #1e293b; color: white; padding: 12px 16px; }
-        .space-detail-title { font-family: 'Noto Serif TC', serif; font-size: 14px; font-weight: 700; }
-        .space-detail-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
-        .space-detail-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--bg-color); padding: 4px 0; }
-        .space-detail-label { color: var(--on-surface-variant); font-weight: 600; }
-        .space-detail-val { font-weight: 700; color: var(--on-bg); }
-        .space-price-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
-        .space-price-table th, .space-price-table td { border: 1px solid var(--outline); padding: 6px; text-align: right; }
-        .space-price-table th { background: var(--bg-color); color: var(--on-surface-variant); font-weight: 700; }
-        .space-price-table td:first-child, .space-price-table th:first-child { text-align: left; }
-
-        /* Empty state */
-        .empty-state { padding: 40px 16px; text-align: center; color: var(--on-surface-variant); }
-        .empty-icon { font-size: 32px; margin-bottom: 8px; }
-        .empty-text { font-size: 13px; font-weight: 600; }
-
-        /* Space filter tabs */
-        .space-filter-container {
-            margin-bottom: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .space-filter-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--on-surface-variant);
-        }
-        .space-filter-tabs {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 6px;
-            scrollbar-width: none; /* Firefox */
-        }
-        .space-filter-tabs::-webkit-scrollbar {
-            display: none; /* Safari and Chrome */
-        }
-        .space-filter-tab {
-            flex-shrink: 0;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1.5px solid var(--outline);
-            background: var(--surface);
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--on-surface-variant);
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-        .space-filter-tab:active {
-            transform: scale(0.95);
-        }
-        .space-filter-tab.active {
-            background: var(--inverse-surface);
-            color: var(--inverse-on-surface);
-            border-color: var(--inverse-surface);
+        /* Responsive Modal CSS (Mobile Bottom Sheet / Desktop Modal Dialog) */
+        @media (max-width: 899px) {
+            .modal {
+                bottom: 0; left: 0; right: 0;
+                border-radius: 20px 20px 0 0;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                max-height: 85vh;
+            }
+            .modal.open { transform: translateY(0); }
+            .modal-header { padding: 16px; border-bottom: 1px solid var(--outline); display: flex; justify-content: space-between; align-items: center; }
+            .modal-title { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700; }
+            .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
+            .modal-footer { padding: 12px 16px; border-top: 1px solid var(--outline); display: flex; gap: 8px; justify-content: flex-end; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
         }
 
-        /* Space filter tabs custom coloring - Taichung */
-        .space-filter-tab.tab-taichung-1 { border-color: #ef4444; color: #ef4444; }
-        .space-filter-tab.tab-taichung-1.active { background: #ef4444; color: #ffffff; border-color: #ef4444; }
-        
-        .space-filter-tab.tab-taichung-2 { border-color: #3b82f6; color: #3b82f6; }
-        .space-filter-tab.tab-taichung-2.active { background: #3b82f6; color: #ffffff; border-color: #3b82f6; }
-        
-        .space-filter-tab.tab-taichung-3 { border-color: #10b981; color: #10b981; }
-        .space-filter-tab.tab-taichung-3.active { background: #10b981; color: #ffffff; border-color: #10b981; }
-        
-        .space-filter-tab.tab-taichung-4 { border-color: #f59e0b; color: #f59e0b; }
-        .space-filter-tab.tab-taichung-4.active { background: #f59e0b; color: #ffffff; border-color: #f59e0b; }
-        
-        .space-filter-tab.tab-taichung-5 { border-color: #8b5cf6; color: #8b5cf6; }
-        .space-filter-tab.tab-taichung-5.active { background: #8b5cf6; color: #ffffff; border-color: #8b5cf6; }
+        @media (min-width: 900px) {
+            .modal {
+                top: 50%; left: 50%; width: 500px;
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0; pointer-events: none;
+                border-radius: 16px; border: 1px solid var(--outline);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                max-height: 90vh;
+            }
+            .modal.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
+            .modal-header { padding: 20px; border-bottom: 1px solid var(--outline); display: flex; justify-content: space-between; align-items: center; }
+            .modal-title { font-family: 'Noto Serif TC', serif; font-size: 17px; font-weight: 700; }
+            .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+            .modal-footer { padding: 16px 20px; border-top: 1px solid var(--outline); display: flex; gap: 8px; justify-content: flex-end; }
+        }
 
-        /* Space filter tabs custom coloring - Xinyi */
-        .space-filter-tab.tab-xinyi-1 { border-color: #ec4899; color: #ec4899; }
-        .space-filter-tab.tab-xinyi-1.active { background: #ec4899; color: #ffffff; border-color: #ec4899; }
+        /* Quotation panel */
+        .price-panel {
+            background: var(--bg-color); border: 1px solid var(--outline); border-radius: 12px;
+            padding: 14px; margin-top: 14px; display: flex; flex-direction: column; gap: 6px;
+        }
+        .price-panel-title { font-size: 12px; font-weight: 700; color: var(--on-surface-variant); border-bottom: 1px solid var(--outline); padding-bottom: 4px; margin-bottom: 4px; }
+        .app-calc-row { display: flex; justify-content: space-between; font-size: 12px; }
+        .app-calc-row.total-row { font-size: 14px; font-weight: 700; color: var(--inverse-surface); border-top: 1px dashed var(--outline); padding-top: 6px; margin-top: 4px; }
+
+        /* Warning alert for進撤場物流 */
+        .logistics-alert {
+            background: var(--warning-container); border: 1.5px solid var(--warning);
+            border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 11px;
+            color: var(--on-warning-container); line-height: 1.5;
+        }
+        .logistics-alert strong { font-weight: 700; display: block; margin-bottom: 2px; }
+
+        /* Space details styles */
+        .space-detail-header { border-bottom: 1px solid var(--outline); padding-bottom: 12px; margin-bottom: 12px; }
+        .space-detail-name { font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700; }
+        .space-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .space-detail-label { font-size: 11px; color: var(--on-surface-variant); font-weight: 600; }
+        .space-detail-val { font-size: 13px; font-weight: 700; color: var(--inverse-surface); }
+        .price-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        .price-table th, .price-table td { border: 1px solid var(--outline); padding: 8px; text-align: left; }
+        .price-table th { background: var(--bg-color); font-weight: 700; color: var(--on-surface-variant); }
         
-        .space-filter-tab.tab-xinyi-2 { border-color: #14b8a6; color: #14b8a6; }
-        .space-filter-tab.tab-xinyi-2.active { background: #14b8a6; color: #ffffff; border-color: #14b8a6; }
-        
-        .space-filter-tab.tab-xinyi-3 { border-color: #6366f1; color: #6366f1; }
-        .space-filter-tab.tab-xinyi-3.active { background: #6366f1; color: #ffffff; border-color: #6366f1; }
-        
-        .space-filter-tab.tab-xinyi-4 { border-color: #f97316; color: #f97316; }
-        .space-filter-tab.tab-xinyi-4.active { background: #f97316; color: #ffffff; border-color: #f97316; }
-        
-        .space-filter-tab.tab-xinyi-5 { border-color: #d946ef; color: #d946ef; }
-        .space-filter-tab.tab-xinyi-5.active { background: #d946ef; color: #ffffff; border-color: #d946ef; }
+        .empty-state {
+            padding: 30px 16px; text-align: center; color: var(--on-surface-variant);
+        }
+        .empty-icon { font-size: 28px; margin-bottom: 6px; }
+        .empty-text { font-size: 12px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -642,279 +520,277 @@
         <header class="status-bar">
             <div class="status-bar-left">
                 <div class="status-bar-logo">蔦</div>
-                <h1 class="status-bar-title">大型主題平台展區排程系統</h1>
+                <h1 class="status-bar-title">得利蔦屋大型主題平台展區排程系統</h1>
             </div>
             <div class="status-bar-right">
                 <div class="cloud-status">
-                    <span id="cloudDot" class="cloud-dot connected"></span>
-                    <span id="cloudLabel">已連線</span>
+                    <span id="cloudDot" class="cloud-dot"></span>
+                    <span id="cloudLabel">正在初始化...</span>
                 </div>
-                <div id="roleBadge" class="role-badge staff" onclick="toggleRole()">👤 營運人員</div>
+                <span id="roleBadge" class="role-badge staff" onclick="toggleRole()">內部營運人員</span>
             </div>
         </header>
 
-        <!-- Store Selector Pill Bar -->
-        <section class="store-selector-bar">
+        <!-- Store Selector Bar -->
+        <nav class="store-selector-bar">
             <button id="storeTaichung" class="store-pill active taichung" onclick="switchStore('台中市政店')">台中市政店</button>
             <button id="storeXinyi" class="store-pill xinyi" onclick="switchStore('信義店')">信義店</button>
-        </section>
+        </nav>
 
-        <!-- Main Pages Container -->
+        <!-- Content Area -->
         <main class="content">
-            <!-- 1. PAGE: CALENDAR SCHEDULE -->
-            <section id="pageCalendar" class="page">
-                <div class="layout-grid">
-                    <!-- Left: Month grid -->
-                    <div class="card" style="margin-bottom: 0;">
-                        <div class="calendar-nav">
-                            <button class="calendar-arrow-btn" onclick="adjustMonth(-1)">
-                                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
-                            </button>
-                            <span id="calendarMonthLabel" class="calendar-month-text">2026 年 06 月</span>
-                            <button class="calendar-arrow-btn" onclick="adjustMonth(1)">
-                                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
-                            </button>
-                        </div>
-                        
-                        <!-- Space Filter for Availability (可以點選每個區域看目前還有空閑的時間) -->
-                        <div class="space-filter-container">
-                            <span class="space-filter-label">🔍 選擇展區查看空閒時段：</span>
-                            <div id="spaceFilterTabs" class="space-filter-tabs"></div>
-                        </div>
-
-                        <div id="calendarGrid" class="calendar-grid">
-                            <!-- Weekday headers -->
-                            <div class="calendar-hdr">日</div>
-                            <div class="calendar-hdr">一</div>
-                            <div class="calendar-hdr">二</div>
-                            <div class="calendar-hdr">三</div>
-                            <div class="calendar-hdr">四</div>
-                            <div class="calendar-hdr">五</div>
-                            <div class="calendar-hdr">六</div>
-                            <!-- Days populated by JS -->
-                        </div>
-                        <div id="calendarLegend" style="font-size: 11px; color: var(--on-surface-variant); display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 8px;">
-                            <!-- Populated dynamically by JS -->
+            <div class="responsive-container">
+                
+                <!-- 1. PAGE: CALENDAR SCHEDULE -->
+                <section id="pageCalendar" class="page">
+                    <!-- Glassmorphism Live Metrics Card -->
+                    <div class="metrics-card">
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">當月預約案件</div>
+                                <div class="metric-value"><span id="metricCount">0</span><span class="metric-unit">件</span></div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">當月預計租金</div>
+                                <div class="metric-value"><span id="metricRevenue">0K</span></div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">展區出租率</div>
+                                <div class="metric-value"><span id="metricOccupancy">0%</span></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Right: Day breakdown list & glass metrics -->
-                    <div>
-                        <div class="metrics-card">
-                            <div class="metrics-grid">
-                                <div class="metric-item">
-                                    <div class="metric-label">當月預約天數</div>
-                                    <div class="metric-value"><span id="metricDays">0</span><span class="metric-unit">天</span></div>
+                    <div class="layout-grid">
+                        <!-- Left Column: Calendar & Free Periods -->
+                        <div>
+                            <div class="card">
+                                <div class="calendar-nav">
+                                    <button class="calendar-arrow-btn" onclick="adjustMonth(-1)">
+                                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"></path></svg>
+                                    </button>
+                                    <span id="calendarMonthLabel" class="calendar-month-text">2026 年 06 月</span>
+                                    <button class="calendar-arrow-btn" onclick="adjustMonth(1)">
+                                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"></path></svg>
+                                    </button>
                                 </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">當月預計租金</div>
-                                    <div class="metric-value"><span id="metricRevenue">0K</span></div>
+
+                                <!-- Space Filter Tabs (顏色分離) -->
+                                <div id="spaceFilterBar" class="space-filter-bar">
+                                    <!-- Populated by JS -->
                                 </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">當月主題品牌</div>
-                                    <div class="metric-value"><span id="metricBrands">0</span><span class="metric-unit">個</span></div>
+
+                                <div id="calendarGrid" class="calendar-grid">
+                                    <!-- Weekday headers -->
+                                    <div class="calendar-hdr">日</div>
+                                    <div class="calendar-hdr">一</div>
+                                    <div class="calendar-hdr">二</div>
+                                    <div class="calendar-hdr">三</div>
+                                    <div class="calendar-hdr">四</div>
+                                    <div class="calendar-hdr">五</div>
+                                    <div class="calendar-hdr">六</div>
+                                    <!-- Day Cells populated by JS -->
+                                </div>
+
+                                <div id="calendarLegend" class="calendar-legend">
+                                    <!-- Dynamic Legend by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Free Periods List (未來 90 天) -->
+                            <div class="card" id="freePeriodsCard" style="display: none;">
+                                <div class="card-title">未來 90 天空閒時段 <span>(連續空閒)</span></div>
+                                <div class="space-status-list" id="freePeriodsList">
+                                    <!-- Populated by JS -->
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Right Column: Selected Date Occupancy & Quick Booking -->
+                        <div>
+                            <div class="card">
+                                <div id="selectedDateTitle" class="card-title">2026-06-03 展區預約狀態</div>
+                                <div id="spaceStatusList" class="space-status-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. PAGE: APPLICATIONS LIST -->
+                <section id="pageApplications" class="page hidden">
+                    <div style="max-width: 800px; margin: 0 auto; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700;">申請案件清單</h2>
+                            <button class="btn btn-primary" onclick="openNewAppModal()">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                                新增申請
+                            </button>
+                        </div>
+                        <div id="appContainer" class="app-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. PAGE: SPACE DETAILS -->
+                <section id="pageSpaces" class="page hidden">
+                    <div style="max-width: 800px; margin: 0 auto; width: 100%;">
                         <div class="card">
-                            <div id="selectedDateTitle" class="card-title">2026-06-03 展區預約狀態</div>
-                            <div id="spaceStatusList" class="space-status-list">
-                                <!-- Populated by JS -->
+                            <div id="spaceDetailContainer">
+                                <!-- Populated dynamically by JS based on selection -->
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- 2. PAGE: APPLICATIONS LIST -->
-            <section id="pageApplications" class="page hidden">
-                <div style="max-width: 800px; margin: 0 auto; width: 100%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h2 style="font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700;">申請案件清單</h2>
-                        <button class="btn btn-primary" onclick="openNewAppModal()">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
-                            新增申請
-                        </button>
-                    </div>
-                    <div id="appContainer" class="app-list">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. PAGE: SPACE DETAILS -->
-            <section id="pageSpaces" class="page hidden">
-                <div style="max-width: 800px; margin: 0 auto; width: 100%;" id="spacesDetailContainer">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
-
-            <!-- 4. PAGE: SETTINGS -->
-            <section id="pageSettings" class="page hidden">
-                <div style="max-width: 600px; margin: 0 auto; width: 100%;">
-                    <div class="card">
-                        <div class="card-title">資料管理</div>
-                        <div class="space-status-list">
-                            <button class="btn btn-secondary btn-block" onclick="importMockData()">重置/載入模擬展區排程資料</button>
-                            <button class="btn btn-danger btn-block" onclick="clearAllData()">清除所有本機儲存資料</button>
+                <!-- 4. PAGE: SETTINGS -->
+                <section id="pageSettings" class="page hidden">
+                    <div style="max-width: 600px; margin: 0 auto; width: 100%;">
+                        <div class="card">
+                            <div class="card-title">本機資料管理</div>
+                            <div class="app-item-details" style="font-size: 13px; line-height: 1.8; margin-bottom: 20px;">
+                                <p><strong>專案名稱</strong>：得利蔦屋大型主題平台展區排程系統</p>
+                                <p><strong>時區設定</strong>：台北 (Asia/Taipei)</p>
+                                <p><strong>PWA 快取</strong>：PWA 離線快取服務啟用中 (popup-planning-v9)</p>
+                            </div>
+                            <div style="display:flex; gap:12px;">
+                                <button class="btn btn-primary" onclick="importMockData(true)">重置/載入模擬排程資料</button>
+                                <button class="btn btn-danger" onclick="clearAllData()">清空所有預約</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-title">系統與開發資訊</div>
-                        <div class="space-status-list" style="font-size: 13px; line-height: 1.6; color: var(--on-surface-variant);">
-                            <p><strong>專案名稱</strong>：得利蔦屋大型主題平台展區排程系統</p>
-                            <p><strong>時區設定</strong>：台北 (Asia/Taipei)</p>
-                            <p><strong>PWA 快取</strong>：PWA 離線快取服務啟用中 (popup-planning-v9)</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                </section>
+
+            </div>
         </main>
 
-        <!-- New Application Modal -->
-        <div id="newAppModal" class="modal-overlay">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3 class="modal-title">新增主題平台展區申請</h3>
-                    <button class="modal-close" onclick="closeNewAppModal()">×</button>
-                </div>
-                <div class="modal-body">
-                    <form id="appForm" onsubmit="submitApplication(event)">
-                        <div class="form-group">
-                            <label class="form-label">品牌名稱</label>
-                            <input type="text" id="formBrand" class="form-input" placeholder="例如：Deltamac Select" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">目標分店</label>
-                            <select id="formStore" class="form-select" onchange="populateSpacesSelect()" required>
-                                <option value="台中市政店">台中市政店</option>
-                                <option value="信義店">信義店</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">申請展區</label>
-                            <select id="formSpace" class="form-select" onchange="recalculatePrice()" required>
-                                <!-- Populated by JS -->
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">開始日期</label>
-                                <input type="date" id="formStart" class="form-input" onchange="recalculatePrice()" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">結束日期</label>
-                                <input type="date" id="formEnd" class="form-input" onchange="recalculatePrice()" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">租賃方案</label>
-                            <select id="formPlan" class="form-select" onchange="recalculatePrice()" required>
-                                <option value="fixed">固定租金制（純展示）</option>
-                                <option value="commission">基礎服務費加%制（展售 + 25%抽成）</option>
-                            </select>
-                        </div>
+        <!-- Form Overlay & Dialog (Bottom Sheet / Center Modal) -->
+        <div id="modalBackdrop" class="modal-backdrop" onclick="closeNewAppModal()"></div>
+        <div id="appModal" class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">新增展區租用申請</h3>
+                <button class="btn" style="border:none; background:transparent; font-size:16px;" onclick="closeNewAppModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="appForm" onsubmit="submitApplication(event)">
+                    <input type="hidden" id="formEditId">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="formBrand">品牌商戶名稱</label>
+                        <input class="form-control" type="text" id="formBrand" required placeholder="例如：京都手工餐具庫">
+                    </div>
 
-                        <!-- Real-time conflict warning -->
-                        <div id="formConflictWarning" class="rule-alert" style="display:none; background: var(--error-container); color: var(--on-error-container); border: 1px solid #fca5a5; margin-bottom: 12px;">
-                            <div class="rule-alert-title" style="color: var(--on-error-container);">
-                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                                ⚠️ 展區檔期衝突警報
-                            </div>
-                            <p id="conflictWarningText" style="margin-top: 4px; font-weight: 600;"></p>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label" for="formStore">租賃門市</label>
+                        <select class="form-select" id="formStore" onchange="onFormStoreChange()">
+                            <option value="台中市政店">台中市政店</option>
+                            <option value="信義店">信義店</option>
+                        </select>
+                    </div>
 
-                        <!-- Price calculation panel -->
-                        <div class="app-calc-details" id="pricePanel">
-                            <div class="app-calc-row">
-                                <span>計算基準：</span>
-                                <span id="calcDuration">0 天 (0 週 0 天)</span>
-                            </div>
-                            <div class="app-calc-row">
-                                <span>基礎租金（一般費率）：</span>
-                                <span id="calcBasePrice">NT$ 0</span>
-                            </div>
-                            <div class="app-calc-row" id="specialPeriodRow" style="display:none; color: var(--warning);">
-                                <span id="specialPeriodLabel">特殊檔期加給 (1.2x)：</span>
-                                <span id="calcSpecialAddition">NT$ 0</span>
-                            </div>
-                            <div class="app-calc-row">
-                                <span>營業稅金 (5%)：</span>
-                                <span id="calcTax">NT$ 0</span>
-                            </div>
-                            <div class="app-calc-row app-calc-total">
-                                <span>估算總租金 (含稅)：</span>
-                                <span id="calcTotal">NT$ 0</span>
-                            </div>
-                            <div class="app-calc-row" style="color: var(--primary); font-weight: 600;">
-                                <span>預收訂金 (50%)：</span>
-                                <span id="calcDeposit">NT$ 0</span>
-                            </div>
-                            <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
-                                <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px; height: 26px; display: flex; align-items: center; gap: 4px;" onclick="copyQuotationDraft(event)">
-                                    📋 複製報價草案
-                                </button>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label" for="formSpace">租用展區空間</label>
+                        <select class="form-select" id="formSpace" onchange="recalculatePrice()">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
 
-                        <!-- Warning rules hint -->
-                        <div class="rule-alert" style="margin-top: 14px;">
-                            <div class="rule-alert-title">
-                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                                營運與進撤場細則提示
-                            </div>
-                            <p>• <strong>進場時間</strong>：每日 21:00 後進行陳列佈置與施工，營業時間（10:00–21:00）禁止施工。</p>
-                            <p>• <strong>撤場時間</strong>：結束當日 21:00 後撤場，須於次日 10:00 前恢復原狀。</p>
-                            <p>• <strong>補貨時限</strong>：一般檔期通知後 3 工作天送達，特殊檔期須於 1–2 工作天內送達。</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="form-group">
+                            <label class="form-label" for="formStart">起始日期</label>
+                            <input class="form-control" type="date" id="formStart" required onchange="recalculatePrice()">
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" onclick="closeNewAppModal()">取消</button>
-                    <button class="btn btn-primary" type="submit" form="appForm">送出申請</button>
-                </div>
+                        <div class="form-group">
+                            <label class="form-label" for="formEnd">結束日期</label>
+                            <input class="form-control" type="date" id="formEnd" required onchange="recalculatePrice()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="formPlan">租賃合約方案</label>
+                        <select class="form-select" id="formPlan" onchange="recalculatePrice()">
+                            <option value="fixed">固定租金制</option>
+                            <option value="commission">基礎服務費加%制</option>
+                        </select>
+                    </div>
+
+                    <!-- Logistics alert banner -->
+                    <div class="logistics-alert">
+                        <strong>⚠️ 蔦屋場地進撤場與物流規範：</strong>
+                        • 進場：每日 21:00 後。<br>
+                        • 撤場：結束當日 21:00 後，次日 10:00 前完成盤點與清空復原。<br>
+                        • 補貨時效：一般檔期通知後 3 工作天，特殊檔期 1-2 工作天送達。
+                    </div>
+
+                    <!-- Dynamic pricing calculator panel -->
+                    <div class="price-panel" id="pricePanel">
+                        <div class="price-panel-title">費用估算明細</div>
+                        <div class="app-calc-row">
+                            <span>期間天數：</span>
+                            <span id="calcDays">0 天</span>
+                        </div>
+                        <div class="app-calc-row">
+                            <span>場地租金小計：</span>
+                            <span id="calcBasePrice">NT$ 0</span>
+                        </div>
+                        <div class="app-calc-row" id="specialPeriodRow" style="display:none; color: var(--warning);">
+                            <span id="specialPeriodLabel">特殊檔期加給 (1.2x)：</span>
+                            <span id="calcSpecialAddition">NT$ 0</span>
+                        </div>
+                        <div class="app-calc-row">
+                            <span>營業稅金 (5%)：</span>
+                            <span id="calcTax">NT$ 0</span>
+                        </div>
+                        <div class="app-calc-row total-row">
+                            <span>總金額 (含稅)：</span>
+                            <span id="calcTotal">NT$ 0</span>
+                        </div>
+                        <div class="app-calc-row" style="color: var(--on-tertiary-container); font-weight:700; margin-top: 4px;">
+                            <span>預收訂金 (50%)：</span>
+                            <span id="calcDeposit">NT$ 0</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="copyQuotationDraft()">複製報價草稿</button>
+                <button type="button" class="btn btn-secondary" onclick="closeNewAppModal()">取消</button>
+                <button type="submit" class="btn btn-primary" form="appForm">送出申請</button>
             </div>
         </div>
 
-        <!-- Bottom Navigation Tabs -->
-        <nav class="bottom-nav">
-            <button id="navCalendar" class="nav-tab active" onclick="switchTab('Calendar')">
-                <div class="nav-tab-icon">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </div>
-                <span class="nav-tab-label">時程日曆</span>
-            </button>
-            <button id="navApplications" class="nav-tab" onclick="switchTab('Applications')">
-                <div class="nav-tab-icon">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                </div>
-                <span class="nav-tab-label">申請管理</span>
-            </button>
-            <button id="navSpaces" class="nav-tab" onclick="switchTab('Spaces')">
-                <div class="nav-tab-icon">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                </div>
-                <span class="nav-tab-label">場地資訊</span>
-            </button>
-            <button id="navSettings" class="nav-tab" onclick="switchTab('Settings')">
-                <div class="nav-tab-icon">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                </div>
-                <span class="nav-tab-label">設定</span>
-            </button>
-        </nav>
+        <!-- Toast notification element -->
+        <div id="toast" class="toast"></div>
+
+        <!-- RWD Mobile Bottom Navigation Bar -->
+        <footer class="bottom-nav">
+            <div class="nav-item active" id="navCalendar" onclick="navTo('Calendar')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"></path></svg>
+                <span>時程日曆</span>
+            </div>
+            <div class="nav-item" id="navApplications" onclick="navTo('Applications')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
+                <span>申請清單</span>
+            </div>
+            <div class="nav-item" id="navSpaces" onclick="navTo('Spaces')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M2.25 21h19.5m-18-18v18m16.5-18v18m-18-10.5h19.5M3 7.5h18M3 16.5h18M10.5 3v18M13.5 3v18"></path></svg>
+                <span>展區規格</span>
+            </div>
+            <div class="nav-item" id="navSettings" onclick="navTo('Settings')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>設定</span>
+            </div>
+        </footer>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase Compat SDK SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    
-    <!-- Config File -->
     <script src="firebase-config.js"></script>
 
-    <!-- Main Logic Script -->
+    <!-- App Business Logic -->
     <script>
         // ----------------------------------------------------
         // 1. DATA DEFINITIONS (Spaces, pricing tables)
@@ -936,8 +812,7 @@
             ]
         };
 
-        // Special Periods (特殊檔期，租金以 1.2 倍計算)
-        // 1-2月新春, 4-5月母親節, 7-8月暑假, 11-12月聖誕跨年
+        // Special Periods: 1-2月新春, 4-5月母親節, 7-8月暑假, 11-12月聖誕跨年
         const SPECIAL_MONTHS = [1, 2, 4, 5, 7, 8, 11, 12];
 
         // ----------------------------------------------------
@@ -945,33 +820,25 @@
         // ----------------------------------------------------
         let currentStore = "台中市政店";
         let currentTab = "Calendar";
-        let currentDate = new Date(); // Current viewing month for calendar
-        let selectedDateStr = localDateStr(new Date()); // Selected day for list
-        let userRole = "staff"; // 'staff' (內部營運人員) or 'admin' (經理/決策)
-        let currentSpaceFilter = "all"; // Space filter value ('all' or space id string)
+        let currentSpaceFilter = "all"; // 'all' (熱力圖) or Space ID (1, 2, 3, 4, 5)
+        let currentDate = new Date(); // Month being viewed on calendar
+        let selectedDateStr = localDateStr(new Date()); // Selected day for lists
+        let userRole = "staff"; // 'staff' (內部營運人員) or 'admin' (經理/審核員)
         
         let db = null;
         let isFirebaseConnected = false;
-        let localApplications = []; // Fallback LocalStorage cache
+        let localApplications = []; // Array to store all applications (firebase synced or local fallback)
 
         // ----------------------------------------------------
         // 3. INITIALIZATION & SYNC
         // ----------------------------------------------------
         window.addEventListener('DOMContentLoaded', () => {
             initFirebase();
-            loadLocalData();
-            switchStore(currentStore);
-            switchTab(currentTab);
-            renderCalendar();
-            renderSelectedDayStatus();
-            renderSpacesDetail();
-            
-            // Register PWA Service Worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker 註冊成功', reg))
-                    .catch(err => console.warn('Service worker 註冊失敗', err));
-            }
+            registerPWA();
+            setupFormDates();
+            buildSpaceFilterTabs();
+            onFormStoreChange(); // Populate form spaces dropdown
+            refreshAllUI();
         });
 
         function initFirebase() {
@@ -980,48 +847,189 @@
                     firebase.initializeApp(FIREBASE_CONFIG);
                     db = firebase.firestore();
                     isFirebaseConnected = true;
-                    document.getElementById('cloudDot').className = 'cloud-dot connected';
-                    document.getElementById('cloudLabel').textContent = '已連線';
-                    
-                    // Listen to Firestore updates
+                    setCloudStatus('connected');
+
+                    // Synchronize in real-time
                     db.collection('popup_applications').onSnapshot(snapshot => {
-                        localApplications = [];
+                        const apps = [];
                         snapshot.forEach(doc => {
-                            localApplications.push({ id: doc.id, ...doc.data() });
+                            apps.push(Object.assign({ id: doc.id }, doc.data()));
                         });
+                        localApplications = apps;
                         saveLocalBackup();
                         refreshAllUI();
-                    }, error => {
-                        console.error("Firestore 監聽失敗，改用離線資料", error);
-                        setFirebaseOfflineState();
+                    }, err => {
+                        console.error("Firestore live sync error:", err);
+                        isFirebaseConnected = false;
+                        setCloudStatus('error');
+                        loadLocalBackup();
+                        refreshAllUI();
                     });
                 } else {
-                    setFirebaseOfflineState();
+                    console.warn("Firebase config not found, running in LocalStorage mode.");
+                    loadLocalBackup();
+                    refreshAllUI();
                 }
             } catch (e) {
-                console.warn("Firebase 初始化失敗，使用模擬資料與本機儲存", e);
-                setFirebaseOfflineState();
+                console.error("Firebase init exception:", e);
+                isFirebaseConnected = false;
+                setCloudStatus('error');
+                loadLocalBackup();
+                refreshAllUI();
             }
         }
 
-        function setFirebaseOfflineState() {
-            isFirebaseConnected = false;
-            document.getElementById('cloudDot').className = 'cloud-dot error';
-            document.getElementById('cloudLabel').textContent = '離線模式';
-            refreshAllUI();
+        function registerPWA() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered successfully.', reg.scope))
+                    .catch(err => console.warn('Service Worker registration failed:', err));
+            }
         }
 
-        function loadLocalData() {
-            const data = localStorage.getItem('popup_applications');
+        function loadLocalBackup() {
+            setCloudStatus('offline');
+            const data = localStorage.getItem('tsutaya_popup_apps');
             if (data) {
-                localApplications = JSON.parse(data);
+                try {
+                    localApplications = JSON.parse(data);
+                } catch(e) {
+                    localApplications = [];
+                }
             } else {
-                importMockData(false); // Silent import first time
+                localApplications = [];
+                // If completely empty, seed mock data on first load
+                importMockData(false);
             }
         }
 
         function saveLocalBackup() {
-            localStorage.setItem('popup_applications', JSON.stringify(localApplications));
+            localStorage.setItem('tsutaya_popup_apps', JSON.stringify(localApplications));
+        }
+
+        function setCloudStatus(status) {
+            const dot = document.getElementById('cloudDot');
+            const label = document.getElementById('cloudLabel');
+            if (!dot || !label) return;
+            if (status === 'connected') {
+                dot.className = 'cloud-dot connected';
+                label.textContent = '雲端同步中';
+            } else if (status === 'offline') {
+                dot.className = 'cloud-dot';
+                label.textContent = '本機離線模式';
+            } else {
+                dot.className = 'cloud-dot error';
+                label.textContent = '雲端連線失敗';
+            }
+        }
+
+        function toggleRole() {
+            const btn = document.getElementById('roleBadge');
+            if (userRole === "staff") {
+                userRole = "admin";
+                btn.className = "role-badge admin";
+                btn.textContent = "管理員 (經理)";
+            } else {
+                userRole = "staff";
+                btn.className = "role-badge staff";
+                btn.textContent = "內部營運人員";
+            }
+            refreshAllUI();
+            showToast(`已切換身分為：${userRole === 'admin' ? '管理員' : '營運人員'}`, "info");
+        }
+
+        // ----------------------------------------------------
+        // 4. UI CONTROLS & NAVIGATION
+        // ----------------------------------------------------
+        function switchStore(storeName) {
+            currentStore = storeName;
+            
+            // UI pills toggle
+            document.getElementById('storeTaichung').className = 'store-pill' + (storeName === '台中市政店' ? ' active taichung' : '');
+            document.getElementById('storeXinyi').className = 'store-pill' + (storeName === '信義店' ? ' active xinyi' : '');
+            
+            currentSpaceFilter = "all"; // Reset space filter
+            buildSpaceFilterTabs();
+            onFormStoreChange(); // Update form space select element
+            refreshAllUI();
+        }
+
+        function navTo(tabId) {
+            currentTab = tabId;
+            
+            // Toggle Pages
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+            document.getElementById('page' + tabId).classList.remove('hidden');
+            
+            // Toggle Navigation UI
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const navBtn = document.getElementById('nav' + tabId);
+            if (navBtn) navBtn.classList.add('active');
+
+            if (tabId === 'Spaces') {
+                renderSpacesSpecs();
+            }
+        }
+
+        function buildSpaceFilterTabs() {
+            const bar = document.getElementById('spaceFilterBar');
+            if (!bar) return;
+            bar.innerHTML = '';
+
+            // 1. All Option
+            const allBtn = document.createElement('button');
+            allBtn.className = 'space-filter-tab active tab-all';
+            allBtn.textContent = '顯示所有展區 (熱力圖)';
+            allBtn.dataset.value = 'all';
+            allBtn.onclick = () => selectSpaceFilter('all');
+            bar.appendChild(allBtn);
+
+            // 2. Spaces Options
+            const spaces = SPACES_DATA[currentStore];
+            const storeKey = currentStore === '台中市政店' ? 'taichung' : 'xinyi';
+            
+            spaces.forEach((s, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'space-filter-tab';
+                btn.textContent = s.name;
+                btn.dataset.value = s.id;
+                btn.onclick = () => selectSpaceFilter(s.id);
+                bar.appendChild(btn);
+            });
+        }
+
+        function selectSpaceFilter(val) {
+            currentSpaceFilter = val;
+            const tabs = document.querySelectorAll('.space-filter-tab');
+            const storeKey = currentStore === '台中市政店' ? 'taichung' : 'xinyi';
+
+            tabs.forEach(tab => {
+                const isAll = tab.dataset.value === 'all';
+                const isMatch = String(tab.dataset.value) === String(currentSpaceFilter);
+                
+                // Clear active states
+                tab.className = 'space-filter-tab';
+
+                if (isMatch) {
+                    if (isAll) {
+                        tab.classList.add('active', 'tab-all');
+                    } else {
+                        // Apply separate store space active color
+                        tab.classList.add('active', `store-${storeKey}-${tab.dataset.value}`);
+                    }
+                }
+            });
+
+            // Toggle 90 days availability card
+            const freeCard = document.getElementById('freePeriodsCard');
+            if (currentSpaceFilter === 'all') {
+                freeCard.style.display = 'none';
+            } else {
+                freeCard.style.display = 'block';
+                renderFreePeriodsList();
+            }
+
+            refreshAllUI();
         }
 
         function refreshAllUI() {
@@ -1032,299 +1040,236 @@
         }
 
         // ----------------------------------------------------
-        // 4. CALENDAR RENDER ENGINE
+        // 5. CALENDAR SCHEDULE DRAWING
         // ----------------------------------------------------
         function renderCalendar() {
             const year = currentDate.getFullYear();
-            const month = currentDate.getMonth(); // 0-indexed
-            
-            document.getElementById('calendarMonthLabel').textContent = `${year} 年 ${String(month + 1).padStart(2, '0')} 月`;
+            const month = currentDate.getMonth();
+
+            // Setup Month Label
+            document.getElementById('calendarMonthLabel').textContent = `${year} 年 ${(month + 1).toString().padStart(2, '0')} 月`;
 
             const firstDayIndex = new Date(year, month, 1).getDay();
             const totalDays = new Date(year, month + 1, 0).getDate();
 
             const grid = document.getElementById('calendarGrid');
             
-            // Clear existing day numbers (keep weekday headers)
+            // Clear existing cells except headers
             const headers = grid.querySelectorAll('.calendar-hdr');
             grid.innerHTML = '';
             headers.forEach(h => grid.appendChild(h));
 
-            // Populate empty cells before day 1
+            // Empty cells before start of month
             for (let i = 0; i < firstDayIndex; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.className = 'calendar-day empty';
                 grid.appendChild(emptyCell);
             }
 
-            // Populate day cells
             const todayStr = localDateStr(new Date());
-            const filterVal = currentSpaceFilter;
             const storeKey = currentStore === '台中市政店' ? 'taichung' : 'xinyi';
 
+            // Populate days
             for (let day = 1; day <= totalDays; day++) {
-                const dayDate = new Date(year, month, day);
-                const dateStr = localDateStr(dayDate);
-                
+                const cellDate = new Date(year, month, day);
+                const cellDateStr = localDateStr(cellDate);
+
                 const cell = document.createElement('div');
                 cell.className = 'calendar-day';
-                if (dateStr === todayStr) cell.classList.add('today');
-                if (dateStr === selectedDateStr) cell.classList.add('selected');
-                
+                if (cellDateStr === todayStr) cell.classList.add('today');
+                if (cellDateStr === selectedDateStr) cell.classList.add('selected');
+
                 cell.innerHTML = `<span>${day}</span>`;
-                cell.onclick = () => selectDay(dateStr);
+                cell.onclick = () => selectDay(cellDateStr);
 
-                const activeBookings = getBookingsForDate(dateStr, currentStore);
-
-                if (filterVal === 'all') {
-                    if (activeBookings.length > 0) {
+                // Add occupancy markers
+                const dayBookings = getBookingsForDate(cellDateStr, currentStore);
+                
+                if (currentSpaceFilter === 'all') {
+                    // HEATMAP MODE: Show multiple colored stripes inside the grid box
+                    if (dayBookings.length > 0) {
                         const occupancyContainer = document.createElement('div');
                         occupancyContainer.className = 'day-occupancy';
                         
-                        activeBookings.forEach(booking => {
+                        dayBookings.forEach(booking => {
                             const bar = document.createElement('div');
-                            bar.className = `occupancy-bar space-${storeKey}-${booking.spaceId}`;
-                            bar.title = `${booking.brand}`;
+                            bar.className = `occupancy-bar store-${storeKey}-${booking.spaceId}`;
+                            bar.title = `${booking.brand} (${SPACES_DATA[currentStore].find(s => s.id === booking.spaceId).name})`;
                             occupancyContainer.appendChild(bar);
                         });
                         cell.appendChild(occupancyContainer);
                     }
                 } else {
-                    // Single space occupancy heatmap
-                    const spaceId = parseInt(filterVal);
-                    const isOccupied = activeBookings.some(b => b.spaceId === spaceId);
-                    
-                    const occupancyContainer = document.createElement('div');
-                    occupancyContainer.className = 'day-occupancy';
-                    
-                    const bar = document.createElement('div');
-                    if (isOccupied) {
-                        bar.className = `occupancy-bar space-occupied-single-${storeKey}`;
-                        const bInfo = activeBookings.find(b => b.spaceId === spaceId);
-                        bar.title = `已佔用: ${bInfo.brand}`;
+                    // SINGLE SPACE FILTER MODE: Transparent background and outline
+                    const spaceIdInt = parseInt(currentSpaceFilter);
+                    const activeBooking = dayBookings.find(b => b.spaceId === spaceIdInt);
+                    if (activeBooking) {
+                        cell.classList.add(`occupied-${storeKey}-${spaceIdInt}`);
+                        
+                        // Small indicator text inside cell if occupied
+                        const label = document.createElement('div');
+                        label.style.cssText = 'position:absolute; bottom:4px; right:4px; font-size:8px; font-weight:700; color:var(--inverse-surface); text-overflow:ellipsis; white-space:nowrap; overflow:hidden; width:80%; text-align:right;';
+                        label.textContent = activeBooking.brand;
+                        cell.appendChild(label);
                     } else {
-                        bar.className = `occupancy-bar space-free-single-${storeKey}`;
-                        bar.title = '空閒';
+                        // Mark as free available days in single space mode
+                        cell.classList.add('free-single');
                     }
-                    occupancyContainer.appendChild(bar);
-                    cell.appendChild(occupancyContainer);
                 }
 
                 grid.appendChild(cell);
+            }
+
+            renderCalendarLegend();
+        }
+
+        function renderCalendarLegend() {
+            const legend = document.getElementById('calendarLegend');
+            if (!legend) return;
+            legend.innerHTML = '';
+
+            const storeKey = currentStore === '台中市政店' ? 'taichung' : 'xinyi';
+            const spaces = SPACES_DATA[currentStore];
+
+            if (currentSpaceFilter === 'all') {
+                // Show all space colors in heatmap mode
+                const colors = {
+                    'taichung': ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+                    'xinyi': ['#ec4899', '#14b8a6', '#6366f1', '#f97316', '#d946ef']
+                };
+
+                spaces.forEach((s, idx) => {
+                    const color = colors[storeKey][idx] || '#64748b';
+                    const item = document.createElement('div');
+                    item.style.cssText = 'display:inline-flex; align-items:center; gap:4px;';
+                    item.innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:${color}; display:inline-block;"></span>${s.name}`;
+                    legend.appendChild(item);
+                });
+            } else {
+                // Show Occupied vs Free Legend in single space mode
+                const occupiedColor = { 'taichung': '#ef4444', 'xinyi': '#ec4899' }[storeKey];
+                const spaceName = spaces.find(s => s.id === parseInt(currentSpaceFilter)).name;
+                
+                legend.innerHTML = `
+                    <div style="display:inline-flex; align-items:center; gap:4px;">
+                        <span style="width:8px; height:8px; border-radius:50%; background:${occupiedColor}; display:inline-block;"></span>已預約
+                    </div>
+                    <div style="display:inline-flex; align-items:center; gap:4px; margin-left:12px;">
+                        <span style="width:8px; height:8px; border-radius:50%; background:#a5d6a7; display:inline-block;"></span>空閒可用
+                    </div>
+                `;
             }
         }
 
         function selectDay(dateStr) {
             selectedDateStr = dateStr;
-            // Update active day CSS
-            const selectedCell = document.querySelector('.calendar-day.selected');
-            if (selectedCell) selectedCell.classList.remove('selected');
             
-            renderCalendar(); // Re-render to highlight selection
+            // Toggle calendar grid cell highlighting
+            const cells = document.querySelectorAll('.calendar-day');
+            cells.forEach(c => c.classList.remove('selected'));
+            
+            renderCalendar();
             renderSelectedDayStatus();
         }
 
         function adjustMonth(delta) {
             currentDate.setMonth(currentDate.getMonth() + delta);
-            renderCalendar();
-            updateMetrics();
-        }
-
-        function switchStore(storeName) {
-            currentStore = storeName;
-            document.getElementById('storeTaichung').className = 'store-pill' + (storeName === '台中市政店' ? ' active taichung' : '');
-            document.getElementById('storeXinyi').className = 'store-pill' + (storeName === '信義店' ? ' active xinyi' : '');
-            
-            populateCalendarFilterSelect();
             refreshAllUI();
         }
 
         function renderSelectedDayStatus() {
-            const filterVal = currentSpaceFilter;
-            const titleEl = document.getElementById('selectedDateTitle');
             const list = document.getElementById('spaceStatusList');
             list.innerHTML = '';
+            document.getElementById('selectedDateTitle').textContent = `${selectedDateStr} 展區預約狀態`;
 
-            const storeKey = currentStore === '台中市政店' ? 'taichung' : 'xinyi';
-
-            if (filterVal === 'all') {
-                titleEl.textContent = `${selectedDateStr} 展區預約狀態`;
-                const spaces = SPACES_DATA[currentStore];
-                const bookings = getBookingsForDate(selectedDateStr, currentStore);
-
-                spaces.forEach(space => {
-                    const activeBooking = bookings.find(b => b.spaceId === space.id);
-                    
-                    const row = document.createElement('div');
-                    row.className = `space-status-row space-${storeKey}-${space.id}` + (activeBooking ? ' occupied' : '');
-                    
-                    let badgeHTML = '';
-                    let metaHTML = `坪數: ${space.area} | 建議陳列: ${space.items}`;
-
-                    if (activeBooking) {
-                        badgeHTML = `<span class="space-badge occupied">已預約: ${activeBooking.brand}</span>`;
-                        metaHTML = `品牌: <strong>${activeBooking.brand}</strong> | 方案: ${activeBooking.plan === 'fixed' ? '固定租金' : '展售抽成'}`;
-                    } else {
-                        badgeHTML = `<span class="space-badge available">空閒</span>`;
-                    }
-
-                    row.innerHTML = `
-                        <div class="space-info">
-                            <div class="space-name">${space.name}</div>
-                            <div class="space-meta">${metaHTML}</div>
-                        </div>
-                        ${badgeHTML}
-                    `;
-                    list.appendChild(row);
-                });
-            } else {
-                // Show free periods for the selected space
-                const spaceId = parseInt(filterVal);
-                const space = SPACES_DATA[currentStore].find(s => s.id === spaceId);
-                const spaceName = space ? space.name : '';
-                
-                titleEl.textContent = `【${spaceName}】未來 90 天空閒時段`;
-
-                const freePeriods = calculateFreePeriods(currentStore, spaceId);
-
-                if (freePeriods.length === 0) {
-                    list.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">📅</div>
-                            <div class="empty-text">未來 90 天內無任何空閒時段（已被約滿）</div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                freePeriods.forEach(p => {
-                    const row = document.createElement('div');
-                    row.className = 'space-status-row occupied';
-                    row.style.borderLeftColor = 'var(--tertiary)';
-                    
-                    const startStr = p.start;
-                    const endStr = p.end;
-                    const days = Math.ceil((new Date(endStr) - new Date(startStr)) / (1000 * 3600 * 24)) + 1;
-
-                    row.innerHTML = `
-                        <div class="space-info">
-                            <div class="space-name" style="color: var(--on-tertiary-container); font-weight: 700;">🟢 ${startStr} 至 ${endStr}</div>
-                            <div class="space-meta">連續空閒天數：${days} 天</div>
-                        </div>
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; height: 26px;" onclick="openNewAppWithDates('${startStr}', '${endStr}', ${spaceId})">快速預約</button>
-                    `;
-                    list.appendChild(row);
-                });
-            }
-        }
-
-        // Helper functions for filtering and calculating free space periods
-        function populateCalendarFilterSelect() {
-            const container = document.getElementById('spaceFilterTabs');
-            if (!container) return;
-            container.innerHTML = '';
-            
-            // Check if currentSpaceFilter is still valid for this store, if not, reset to 'all'
             const spaces = SPACES_DATA[currentStore];
-            const spaceExists = currentSpaceFilter === 'all' || spaces.some(s => String(s.id) === currentSpaceFilter);
-            if (!spaceExists) {
-                currentSpaceFilter = 'all';
-            }
-
+            const bookings = getBookingsForDate(selectedDateStr, currentStore);
             const storeKey = currentStore === '台中市政店' ? 'taichung' : 'xinyi';
 
-            // Create 'All' tab
-            const allTab = document.createElement('button');
-            allTab.className = 'space-filter-tab' + (currentSpaceFilter === 'all' ? ' active' : '');
-            allTab.dataset.value = 'all';
-            allTab.textContent = '全部展區（熱力圖）';
-            allTab.onclick = () => selectSpaceFilter('all');
-            container.appendChild(allTab);
-
-            // Create individual tabs
             spaces.forEach(space => {
-                const tab = document.createElement('button');
-                tab.className = `space-filter-tab tab-${storeKey}-${space.id}` + (currentSpaceFilter === String(space.id) ? ' active' : '');
-                tab.dataset.value = space.id;
-                tab.textContent = space.name;
-                tab.onclick = () => selectSpaceFilter(String(space.id));
-                container.appendChild(tab);
-            });
+                // If in single filter mode, skip others
+                if (currentSpaceFilter !== 'all' && String(space.id) !== String(currentSpaceFilter)) return;
 
-            // Populate legend dynamically
-            renderCalendarLegend(storeKey, spaces);
-        }
-
-        function selectSpaceFilter(value) {
-            currentSpaceFilter = value;
-            // Update active states on DOM immediately
-            const tabs = document.querySelectorAll('.space-filter-tab');
-            tabs.forEach(tab => {
-                if (tab.dataset.value === currentSpaceFilter) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-
-            // Re-render legend
-            const storeKey = currentStore === '台中市政店' ? 'taichung' : 'xinyi';
-            const spaces = SPACES_DATA[currentStore];
-            renderCalendarLegend(storeKey, spaces);
-
-            refreshAllUI();
-        }
-
-        function renderCalendarLegend(storeKey, spaces) {
-            const legendContainer = document.getElementById('calendarLegend');
-            if (!legendContainer) return;
-            legendContainer.innerHTML = '';
-
-            const colors = {
-                'taichung': ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
-                'xinyi': ['#ec4899', '#14b8a6', '#6366f1', '#f97316', '#d946ef']
-            };
-
-            if (currentSpaceFilter === 'all') {
-                // Show all spaces' colors
-                spaces.forEach((space, index) => {
-                    const color = colors[storeKey][index] || '#64748b';
-                    const legendItem = document.createElement('span');
-                    legendItem.style.cssText = 'display: inline-flex; align-items: center; gap: 4px;';
-                    legendItem.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${color};"></span>${space.name}`;
-                    legendContainer.appendChild(legendItem);
-                });
-            } else {
-                // Show occupied/free colors
-                const occupiedColor = storeKey === 'taichung' ? '#ef4444' : '#ec4899';
-                const freeColor = storeKey === 'taichung' ? '#10b981' : '#14b8a6';
-
-                const occupiedItem = document.createElement('span');
-                occupiedItem.style.cssText = 'display: inline-flex; align-items: center; gap: 4px; margin-right: 8px;';
-                occupiedItem.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${occupiedColor};"></span>已被預約/佔用`;
+                const activeBooking = bookings.find(b => b.spaceId === space.id);
                 
-                const freeItem = document.createElement('span');
-                freeItem.style.cssText = 'display: inline-flex; align-items: center; gap: 4px;';
-                freeItem.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${freeColor};"></span>空閒可預約`;
+                const row = document.createElement('div');
+                row.className = `space-status-row space-${storeKey}-${space.id}` + (activeBooking ? ' occupied' : '');
+                
+                let badgeHTML = '';
+                let metaHTML = `坪數: ${space.area} | 建議陳列: ${space.items}`;
 
-                legendContainer.appendChild(occupiedItem);
-                legendContainer.appendChild(freeItem);
+                if (activeBooking) {
+                    badgeHTML = `<span class="space-badge occupied">${activeBooking.status === 'approved' ? '已核准' : '審核中'}: ${activeBooking.brand}</span>`;
+                    metaHTML = `品牌: <strong>${activeBooking.brand}</strong> | 方案: ${activeBooking.plan === 'fixed' ? '固定租金制' : '展售抽成制'}`;
+                } else {
+                    badgeHTML = `<span class="space-badge available">空閒</span>`;
+                }
+
+                row.innerHTML = `
+                    <div class="space-info">
+                        <div class="space-name">${space.name}</div>
+                        <div class="space-meta">${metaHTML}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        ${badgeHTML}
+                        ${!activeBooking ? `<button class="btn" style="padding:2px 8px; font-size:10px; height:24px;" onclick="openNewAppWithDates('${selectedDateStr}', '${selectedDateStr}', ${space.id})">預約</button>` : ''}
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        // ----------------------------------------------------
+        // 6. FUTURE 90 DAYS FREE PERIOD SCANNER
+        // ----------------------------------------------------
+        function renderFreePeriodsList() {
+            const list = document.getElementById('freePeriodsList');
+            if (!list) return;
+            list.innerHTML = '';
+
+            if (currentSpaceFilter === 'all') return;
+            const spaceId = parseInt(currentSpaceFilter);
+            const freePeriods = calculateFreePeriods(currentStore, spaceId);
+
+            if (freePeriods.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <div class="empty-text">未來 90 天內無任何空閒時段（已被佔滿）</div>
+                    </div>
+                `;
+                return;
             }
+
+            freePeriods.forEach(p => {
+                const days = Math.ceil((new Date(p.end) - new Date(p.start)) / (1000 * 3600 * 24)) + 1;
+                const row = document.createElement('div');
+                row.className = 'space-status-row';
+                row.style.borderLeft = '4px solid var(--tertiary)';
+                row.innerHTML = `
+                    <div class="space-info">
+                        <div class="space-name" style="color: var(--on-tertiary-container);">🟢 ${p.start} 至 ${p.end}</div>
+                        <div class="space-meta">連續空閒天數：${days} 天</div>
+                    </div>
+                    <button class="btn btn-primary" style="padding:2px 8px; font-size:10px; height:24px;" onclick="openNewAppWithDates('${p.start}', '${p.end}', ${spaceId})">快速預約</button>
+                `;
+                list.appendChild(row);
+            });
         }
 
         function calculateFreePeriods(store, spaceId) {
             const freePeriods = [];
             const today = new Date();
             today.setHours(0,0,0,0);
-            
+
             let scanDate = new Date(today);
             let startFreeDate = null;
-            
+
             for (let i = 0; i < 90; i++) {
                 const dateStr = localDateStr(scanDate);
-                const activeBookings = getBookingsForDate(dateStr, store);
-                const isOccupied = activeBookings.some(b => b.spaceId === spaceId);
-                
+                const bookings = getBookingsForDate(dateStr, store);
+                const isOccupied = bookings.some(b => b.spaceId === spaceId && b.status === 'approved');
+
                 if (!isOccupied) {
                     if (startFreeDate === null) {
                         startFreeDate = new Date(scanDate);
@@ -1333,19 +1278,25 @@
                     if (startFreeDate !== null) {
                         const endFreeDate = new Date(scanDate);
                         endFreeDate.setDate(endFreeDate.getDate() - 1);
-                        freePeriods.push({ start: localDateStr(startFreeDate), end: localDateStr(endFreeDate) });
+                        freePeriods.push({
+                            start: localDateStr(startFreeDate),
+                            end: localDateStr(endFreeDate)
+                        });
                         startFreeDate = null;
                     }
                 }
                 scanDate.setDate(scanDate.getDate() + 1);
             }
-            
+
             if (startFreeDate !== null) {
                 const endFreeDate = new Date(scanDate);
                 endFreeDate.setDate(endFreeDate.getDate() - 1);
-                freePeriods.push({ start: localDateStr(startFreeDate), end: localDateStr(endFreeDate) });
+                freePeriods.push({
+                    start: localDateStr(startFreeDate),
+                    end: localDateStr(endFreeDate)
+                });
             }
-            
+
             return freePeriods;
         }
 
@@ -1357,81 +1308,79 @@
             recalculatePrice();
         }
 
-
         // ----------------------------------------------------
-        // 5. PRICING & CALCULATION ENGINE
+        // 7. PRICING & CALCULATION ENGINE
         // ----------------------------------------------------
         function recalculatePrice() {
             const store = document.getElementById('formStore').value;
-            const spaceId = parseInt(document.getElementById('formSpace').value);
+            const spaceIdVal = document.getElementById('formSpace').value;
             const startStr = document.getElementById('formStart').value;
             const endStr = document.getElementById('formEnd').value;
             const plan = document.getElementById('formPlan').value;
 
-            const panel = document.getElementById('pricePanel');
-            const specialRow = document.getElementById('specialPeriodRow');
+            if (!spaceIdVal || !startStr || !endStr) return;
 
-            if (!startStr || !endStr || !spaceId) {
-                return;
-            }
-
-            const start = new Date(startStr);
-            const end = new Date(endStr);
-
-            if (end < start) {
-                document.getElementById('calcTotal').textContent = "結束日期不可早於開始日期";
-                return;
-            }
-
-            const timeDiff = end.getTime() - start.getTime();
-            const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-            
-            const weeks = Math.floor(totalDays / 7);
-            const remainingDays = totalDays % 7;
-            document.getElementById('calcDuration').textContent = `${totalDays} 天 (${weeks} 週 ${remainingDays} 天)`;
-
+            const spaceId = parseInt(spaceIdVal);
             const space = SPACES_DATA[store].find(s => s.id === spaceId);
             if (!space) return;
 
-            // Check if any date in the range lies within a Special Period (1.2x rate)
-            let specialDayCount = 0;
-            let current = new Date(start);
-            while (current <= end) {
-                const month = current.getMonth() + 1; // 1-12
-                if (SPECIAL_MONTHS.includes(month)) {
-                    specialDayCount++;
-                }
-                current.setDate(current.getDate() + 1);
-            }
+            const start = new Date(startStr);
+            const end = new Date(endStr);
+            const totalDays = Math.ceil((end - start) / (1000 * 3600 * 24)) + 1;
 
-            const specialRatio = specialDayCount / totalDays; // Portion of lease in special periods
+            if (isNaN(totalDays) || totalDays <= 0) {
+                document.getElementById('calcDays').textContent = '0 天';
+                document.getElementById('calcBasePrice').textContent = 'NT$ 0';
+                document.getElementById('specialPeriodRow').style.display = 'none';
+                document.getElementById('calcTax').textContent = 'NT$ 0';
+                document.getElementById('calcTotal').textContent = 'NT$ 0';
+                document.getElementById('calcDeposit').textContent = 'NT$ 0';
+                return;
+            }
 
             let basePrice = 0;
-            if (plan === 'fixed') {
-                // Fixed Rent Model: Calculate weekly rate and remaining days
-                // Remaining days rate is prorated from weekly rate (rate / 7)
-                const weekRate = space.rent_week;
-                basePrice = (weeks * weekRate) + (remainingDays * (weekRate / 7));
-            } else {
-                // Commission Model: Monthly base service fee, prorated daily based on 30-day month
-                const monthlyBase = space.basic_comm_month;
-                basePrice = totalDays * (monthlyBase / 30);
+            let specialAddition = 0;
+            let specialDays = 0;
+
+            // Calculate special days (落入特殊月份 1, 2, 4, 5, 7, 8, 11, 12月)
+            let scan = new Date(start);
+            for (let d = 0; d < totalDays; d++) {
+                const month = scan.getMonth() + 1; // 1-based index
+                if (SPECIAL_MONTHS.includes(month)) {
+                    specialDays++;
+                }
+                scan.setDate(scan.getDate() + 1);
             }
 
-            // Calculate 1.2x special period multiplier logic
-            // Extra surcharge = basePrice * specialRatio * 0.2
-            const specialAddition = basePrice * specialRatio * 0.2;
+            if (plan === 'fixed') {
+                // 固定租金制：以「週」為主要計費基礎，不滿一週則按比例（週租/7）折算天數。
+                const weeks = Math.floor(totalDays / 7);
+                const remainingDays = totalDays % 7;
+                basePrice = (weeks * space.rent_week) + (remainingDays * (space.rent_week / 7));
+                
+                // 加給 20%：相當於特殊天租費乘以 1.2
+                specialAddition = specialDays * (space.rent_week / 7) * 0.2;
+            } else {
+                // 展售抽成制：基礎服務費按天數比例折算（月費/30）
+                basePrice = totalDays * (space.basic_comm_month / 30);
+                
+                // 加給 20%
+                specialAddition = specialDays * (space.basic_comm_month / 30) * 0.2;
+            }
+
             const subtotal = basePrice + specialAddition;
             const tax = subtotal * 0.05;
             const total = subtotal + tax;
             const deposit = total * 0.5;
 
-            // Update display
+            // Update UI elements
+            document.getElementById('calcDays').textContent = `${totalDays} 天`;
             document.getElementById('calcBasePrice').textContent = `NT$ ${Math.round(basePrice).toLocaleString()}`;
             
-            if (specialDayCount > 0) {
+            const specialRow = document.getElementById('specialPeriodRow');
+            if (specialDays > 0) {
                 specialRow.style.display = 'flex';
-                document.getElementById('specialPeriodLabel').textContent = `特殊檔期加成 (含 ${specialDayCount}天, 1.2x)：`;
+                document.getElementById('specialPeriodLabel').textContent = `特殊檔期加給 (1.2x, 共 ${specialDays} 天)：`;
                 document.getElementById('calcSpecialAddition').textContent = `NT$ ${Math.round(specialAddition).toLocaleString()}`;
             } else {
                 specialRow.style.display = 'none';
@@ -1440,525 +1389,505 @@
             document.getElementById('calcTax').textContent = `NT$ ${Math.round(tax).toLocaleString()}`;
             document.getElementById('calcTotal').textContent = `NT$ ${Math.round(total).toLocaleString()}`;
             document.getElementById('calcDeposit').textContent = `NT$ ${Math.round(deposit).toLocaleString()}`;
-
-            // Real-time conflict validation
-            const conflict = getConflictingBooking(store, spaceId, startStr, endStr);
-            const conflictWarning = document.getElementById('formConflictWarning');
-            const conflictWarningText = document.getElementById('conflictWarningText');
-            const submitBtn = document.querySelector('button[form="appForm"]');
-
-            if (conflict) {
-                conflictWarning.style.display = 'block';
-                conflictWarningText.textContent = `所選區間與已核准/審核中主題平台展區「${conflict.brand}」（期間：${conflict.startDate} 至 ${conflict.endDate}）衝突！請調整日期。`;
-                if (submitBtn) submitBtn.disabled = true;
-            } else {
-                conflictWarning.style.display = 'none';
-                if (submitBtn) submitBtn.disabled = false;
-            }
         }
 
-        function getConflictingBooking(store, spaceId, startStr, endStr, excludeId = null) {
-            if (!startStr || !endStr) return null;
-            const start = new Date(startStr);
-            const end = new Date(endStr);
-
-            return localApplications.find(app => {
-                if (excludeId && app.id === excludeId) return false;
-                if (app.status === 'rejected') return false; 
-                if (app.store !== store || app.spaceId !== spaceId) return false;
-
-                const appStart = new Date(app.startDate);
-                const appEnd = new Date(app.endDate);
-                return start <= appEnd && end >= appStart;
-            }) || null;
-        }
-
-        function copyQuotationDraft(event) {
-            if (event) event.preventDefault();
-            
-            const brand = document.getElementById('formBrand').value || "未指定品牌";
+        function copyQuotationDraft() {
+            const brand = document.getElementById('formBrand').value || '未指定品牌';
             const store = document.getElementById('formStore').value;
-            const spaceId = parseInt(document.getElementById('formSpace').value);
+            const spaceIdVal = document.getElementById('formSpace').value;
             const startStr = document.getElementById('formStart').value;
             const endStr = document.getElementById('formEnd').value;
             const plan = document.getElementById('formPlan').value;
 
-            if (!startStr || !endStr || !spaceId) {
-                showToast("請先選擇展區與日期以進行估算", "warning");
+            if (!spaceIdVal || !startStr || !endStr) {
+                showToast("請填妥預約期間與展區空間以計算報價！", "error");
                 return;
             }
 
+            const spaceId = parseInt(spaceIdVal);
             const space = SPACES_DATA[store].find(s => s.id === spaceId);
-            const spaceName = space ? space.name : "未知展區";
+            if (!space) return;
 
-            const durationText = document.getElementById('calcDuration').textContent;
-            const basePriceText = document.getElementById('calcBasePrice').textContent;
-            const hasSpecial = document.getElementById('specialPeriodRow').style.display !== 'none';
-            const specialAdditionText = document.getElementById('calcSpecialAddition').textContent;
-            const taxText = document.getElementById('calcTax').textContent;
-            const totalText = document.getElementById('calcTotal').textContent;
-            const depositText = document.getElementById('calcDeposit').textContent;
+            const start = new Date(startStr);
+            const end = new Date(endStr);
+            const totalDays = Math.ceil((end - start) / (1000 * 3600 * 24)) + 1;
 
-            let draft = `【得利蔦屋大型主題平台展區租賃報價試算草案】\n`;
-            draft += `=======================================\n`;
-            draft += `品牌名稱：${brand}\n`;
-            draft += `目標門市：${store}\n`;
-            draft += `申請展區：${spaceName}\n`;
-            draft += `租賃期間：${startStr} 至 ${endStr}\n`;
-            draft += `租賃天數：${durationText}\n`;
-            draft += `租賃方案：${plan === 'fixed' ? '固定租金制' : '基礎服務費加%制'}\n`;
-            draft += `=======================================\n`;
-            draft += `基礎租金：${basePriceText}\n`;
-            if (hasSpecial) {
-                draft += `特殊檔期加成 (1.2x)：${specialAdditionText}\n`;
+            if (isNaN(totalDays) || totalDays <= 0) {
+                showToast("日期區間錯誤！", "error");
+                return;
             }
-            draft += `營業稅金 (5%)：${taxText}\n`;
-            draft += `估算總租金 (含稅)：${totalText}\n`;
-            draft += `預收訂金 (50%)：${depositText}\n`;
-            draft += `=======================================\n`;
-            draft += `備註：此金額為系統試算估價，實際費用以雙方合約為準。\n`;
-            draft += `Best regards, Linus\n`;
 
-            navigator.clipboard.writeText(draft).then(() => {
-                showToast("報價草稿已複製到剪貼簿！", "success");
+            let basePrice = 0;
+            let specialAddition = 0;
+            let specialDays = 0;
+
+            let scan = new Date(start);
+            for (let d = 0; d < totalDays; d++) {
+                const month = scan.getMonth() + 1;
+                if (SPECIAL_MONTHS.includes(month)) {
+                    specialDays++;
+                }
+                scan.setDate(scan.getDate() + 1);
+            }
+
+            if (plan === 'fixed') {
+                const weeks = Math.floor(totalDays / 7);
+                const remainingDays = totalDays % 7;
+                basePrice = (weeks * space.rent_week) + (remainingDays * (space.rent_week / 7));
+                specialAddition = specialDays * (space.rent_week / 7) * 0.2;
+            } else {
+                basePrice = totalDays * (space.basic_comm_month / 30);
+                specialAddition = specialDays * (space.basic_comm_month / 30) * 0.2;
+            }
+
+            const subtotal = basePrice + specialAddition;
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+            const deposit = total * 0.5;
+
+            const text = `【得利蔦屋大型主題平台展區 - 場地報價單草稿】
+品牌商戶：${brand}
+租賃門市：${store}
+租賃展區：${space.name}
+租賃期間：${startStr} 至 ${endStr} (共 ${totalDays} 天)
+租賃方案：${plan === 'fixed' ? '固定租金制' : '基礎服務費加%制'}
+
+場地租金小計：NT$ ${Math.round(basePrice).toLocaleString()}
+特殊檔期加給：NT$ ${Math.round(specialAddition).toLocaleString()} (${specialDays} 天落入特殊月份)
+營業稅金 (5%)：NT$ ${Math.round(tax).toLocaleString()}
+總金額 (含稅)：NT$ ${Math.round(total).toLocaleString()}
+預收訂金 (50%)：NT$ ${Math.round(deposit).toLocaleString()}
+
+※ 進撤場物流規範：
+- 進場時間：每日 21:00 後。
+- 撤場時間：結束當日 21:00 後，次日 10:00 前完成盤點與清空復原。
+- 補貨時效：一般檔期通知後 3 工作天，特殊檔期 1-2 工作天內送達。
+
+Best regards,
+Linus`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("已成功複製報價草稿至剪貼簿！", "success");
             }).catch(err => {
-                console.error("複製失敗：", err);
-                showToast("複製失敗，請手動複製", "error");
+                showToast("複製失敗，請手動選取複製", "error");
             });
         }
 
         // ----------------------------------------------------
-        // 6. FORM & APPLICATION MANAGEMENT
+        // 8. FORM & APPLICATION MANAGEMENT
         // ----------------------------------------------------
-        function switchTab(tabId) {
-            currentTab = tabId;
-            // Update tabs active state
-            document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`nav${tabId}`).classList.add('active');
-
-            // Hide/Show pages
-            document.querySelectorAll('.page').forEach(pg => pg.classList.add('hidden'));
-            document.getElementById(`page${tabId}`).classList.remove('hidden');
-
-            if (tabId === 'Applications') renderApplicationsList();
-            if (tabId === 'Spaces') renderSpacesDetail();
-            updateMetrics();
+        function openNewAppModal() {
+            // Reset form fields
+            document.getElementById('formEditId').value = '';
+            document.getElementById('formBrand').value = '';
+            document.getElementById('formStore').value = currentStore;
+            onFormStoreChange(); // Populate space choices for this store
+            setupFormDates();
+            document.getElementById('formPlan').value = 'fixed';
+            
+            document.getElementById('modalTitle').textContent = "新增展區租用申請";
+            
+            // Show modal and backdrop
+            document.getElementById('modalBackdrop').classList.add('open');
+            document.getElementById('appModal').classList.add('open');
+            recalculatePrice();
         }
 
-        function openNewAppModal() {
-            document.getElementById('newAppModal').classList.add('active');
-            // Reset form
-            document.getElementById('appForm').reset();
-            document.getElementById('formStore').value = currentStore;
-            populateSpacesSelect();
+        function openEditAppModal(appId) {
+            const app = localApplications.find(a => a.id === appId);
+            if (!app) return;
+
+            document.getElementById('formEditId').value = app.id;
+            document.getElementById('formBrand').value = app.brand;
+            document.getElementById('formStore').value = app.store;
+            onFormStoreChange();
+            document.getElementById('formSpace').value = app.spaceId;
+            document.getElementById('formStart').value = app.startDate;
+            document.getElementById('formEnd').value = app.endDate;
+            document.getElementById('formPlan').value = app.plan;
+
+            document.getElementById('modalTitle').textContent = "修改展區租用申請";
+
+            document.getElementById('modalBackdrop').classList.add('open');
+            document.getElementById('appModal').classList.add('open');
             recalculatePrice();
         }
 
         function closeNewAppModal() {
-            document.getElementById('newAppModal').classList.remove('active');
+            document.getElementById('modalBackdrop').classList.remove('open');
+            document.getElementById('appModal').classList.remove('open');
         }
 
-        function populateSpacesSelect() {
+        function onFormStoreChange() {
             const store = document.getElementById('formStore').value;
             const select = document.getElementById('formSpace');
             select.innerHTML = '';
             
-            SPACES_DATA[store].forEach(space => {
+            const spaces = SPACES_DATA[store];
+            spaces.forEach(s => {
                 const opt = document.createElement('option');
-                opt.value = space.id;
-                opt.textContent = space.name;
+                opt.value = s.id;
+                opt.textContent = `${s.name} (${s.area})`;
                 select.appendChild(opt);
             });
             recalculatePrice();
         }
 
+        function setupFormDates() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 7);
+            
+            document.getElementById('formStart').value = localDateStr(today);
+            document.getElementById('formEnd').value = localDateStr(tomorrow);
+        }
+
         function submitApplication(event) {
             event.preventDefault();
             
-            const brand = document.getElementById('formBrand').value;
+            const id = document.getElementById('formEditId').value;
+            const brand = document.getElementById('formBrand').value.trim();
             const store = document.getElementById('formStore').value;
             const spaceId = parseInt(document.getElementById('formSpace').value);
-            const startStr = document.getElementById('formStart').value;
-            const endStr = document.getElementById('formEnd').value;
+            const startDate = document.getElementById('formStart').value;
+            const endDate = document.getElementById('formEnd').value;
             const plan = document.getElementById('formPlan').value;
 
-            // Simple validation: Check conflicts
-            if (hasBookingConflict(store, spaceId, startStr, endStr)) {
-                alert("此展區於所選期間已有其他品牌預約！請調整日期。");
+            if (!brand) return;
+
+            // Date validation
+            if (new Date(endDate) < new Date(startDate)) {
+                showToast("結束日期不能早於起始日期", "error");
                 return;
             }
 
-            const newApp = {
-                brand,
-                store,
-                spaceId,
-                startDate: startStr,
-                endDate: endStr,
-                plan,
-                status: 'pending', // pending, approved, rejected
-                createdAt: new Date().toISOString()
+            // Conflict Warning logic
+            const hasConflict = localApplications.some(app => {
+                if (app.store !== store || app.spaceId !== spaceId || app.status !== 'approved') return false;
+                if (id && app.id === id) return false; // Skip checking self on edits
+
+                // Check overlap
+                const appStart = new Date(app.startDate);
+                const appEnd = new Date(app.endDate);
+                const formStart = new Date(startDate);
+                const formEnd = new Date(endDate);
+
+                return (formStart <= appEnd && formEnd >= appStart);
+            });
+
+            if (hasConflict) {
+                showToast("與該展區之現有已核准預約時間衝突！無法送出申請。", "error");
+                return;
+            }
+
+            const appData = {
+                brand: brand,
+                store: store,
+                spaceId: spaceId,
+                startDate: startDate,
+                endDate: endDate,
+                plan: plan,
+                status: id ? localApplications.find(a => a.id === id).status : 'pending',
+                createdAt: id ? localApplications.find(a => a.id === id).createdAt : new Date().toISOString()
             };
 
-            if (isFirebaseConnected && db) {
-                db.collection('popup_applications').add(newApp)
-                    .then(() => {
-                        showToast("申請已送出！", "success");
-                        closeNewAppModal();
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        showToast("連線儲存失敗", "error");
-                    });
+            if (isFirebaseConnected) {
+                if (id) {
+                    db.collection('popup_applications').doc(id).set(appData)
+                        .then(() => {
+                            showToast("申請已成功修改！", "success");
+                            closeNewAppModal();
+                        })
+                        .catch(err => {
+                            console.error("Firebase update failed:", err);
+                            showToast("雲端同步失敗，已轉存本機", "warning");
+                        });
+                } else {
+                    db.collection('popup_applications').add(appData)
+                        .then(() => {
+                            showToast("申請已成功送出！", "success");
+                            closeNewAppModal();
+                        })
+                        .catch(err => {
+                            console.error("Firebase add failed:", err);
+                            showToast("雲端同步失敗，已轉存本機", "warning");
+                        });
+                }
             } else {
-                // Offline fallback
-                newApp.id = 'off_' + Date.now();
-                localApplications.push(newApp);
+                // LocalStorage Fallback
+                if (id) {
+                    const idx = localApplications.findIndex(a => a.id === id);
+                    if (idx !== -1) {
+                        localApplications[idx] = Object.assign({ id: id }, appData);
+                    }
+                } else {
+                    const newId = 'local_' + Date.now();
+                    localApplications.push(Object.assign({ id: newId }, appData));
+                }
                 saveLocalBackup();
                 refreshAllUI();
-                showToast("本機暫存成功！(離線)", "info");
+                showToast(id ? "本機資料已更新！" : "已成功建立本機預約單！", "success");
                 closeNewAppModal();
             }
         }
 
-        function hasBookingConflict(store, spaceId, startStr, endStr, excludeId = null) {
-            const start = new Date(startStr);
-            const end = new Date(endStr);
+        function deleteApplication(appId) {
+            if (!confirm("確定要刪除此筆展區申請案件嗎？")) return;
 
-            return localApplications.some(app => {
-                if (excludeId && app.id === excludeId) return false;
-                if (app.status === 'rejected') return false; // Ignored rejected
-                if (app.store !== store || app.spaceId !== spaceId) return false;
-
-                const appStart = new Date(app.startDate);
-                const appEnd = new Date(app.endDate);
-                
-                // Intersect overlap condition: StartA <= EndB && EndA >= StartB
-                return start <= appEnd && end >= appStart;
-            });
-        }
-
-        function getBookingsForDate(dateStr, store) {
-            const checkDate = new Date(dateStr);
-            return localApplications.filter(app => {
-                if (app.status === 'rejected') return false;
-                if (app.store !== store) return false;
-                
-                const start = new Date(app.startDate);
-                const end = new Date(app.endDate);
-                return checkDate >= start && checkDate <= end;
-            });
-        }
-
-        function updateApplicationStatus(id, newStatus) {
-            if (isFirebaseConnected && db) {
-                db.collection('popup_applications').doc(id).update({ status: newStatus })
-                    .then(() => showToast(`狀態已更新為: ${newStatus}`, "success"))
-                    .catch(err => console.error(err));
+            if (isFirebaseConnected) {
+                db.collection('popup_applications').doc(appId).delete()
+                    .then(() => {
+                        showToast("案件已成功刪除", "info");
+                    })
+                    .catch(err => {
+                        console.error("Firebase delete failed:", err);
+                        showToast("雲端刪除失敗", "error");
+                    });
             } else {
-                const app = localApplications.find(a => a.id === id);
-                if (app) {
-                    app.status = newStatus;
-                    saveLocalBackup();
-                    refreshAllUI();
-                    showToast(`本機狀態更新: ${newStatus}`, "info");
-                }
-            }
-        }
-
-        function deleteApplication(id) {
-            if (!confirm("確定要刪除此筆申請案件嗎？")) return;
-
-            if (isFirebaseConnected && db) {
-                db.collection('popup_applications').doc(id).delete()
-                    .then(() => showToast("刪除成功", "success"))
-                    .catch(err => console.error(err));
-            } else {
-                localApplications = localApplications.filter(a => a.id !== id);
+                localApplications = localApplications.filter(a => a.id !== appId);
                 saveLocalBackup();
                 refreshAllUI();
-                showToast("已從本機移除", "info");
+                showToast("本機案件已刪除", "info");
             }
         }
 
-        function toggleRole() {
-            const badge = document.getElementById('roleBadge');
-            if (userRole === 'staff') {
-                userRole = 'admin';
-                badge.className = 'role-badge admin';
-                badge.textContent = '🔑 系統管理員';
-            } else {
-                userRole = 'staff';
-                badge.className = 'role-badge staff';
-                badge.textContent = '👤 營運人員';
+        function approveApplication(appId, approve) {
+            const app = localApplications.find(a => a.id === appId);
+            if (!app) return;
+
+            const newStatus = approve ? 'approved' : 'rejected';
+
+            // If approving, make sure there is no overlapping approved booking
+            if (approve) {
+                const hasConflict = localApplications.some(other => {
+                    if (other.id === appId || other.store !== app.store || other.spaceId !== app.spaceId || other.status !== 'approved') return false;
+                    
+                    const otherStart = new Date(other.startDate);
+                    const otherEnd = new Date(other.endDate);
+                    const appStart = new Date(app.startDate);
+                    const appEnd = new Date(app.endDate);
+
+                    return (appStart <= otherEnd && appEnd >= otherStart);
+                });
+
+                if (hasConflict) {
+                    showToast("此案件與現有已核准檔期重疊！無法核准。", "error");
+                    return;
+                }
             }
-            refreshAllUI();
+
+            if (isFirebaseConnected) {
+                db.collection('popup_applications').doc(appId).update({ status: newStatus })
+                    .then(() => {
+                        showToast(approve ? "案件已成功核准！" : "案件已駁回！", "info");
+                    })
+                    .catch(err => {
+                        console.error("Firebase approve failed:", err);
+                        showToast("審核同步失敗", "error");
+                    });
+            } else {
+                app.status = newStatus;
+                saveLocalBackup();
+                refreshAllUI();
+                showToast(approve ? "本機案件已核准！" : "本機案件已駁回！", "info");
+            }
         }
 
         // ----------------------------------------------------
-        // 7. LISTS RENDERERS & HELPERS
+        // 9. LISTS RENDERERS & HELPERS
         // ----------------------------------------------------
         function renderApplicationsList() {
             const container = document.getElementById('appContainer');
+            if (!container) return;
             container.innerHTML = '';
 
-            // Filter apps matching current store selection
             const filteredApps = localApplications.filter(app => app.store === currentStore);
 
             if (filteredApps.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">📁</div>
-                        <div class="empty-text">當前門市尚無任何申請案件</div>
+                        <div class="empty-icon">📂</div>
+                        <div class="empty-text">目前尚無預約申請資料</div>
                     </div>
                 `;
                 return;
             }
 
-            // Sort by start date desc
-            filteredApps.sort((a, b) => b.startDate.localeCompare(a.startDate));
+            // Sort applications by startDate
+            filteredApps.sort((a,b) => new Date(a.startDate) - new Date(b.startDate));
 
             filteredApps.forEach(app => {
                 const space = SPACES_DATA[app.store].find(s => s.id === app.spaceId);
-                const spaceName = space ? space.name : `未知展區 (ID: ${app.spaceId})`;
-
-                const card = document.createElement('div');
-                card.className = 'app-item-card';
-
-                // Prorate calculations
-                const totalDays = Math.ceil((new Date(app.endDate) - new Date(app.startDate)) / (1000 * 3600 * 24)) + 1;
-                const basePrice = app.plan === 'fixed' 
-                    ? (Math.floor(totalDays/7) * (space ? space.rent_week : 0) + (totalDays%7) * ((space ? space.rent_week : 0)/7))
-                    : (totalDays * ((space ? space.basic_comm_month : 0)/30));
+                const spaceName = space ? space.name : `展區 ${app.spaceId}`;
                 
-                // Estimate special periods
-                let specialCount = 0;
-                let curr = new Date(app.startDate);
-                const endD = new Date(app.endDate);
-                while (curr <= endD) {
-                    if (SPECIAL_MONTHS.includes(curr.getMonth() + 1)) specialCount++;
-                    curr.setDate(curr.getDate() + 1);
-                }
-                const addition = basePrice * (specialCount / totalDays) * 0.2;
-                const totalWithTax = (basePrice + addition) * 1.05;
-
-                let actionBtns = '';
-                if (userRole === 'admin') {
-                    if (app.status === 'pending') {
-                        actionBtns = `
-                            <div class="app-actions">
-                                <button class="btn btn-secondary btn-danger" onclick="updateApplicationStatus('${app.id}', 'rejected')">駁回</button>
-                                <button class="btn btn-success" onclick="updateApplicationStatus('${app.id}', 'approved')">核准通過</button>
-                            </div>
-                        `;
-                    } else {
-                        actionBtns = `
-                            <div class="app-actions">
-                                <button class="btn btn-secondary" onclick="updateApplicationStatus('${app.id}', 'pending')">設為重審</button>
-                                <button class="btn btn-secondary btn-danger" onclick="deleteApplication('${app.id}')">刪除記錄</button>
-                            </div>
-                        `;
-                    }
-                } else {
-                    // Staff role delete option for pending
-                    if (app.status === 'pending') {
-                        actionBtns = `
-                            <div class="app-actions">
-                                <button class="btn btn-secondary btn-danger" onclick="deleteApplication('${app.id}')">撤回申請</button>
-                            </div>
-                        `;
-                    }
+                const item = document.createElement('div');
+                item.className = 'app-item';
+                
+                // Tag classes
+                let tagClass = 'pending';
+                let tagLabel = '待審核';
+                if (app.status === 'approved') {
+                    tagClass = 'approved';
+                    tagLabel = '已核准';
+                } else if (app.status === 'rejected') {
+                    tagClass = 'rejected';
+                    tagLabel = '已駁回';
                 }
 
-                card.innerHTML = `
+                let adminActions = '';
+                if (userRole === 'admin' && app.status === 'pending') {
+                    adminActions = `
+                        <button class="btn btn-success" style="height:26px; padding:2px 8px; font-size:10px;" onclick="approveApplication('${app.id}', true)">核准</button>
+                        <button class="btn btn-danger" style="height:26px; padding:2px 8px; font-size:10px;" onclick="approveApplication('${app.id}', false)">駁回</button>
+                    `;
+                }
+
+                item.innerHTML = `
                     <div class="app-item-header">
-                        <div>
-                            <span class="app-brand">${app.brand}</span>
-                            <div class="app-space-tag">${spaceName}</div>
-                        </div>
-                        <span class="status-pill ${app.status}">${translateStatus(app.status)}</span>
+                        <span class="app-brand">${app.brand}</span>
+                        <span class="app-status-tag ${tagClass}">${tagLabel}</span>
                     </div>
-                    <div class="app-dates">
-                        📅 期間：${app.startDate} 至 ${app.endDate} (共 ${totalDays} 天)
+                    <div class="app-item-details">
+                        <p>📍 <strong>租賃展區</strong>：${spaceName}</p>
+                        <p>📅 <strong>租賃期間</strong>：${app.startDate} 至 ${app.endDate}</p>
+                        <p>💼 <strong>合約方案</strong>：${app.plan === 'fixed' ? '固定租金制' : '基礎服務費加%制'}</p>
                     </div>
-                    <div class="app-calc-details">
-                        <div class="app-calc-row">
-                            <span>合作模式：</span>
-                            <span>${app.plan === 'fixed' ? '固定租金制' : '基礎費加25%抽成'}</span>
-                        </div>
-                        <div class="app-calc-row">
-                            <span>估算總額 (含稅)：</span>
-                            <span style="font-weight: 700;">NT$ ${Math.round(totalWithTax).toLocaleString()}</span>
-                        </div>
+                    <div class="app-item-actions">
+                        ${adminActions}
+                        <button class="btn btn-secondary" style="height:26px; padding:2px 8px; font-size:10px;" onclick="openEditAppModal('${app.id}')">編輯</button>
+                        <button class="btn btn-danger" style="height:26px; padding:2px 8px; font-size:10px;" onclick="deleteApplication('${app.id}')">刪除</button>
                     </div>
-                    ${actionBtns}
                 `;
-                container.appendChild(card);
+                container.appendChild(item);
             });
         }
 
-        function renderSpacesDetail() {
-            const container = document.getElementById('spacesDetailContainer');
+        function renderSpacesSpecs() {
+            const container = document.getElementById('spaceDetailContainer');
+            if (!container) return;
             container.innerHTML = '';
 
             const spaces = SPACES_DATA[currentStore];
-            spaces.forEach(space => {
-                const card = document.createElement('div');
-                card.className = 'space-detail-card';
+            
+            const header = document.createElement('div');
+            header.className = 'space-detail-header';
+            header.innerHTML = `<h3 class="space-detail-name">${currentStore} 展區場域規格</h3>`;
+            container.appendChild(header);
 
-                card.innerHTML = `
-                    <div class="space-detail-hdr">
-                        <div class="space-detail-title">${space.name}</div>
-                    </div>
-                    <div class="space-detail-body">
-                        <div class="space-detail-row">
-                            <span class="space-detail-label">預估坪數</span>
-                            <span class="space-detail-val">${space.area}</span>
+            spaces.forEach(s => {
+                const item = document.createElement('div');
+                item.style.cssText = 'border-bottom: 1px solid var(--outline); padding: 14px 0; margin-bottom: 12px;';
+                item.innerHTML = `
+                    <h4 style="font-size:14px; font-weight:700; margin-bottom:8px; color:var(--inverse-surface);">${s.name}</h4>
+                    <div class="space-detail-grid">
+                        <div>
+                            <div class="space-detail-label">建議坪數</div>
+                            <div class="space-detail-val">${s.area}</div>
                         </div>
-                        <div class="space-detail-row">
-                            <span class="space-detail-label">建議陳列數</span>
-                            <span class="space-detail-val">${space.items}</span>
+                        <div>
+                            <div class="space-detail-label">建議陳列件數</div>
+                            <div class="space-detail-val">${s.items}</div>
                         </div>
-                        <p style="font-weight:700; margin-top: 4px; font-size:12px;">費率明細：</p>
-                        <table class="space-price-table">
-                            <thead>
-                                <tr>
-                                    <th>方案模式</th>
-                                    <th>一般費率</th>
-                                    <th>特殊檔期費率 (1.2x)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>固定租金 (週計費)</td>
-                                    <td>NT$ ${space.rent_week.toLocaleString()} /週</td>
-                                    <td>NT$ ${Math.round(space.rent_week * 1.2).toLocaleString()} /週</td>
-                                </tr>
-                                <tr>
-                                    <td>固定租金 (月計費)</td>
-                                    <td>NT$ ${space.rent_month.toLocaleString()} /月</td>
-                                    <td>NT$ ${Math.round(space.rent_month * 1.2).toLocaleString()} /月</td>
-                                </tr>
-                                <tr>
-                                    <td>展售模式 (基本服務費/月)</td>
-                                    <td>NT$ ${space.basic_comm_month.toLocaleString()} /月</td>
-                                    <td>NT$ ${Math.round(space.basic_comm_month * 1.2).toLocaleString()} /月</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>計費項目</th>
+                                <th>固定租金</th>
+                                <th>基礎抽成服務費</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>基準定價</td>
+                                <td>NT$ ${s.rent_week.toLocaleString()} /週</td>
+                                <td>NT$ ${s.basic_comm_month.toLocaleString()} /月</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 `;
-                container.appendChild(card);
+                container.appendChild(item);
             });
         }
 
         function updateMetrics() {
             const year = currentDate.getFullYear();
-            const month = currentDate.getMonth() + 1; // 1-12
-            
-            // Total booked days for all confirmed bookings this month
-            let totalBookedDays = 0;
-            let estimatedRevenue = 0;
-            let brands = new Set();
+            const month = currentDate.getMonth();
 
-            localApplications.forEach(app => {
-                if (app.status !== 'approved' || app.store !== currentStore) return;
+            // Filter approved apps in current store during this month
+            const monthStart = new Date(year, month, 1);
+            const monthEnd = new Date(year, month + 1, 0);
 
+            const thisMonthApps = localApplications.filter(app => {
+                if (app.store !== currentStore || app.status !== 'approved') return false;
+                const start = new Date(app.startDate);
+                const end = new Date(app.endDate);
+                return (start <= monthEnd && end >= monthStart);
+            });
+
+            // Calculate revenue and count
+            let totalRevenue = 0;
+            let occupiedDaysSum = 0;
+
+            const spacesCount = SPACES_DATA[currentStore].length;
+            const daysInMonth = monthEnd.getDate();
+            const totalSpaceDaysPossible = spacesCount * daysInMonth;
+
+            thisMonthApps.forEach(app => {
+                const space = SPACES_DATA[app.store].find(s => s.id === app.spaceId);
+                if (!space) return;
+
+                // Overlap interval days within the current month
                 const start = new Date(app.startDate);
                 const end = new Date(app.endDate);
                 
-                // Calculate days falling in the viewing month
-                let current = new Date(start);
-                let daysInMonth = 0;
+                const overlapStart = new Date(Math.max(start, monthStart));
+                const overlapEnd = new Date(Math.min(end, monthEnd));
+                const overlapDays = Math.ceil((overlapEnd - overlapStart) / (1000 * 3600 * 24)) + 1;
+
+                occupiedDaysSum += overlapDays;
+
+                // App total days
+                const totalAppDays = Math.ceil((end - start) / (1000 * 3600 * 24)) + 1;
+
+                let appSubtotal = 0;
                 let specialDays = 0;
 
-                while (current <= end) {
-                    if (current.getFullYear() === year && (current.getMonth() + 1) === month) {
-                        daysInMonth++;
-                        if (SPECIAL_MONTHS.includes(current.getMonth() + 1)) {
-                            specialDays++;
-                        }
+                // Scan overlap days to count special period days
+                let scan = new Date(overlapStart);
+                for (let d = 0; d < overlapDays; d++) {
+                    const m = scan.getMonth() + 1;
+                    if (SPECIAL_MONTHS.includes(m)) {
+                        specialDays++;
                     }
-                    current.setDate(current.getDate() + 1);
+                    scan.setDate(scan.getDate() + 1);
                 }
 
-                if (daysInMonth > 0) {
-                    totalBookedDays += daysInMonth;
-                    brands.add(app.brand);
-
-                    // Estimate revenue contribution for this month
-                    const totalLeaseDays = Math.ceil((end - start) / (1000 * 3600 * 24)) + 1;
-                    const space = SPACES_DATA[app.store].find(s => s.id === app.spaceId);
-                    
-                    if (space) {
-                        let basePrice = app.plan === 'fixed'
-                            ? (Math.floor(totalLeaseDays/7) * space.rent_week + (totalLeaseDays%7) * (space.rent_week/7))
-                            : (totalLeaseDays * (space.basic_comm_month/30));
-                        
-                        // Surcharge portion
-                        let specialCount = 0;
-                        let curr = new Date(start);
-                        while (curr <= end) {
-                            if (SPECIAL_MONTHS.includes(curr.getMonth() + 1)) specialCount++;
-                            curr.setDate(curr.getDate() + 1);
-                        }
-                        const surcharge = basePrice * (specialCount / totalLeaseDays) * 0.2;
-                        const subtotal = basePrice + surcharge;
-                        
-                        // Prorate revenue specifically for the days in the viewing month
-                        const proportion = daysInMonth / totalLeaseDays;
-                        estimatedRevenue += (subtotal * proportion * 1.05); // Include 5% tax
-                    }
+                if (app.plan === 'fixed') {
+                    // weekly base
+                    const rate = space.rent_week / 7;
+                    appSubtotal = (overlapDays * rate) + (specialDays * rate * 0.2);
+                } else {
+                    // monthly base
+                    const rate = space.basic_comm_month / 30;
+                    appSubtotal = (overlapDays * rate) + (specialDays * rate * 0.2);
                 }
+                
+                totalRevenue += appSubtotal;
             });
 
-            document.getElementById('metricDays').textContent = totalBookedDays;
-            document.getElementById('metricBrands').textContent = brands.size;
-            document.getElementById('metricRevenue').textContent = estimatedRevenue >= 1000 
-                ? `$${Math.round(estimatedRevenue/1000)}k` 
-                : `$${Math.round(estimatedRevenue)}`;
+            // Update DOM metrics
+            document.getElementById('metricCount').textContent = thisMonthApps.length;
+            document.getElementById('metricRevenue').textContent = `${(totalRevenue / 1000).toFixed(1)}K`;
+
+            const percentage = totalSpaceDaysPossible > 0 
+                ? Math.round((occupiedDaysSum / totalSpaceDaysPossible) * 100) 
+                : 0;
+            document.getElementById('metricOccupancy').textContent = `${percentage}%`;
         }
 
         // ----------------------------------------------------
-        // 8. UTILITIES
-        // ----------------------------------------------------
-        function localDateStr(d) {
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${y}-${m}-${day}`;
-        }
-
-        function translateStatus(s) {
-            if (s === 'pending') return '待審核';
-            if (s === 'approved') return '已核准';
-            if (s === 'rejected') return '已駁回';
-            return s;
-        }
-
-        function showToast(msg, type = "info") {
-            // Check if container exists, else create it
-            let container = document.querySelector('.toast-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.className = 'toast-container';
-                document.body.appendChild(container);
-            }
-
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = msg;
-
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-10px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // ----------------------------------------------------
-        // 9. MOCK DATA SETUP
+        // 10. MOCK DATA GENERATION
         // ----------------------------------------------------
         function importMockData(showToastAlert = true) {
             const mock = [
@@ -1988,7 +1917,7 @@
                     id: 'mock_3',
                     brand: '北歐生活香氛蠟燭',
                     store: '信義店',
-                    spaceId: 3, // 5F 右側提案展台
+                    spaceId: 3, // 5F 提案主題花車2號
                     startDate: '2026-06-02',
                     endDate: '2026-06-12',
                     plan: 'fixed',
@@ -1999,7 +1928,7 @@
                     id: 'mock_4',
                     brand: '台南在地小農果乾',
                     store: '信義店',
-                    spaceId: 1, // 5F 左側提案展台
+                    spaceId: 1, // 5F 提案主題花車1號
                     startDate: '2026-06-15',
                     endDate: '2026-06-28',
                     plan: 'commission',
@@ -2008,18 +1937,94 @@
                 }
             ];
 
-            localApplications = mock;
-            saveLocalBackup();
-            refreshAllUI();
-            if (showToastAlert) showToast("已成功導入模擬主題平台預約資料！", "success");
+            if (isFirebaseConnected) {
+                // Batch write to Firestore
+                const batch = db.batch();
+                mock.forEach(item => {
+                    const newRef = db.collection('popup_applications').doc();
+                    batch.set(newRef, item);
+                });
+                batch.commit()
+                    .then(() => {
+                        if (showToastAlert) showToast("已成功載入模擬資料並同步雲端！", "success");
+                    })
+                    .catch(err => {
+                        console.error("Firestore batch commit failed:", err);
+                        showToast("雲端資料載入失敗", "error");
+                    });
+            } else {
+                localApplications = mock;
+                saveLocalBackup();
+                refreshAllUI();
+                if (showToastAlert) showToast("已成功導入本機模擬排程資料！", "success");
+            }
         }
 
         function clearAllData() {
-            if (!confirm("確定要清除所有主題平台預約資料嗎？這將清空您的本機暫存快取。")) return;
-            localApplications = [];
-            saveLocalBackup();
-            refreshAllUI();
-            showToast("已清空所有本機資料", "info");
+            if (!confirm("確定要清空所有的申請與預約資料嗎？這將清空您的本機快取與資料庫。")) return;
+
+            if (isFirebaseConnected) {
+                db.collection('popup_applications').get().then(snapshot => {
+                    const batch = db.batch();
+                    snapshot.forEach(doc => batch.delete(doc.ref));
+                    return batch.commit();
+                }).then(() => {
+                    showToast("已成功清空雲端資料庫！", "info");
+                }).catch(err => {
+                    console.error("Firestore delete all failed:", err);
+                    showToast("雲端清空失敗", "error");
+                });
+            } else {
+                localApplications = [];
+                saveLocalBackup();
+                refreshAllUI();
+                showToast("已清空本機暫存資料", "info");
+            }
+        }
+
+        // ----------------------------------------------------
+        // 11. GENERAL HELPERS
+        // ----------------------------------------------------
+        function getBookingsForDate(dateStr, store) {
+            return localApplications.filter(app => {
+                return app.store === store && 
+                       app.status !== 'rejected' &&
+                       dateStr >= app.startDate && 
+                       dateStr <= app.endDate;
+            });
+        }
+
+        function localDateStr(date) {
+            const y = date.getFullYear();
+            const m = (date.getMonth() + 1).toString().padStart(2, '0');
+            const d = date.getDate().toString().padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+
+            let icon = 'ℹ️';
+            if (type === 'success') {
+                icon = '✅';
+                toast.style.background = 'var(--tertiary)';
+            } else if (type === 'error') {
+                icon = '❌';
+                toast.style.background = 'var(--error)';
+            } else if (type === 'warning') {
+                icon = '⚠️';
+                toast.style.background = 'var(--warning)';
+            } else {
+                toast.style.background = 'var(--inverse-surface)';
+            }
+
+            toast.innerHTML = `<span style="margin-right:6px;">${icon}</span>${message}`;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
     </script>
 </body>
